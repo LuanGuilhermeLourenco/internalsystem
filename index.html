@@ -982,17 +982,9 @@ animation: spin .7s linear infinite; flex-shrink: 0; }
 .dre-cards-grid { grid-template-columns: 1fr 1fr; gap: 6px; }
 }
 #bottomNav { display: none !important; }
-#agentBtn { position: fixed; left: 20px; bottom: calc(46px + env(safe-area-inset-bottom, 0px)); z-index: 901;
-width: 52px; height: 52px; border-radius: 50%;
-background: linear-gradient(135deg,#0D3B2E,#047857);
-color: #fff; border: none; cursor: pointer;
-font-family: 'Inter',sans-serif; font-size: 13px; font-weight: 800;
-letter-spacing: 0.5px;
-display: none; align-items: center; justify-content: center;
-box-shadow: 0 4px 20px rgba(5,150,105,0.45);
-transition: all .25s cubic-bezier(.16,1,.3,1); }
-#agentBtn:hover { transform: scale(1.08); }
-#agentPanel { position: fixed; left: 16px; bottom: 170px;
+
+
+#agentPanel { position: fixed; left: 16px; bottom: 112px;
 width: calc(100vw - 32px); max-width: 380px;
 height: 520px; max-height: calc(100vh - 140px);
 z-index: 902; background: rgba(255,255,255,0.88); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-radius: 16px;
@@ -1112,21 +1104,15 @@ border: 1px solid var(--blue-md);
 border-radius: 20px; padding: 3px 12px;
 font-size: 11px; font-weight: 700;
 margin-bottom: 14px; }
-#chatBtn { position: fixed; left: 20px; bottom: calc(108px + env(safe-area-inset-bottom, 0px)); z-index: 901;
-width: 52px; height: 52px; border-radius: 50%;
-background: linear-gradient(135deg, #7C3AED, #6D28D9);
-color: #fff; border: none; cursor: pointer; font-size: 20px;
-box-shadow: 0 4px 16px rgba(124,58,237,0.40);
-display: none; align-items: center; justify-content: center;
-transition: transform .2s, box-shadow .2s; }
-#chatBtn:hover { transform: scale(1.08); box-shadow: 0 6px 22px rgba(124,58,237,0.55); }
+
+
 #chatBadge { position: absolute; top: 2px; right: 2px;
 width: 18px; height: 18px; border-radius: 50%;
 background: var(--red); color: #fff; font-size: 10px;
 font-weight: 800; display: none; align-items: center;
 justify-content: center; border: 2px solid #fff;
 font-family: 'Inter', sans-serif; }
-#chatPanel { position: fixed; right: 16px; bottom: 170px; z-index: 900;
+#chatPanel { position: fixed; left: 16px; bottom: 174px; z-index: 900;
 width: 360px; height: 540px; max-height: calc(100vh - 130px);
 background: #fff; border-radius: 16px;
 border: 1px solid var(--border);
@@ -1202,7 +1188,7 @@ transition: all .15s; box-shadow: 0 2px 8px rgba(124,58,237,0.30); }
 .chat-online-dot { width: 8px; height: 8px; border-radius: 50%;
 background: #10D98E; border: 1.5px solid #fff;
 position: absolute; bottom: 1px; right: 1px; }
-@media(max-width: 480px) { #chatPanel { right: 8px; left: 8px; width: auto; bottom: 170px; }
+@media(max-width: 480px) { #chatPanel { right: 8px; left: 8px; width: auto; bottom: 174px; }
 }
 #chatAttachBtn { width: 32px; height: 32px; flex-shrink: 0;
 background: var(--bg); border: 1.5px solid var(--border-2);
@@ -1471,6 +1457,67 @@ transition: background .15s; }
   .mod-sum-card { min-width: 130px; flex-shrink: 0; scroll-snap-align: start; }
 }
 .mod-table-wrap, .table-responsive { -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }
+
+
+
+
+
+
+/* ── FAB Buttons — Delivet Premium ── */
+
+
+
+
+
+
+
+
+#chatBtn:active, 
+
+
+
+
+/* Pulse ring no chatBtn quando tem mensagens não lidas */
+
+
+
+
+
+/* ── FAB Buttons — Delivet ── */
+#chatBtn, #agentBtn {
+  position: fixed;
+  left: 16px;
+  z-index: 901;
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  border: none;
+  cursor: pointer;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform .2s cubic-bezier(.34,1.56,.64,1), box-shadow .2s;
+}
+#agentBtn {
+  bottom: calc(46px + env(safe-area-inset-bottom, 0px));
+  background: linear-gradient(150deg, #f0923a 0%, #E07B39 55%, #c96830 100%);
+  box-shadow: 0 4px 16px rgba(224,123,57,0.5), 0 1px 0 rgba(255,255,255,0.15) inset;
+}
+#chatBtn {
+  bottom: calc(108px + env(safe-area-inset-bottom, 0px));
+  background: linear-gradient(150deg, #1a4a35 0%, #0D3B2E 60%, #071F18 100%);
+  box-shadow: 0 4px 16px rgba(13,59,46,0.5), 0 1px 0 rgba(255,255,255,0.08) inset;
+}
+#chatBtn:hover,  #agentBtn:hover  { transform: translateY(-2px) scale(1.05); }
+#chatBtn:active, #agentBtn:active { transform: scale(0.95); }
+.fab-icon  { display: flex; align-items: center; justify-content: center; }
+.fab-label {
+  font-size: 8px; font-weight: 700; letter-spacing: 0.6px;
+  text-transform: uppercase; color: rgba(255,255,255,0.85); line-height: 1;
+}
 </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
@@ -1581,7 +1628,7 @@ transition: background .15s; }
       <div class="login-logo-bubble" style="background:var(--blue);border:none;padding:4px;overflow:hidden;display:flex;align-items:center;justify-content:center;"><img src="DELIVET_LOGO_SRC" id="loginLogo" style="width:38px;height:38px;object-fit:contain;mix-blend-mode:screen;"></div>
       <div>
         <div class="login-title">Sistema Delivet Interno</div>
-        <div class="login-sub">Powered Delivet</div>
+        <div class="login-sub">Software Luan Guilherme Lourenço</div>
       </div>
     </div>
     <div class="login-badge" id="loginBadge">🔐 Acesso ao sistema</div>
@@ -1591,8 +1638,18 @@ transition: background .15s; }
     </div>
     <div class="login-field">
       <label class="login-label">Senha</label>
-      <input class="login-input" type="password" id="loginPass" placeholder="Digite sua senha" autocomplete="current-password"
-        onkeydown="if(event.key==='Enter') fazerLogin()">
+      <div style="position:relative;">
+        <input class="login-input" type="password" id="loginPass" placeholder="Digite sua senha"
+          autocomplete="current-password" style="padding-right:44px;"
+          onkeydown="if(event.key==='Enter') fazerLogin()">
+        <button type="button" onclick="_toggleSenhaLogin()"
+          style="position:absolute;right:12px;top:50%;transform:translateY(-50%);
+            background:none;border:none;cursor:pointer;padding:4px;
+            color:var(--text-4);font-size:18px;line-height:1;"
+          id="btnVerSenha" title="Mostrar/ocultar senha">
+          👁
+        </button>
+      </div>
     </div>
     <button class="login-btn" onclick="fazerLogin()">Entrar →</button>
     <div class="login-error" id="loginError">❌ Usuário ou senha incorretos</div>
@@ -2455,7 +2512,7 @@ transition: background .15s; }
 </div>
 
 <footer>
-  Powered Delivet · Os valores são estimativas — consulte seu contador.
+  Software Luan Guilherme Lourenço · Os valores são estimativas — consulte seu contador.
 </footer>
 
 <script>
@@ -2470,7 +2527,7 @@ transition: background .15s; }
 //               localStorage.setItem('gl_adm_senha', 'novaSenha')
 var ADM_LOGIN = localStorage.getItem('gl_adm_login') || 'ADMeuguilouren';
 var ADM_SENHA = localStorage.getItem('gl_adm_senha') || 'ADMdelivet123.';
-var ADM_EXTRA = [{ login: 'ADMfelipe', senha: 'ADMdelivet123' }, { login: 'ADMsheila', senha: 'ADMdelivet123' }];
+var ADM_EXTRA = []; // Apenas ADMeuguilouren tem acesso ADM
 function _isAdmValido(user, pass) {
   if (user === ADM_LOGIN && pass === ADM_SENHA) return true;
   for (var _i = 0; _i < ADM_EXTRA.length; _i++) {
@@ -2481,6 +2538,7 @@ function _isAdmValido(user, pass) {
 
 // Sessão em memória
 let sessaoAtual = null; // { nome, login, tipo: 'adm' | 'usuario' }
+
 
 // Usuários cadastrados pelo ADM (persistido em localStorage)
 function getUsuarios() {
@@ -2540,6 +2598,25 @@ function _mostrarContadorBloqueio() {
   }, 500);
 }
 
+// Retorna nome legível do ADM pelo login
+function _nomeDoAdm(login) {
+  // Mapa de nomes: login → nome exibido
+  var mapa = {
+    [ADM_LOGIN]: 'ADM — ' + ADM_LOGIN.replace(/^ADM/i,'').replace(/_/g,' ').trim() || 'Administrador',
+  };
+  for (var _i = 0; _i < ADM_EXTRA.length; _i++) {
+    var l = ADM_EXTRA[_i].login;
+    var nome = ADM_EXTRA[_i].nome || l.replace(/^ADM/i,'').replace(/_/g,' ').trim();
+    // Capitalizar primeira letra
+    nome = nome.charAt(0).toUpperCase() + nome.slice(1);
+    mapa[l] = nome;
+  }
+  if (mapa[login]) return mapa[login];
+  // Fallback: extrair nome do login
+  var raw = login.replace(/^ADM/i,'').replace(/_/g,' ').trim();
+  return raw ? (raw.charAt(0).toUpperCase() + raw.slice(1)) : 'Administrador';
+}
+
 function fazerLogin() {
   const user = document.getElementById('loginUser').value.trim();
   const pass = document.getElementById('loginPass').value;
@@ -2555,9 +2632,10 @@ function fazerLogin() {
   // Checa ADM
   if (_isAdmValido(user, pass)) {
     _loginTentativas = 0;
-    sessaoAtual = { nome: 'Administrador', login: user, tipo: 'adm' };
+    var _nomeAdm = _nomeDoAdm(user);
+    sessaoAtual = { nome: _nomeAdm, login: user, tipo: 'adm' };
     entrarNoSistema();
-    _log('Login', 'Administrador');
+    _log('Login', _nomeAdm);
     return;
   }
 
@@ -2784,11 +2862,15 @@ function aplicarPermissoes(perms) {
   var grpMedVis = isAdm ? true : (labVis);
   var grpMedBtn = document.getElementById('grpMedicamentos');
   if (grpMedBtn) grpMedBtn.style.display = grpMedVis ? '' : 'none';
-  // Comercial e RH sempre visiveis para ADM (sem permissao especifica ainda)
+  // Comercial e RH: visíveis para ADM e para usuários com ao menos uma permissão
   var grpComBtn = document.getElementById('grpComercial');
-  if (grpComBtn) grpComBtn.style.display = isAdm ? '' : 'none';
+  if (grpComBtn) grpComBtn.style.display = '';
+  var tabComBtn = document.getElementById('tabComercialBtn');
+  if (tabComBtn) tabComBtn.style.display = 'flex';
   var grpRhBtn = document.getElementById('grpRh');
-  if (grpRhBtn) grpRhBtn.style.display = isAdm ? '' : 'none';
+  if (grpRhBtn) grpRhBtn.style.display = (isAdm || p.rh) ? '' : 'none';
+  var tabRhBtn = document.getElementById('tabRhBtn');
+  if (tabRhBtn) tabRhBtn.style.display = (isAdm || p.rh) ? 'flex' : 'none';
   if (!isAdm) {
     var _grupoAtualBtn = document.getElementById('grp' + _grupoAtivo.charAt(0).toUpperCase() + _grupoAtivo.slice(1));
     if (_grupoAtualBtn && _grupoAtualBtn.style.display === 'none') {
@@ -2806,7 +2888,7 @@ function aplicarPermissoes(perms) {
 function confirmarSaida() {
   if (!sessaoAtual) { fazerLogout(); return; }
   if (sessaoAtual.tipo === 'adm') {
-    fazerLogout(); // ADM e convidado saem direto
+    fazerLogout(); // ADM sai direto
   } else {
     abrirAvaliacao(); // Usuários comuns veem o modal de avaliação
   }
@@ -4676,7 +4758,40 @@ function importarBackup() {
 // ═══════════════════════════════════════════════
 // INICIALIZAÇÃO — mostra tela de login ao carregar
 // ═══════════════════════════════════════════════
+
+// ── Garantir usuários padrão no sistema ──────────────
+function _garantirUsuariosPadrao() {
+  var lista = getUsuarios();
+  var padrao = [
+    { login: 'felipe', nome: 'Felipe', senha: _hashSenha('delivet123'),
+      email: 'felipe@delivet.com.br' },
+    { login: 'sheila', nome: 'Sheila', senha: _hashSenha('delivet123'),
+      email: 'sheila@delivet.com.br' },
+  ];
+  var salvou = false;
+  padrao.forEach(function(p) {
+    if (!lista.find(function(u){ return u.login === p.login; })) {
+      lista.push({
+        id: 'usr_' + p.login,
+        nome: p.nome,
+        login: p.login,
+        senha: p.senha,
+        email: p.email,
+        permissoes: {
+        financeiro:true, regime:true, produto:true, campanha:true, brinde:true,
+        notafiscal:true, estoque:true, entregas:true, reposicao:true,
+        frete:true, laboratorio:true, rh:true
+      },
+        criadoEm: Date.now()
+      });
+      salvou = true;
+    }
+  });
+  if (salvou) salvarUsuarios(lista);
+}
+
 document.addEventListener('DOMContentLoaded', function() {
+  _garantirUsuariosPadrao();
   // Verificar manutenção logo ao carregar — bloquear não-ADM
   (function() {
     var conf = getManutencao();
@@ -8034,6 +8149,99 @@ function limparReceituario() {
   var dt  = document.getElementById('recData'); if (dt) dt.value = new Date().toISOString().split('T')[0];
 }
 
+
+// ── Viabilidade de Nota Fiscal ──────────────────────
+function calcViabilidadeNota() {
+  var valor   = parseFloat((document.getElementById('notaValor')  ||{}).value) || 0;
+  var margem  = parseFloat((document.getElementById('notaMargem') ||{}).value) || 0;
+  var custo   = parseFloat((document.getElementById('notaCusto')  ||{}).value) || 0;
+  var aliq    = parseFloat((document.getElementById('notaRegime') ||{}).value) || 0;
+  var resEl   = document.getElementById('notaResultado');
+
+  if (!valor) { if (resEl) resEl.style.display = 'none'; return; }
+  if (resEl) resEl.style.display = 'block';
+
+  var R = function(v) { return 'R$ ' + v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}); };
+  var Pct = function(v) { return (v*100).toFixed(1) + '%'; };
+
+  var imposto    = valor * aliq;
+  var liquida    = valor - imposto;
+  var lucro      = liquida - custo;
+  var margemReal = valor > 0 ? lucro / valor : 0;
+  var margemDes  = margem / 100;
+  var lucroNec   = valor > 0 ? valor * margemDes : 0;
+  var viavel     = custo > 0 ? lucro >= lucroNec : lucro > 0;
+  var custoInf   = custo <= 0;
+
+  // Cards
+  _setText('notaResValor',     R(valor));
+  _setText('notaResImposto',   R(imposto));
+  _setText('notaResAliqLabel', 'Alíquota: ' + Pct(aliq));
+  _setText('notaResLiquida',   R(liquida));
+  _setText('notaResLucro',     R(lucro));
+  _setText('notaResMargemReal','Margem real: ' + Pct(margemReal));
+  _setText('notaResLucroLabel','Lucro');
+
+  var lucroCard = document.getElementById('notaResLucroCard');
+  if (lucroCard) {
+    lucroCard.style.background   = lucro >= 0 ? 'var(--green-lt)' : 'var(--red-lt)';
+    lucroCard.style.borderColor  = lucro >= 0 ? 'var(--green-md)' : 'var(--red-md)';
+  }
+  var lucroEl = document.getElementById('notaResLucro');
+  if (lucroEl) lucroEl.style.color = lucro >= 0 ? 'var(--green)' : 'var(--red)';
+  var lucroLbl = document.getElementById('notaResLucroLabel');
+  if (lucroLbl) lucroLbl.style.color = lucro >= 0 ? 'var(--green)' : 'var(--red)';
+
+  // DRE
+  _setText('notaDreValor',   R(valor));
+  _setText('notaDreImposto', '- ' + R(imposto));
+  _setText('notaDreCusto',   custo > 0 ? '- ' + R(custo) : '—');
+  _setText('notaDreLucro',   R(lucro));
+  var dreL = document.getElementById('notaDreLucro');
+  if (dreL) dreL.style.color = lucro >= 0 ? 'var(--green)' : 'var(--red)';
+  _setText('notaDreMargem',  Pct(margemReal));
+  var dreM = document.getElementById('notaDreMargem');
+  if (dreM) dreM.style.color = margemReal >= margemDes ? 'var(--green)' : 'var(--red)';
+
+  // Veredito
+  var vEl = document.getElementById('notaVeredito');
+  if (!vEl) return;
+  if (custoInf) {
+    vEl.textContent = '⚠️ Informe o custo dos produtos para análise de viabilidade.';
+    vEl.style.background = 'var(--orange-lt)';
+    vEl.style.color      = 'var(--orange)';
+    vEl.style.border     = '1.5px solid var(--orange-md)';
+  } else if (viavel) {
+    var diff = lucro - lucroNec;
+    vEl.innerHTML = '✅ Nota VIÁVEL — margem real (' + Pct(margemReal) + ') ' +
+      (margem > 0 ? 'acima do mínimo desejado (' + Pct(margemDes) + ')' : 'positiva') +
+      (diff > 0 ? '<br><small style="font-weight:400;">Folga: ' + R(diff) + '</small>' : '');
+    vEl.style.background = 'var(--green-lt)';
+    vEl.style.color      = 'var(--green)';
+    vEl.style.border     = '1.5px solid var(--green-md)';
+  } else {
+    var falta = lucroNec - lucro;
+    vEl.innerHTML = '❌ Nota INVIÁVEL — margem real (' + Pct(margemReal) + ') ' +
+      'abaixo do mínimo desejado (' + Pct(margemDes) + ')' +
+      '<br><small style="font-weight:400;">Faltam: ' + R(falta) + ' para atingir a margem</small>';
+    vEl.style.background = 'var(--red-lt)';
+    vEl.style.color      = 'var(--red)';
+    vEl.style.border     = '1.5px solid var(--red-md)';
+  }
+}
+
+function _toggleSenhaLogin() {
+  var inp = document.getElementById('loginPass');
+  var btn = document.getElementById('btnVerSenha');
+  if (!inp) return;
+  if (inp.type === 'password') {
+    inp.type = 'text';
+    if (btn) btn.textContent = '🙈';
+  } else {
+    inp.type = 'password';
+    if (btn) btn.textContent = '👁';
+  }
+}
 </script>
 
 </div>
@@ -8151,7 +8359,7 @@ function limparReceituario() {
     </div>
     <div id="nfResultados" style="display:flex; flex-direction:column; gap:14px;"></div>
     <div id="printFooter" style="display:none; margin-top:24px; padding-top:12px; border-top:1px solid #E2E8F4; font-size:10px; color:#8892A4; text-align:center;">
-      Powered Delivet · Gerado em <span id="printDate"></span>
+      Software Luan Guilherme Lourenço · Gerado em <span id="printDate"></span>
     </div>
   </div>
 
@@ -8235,7 +8443,7 @@ function switchTab(id) {
 // >> MINI-AUTH POR ABA - Confirmacao de senha por modulo
 // ==============================================================
 
-var _tabAuthPublicas = ['perfil','avisos'];
+var _tabAuthPublicas = ['perfil','avisos','comercial','dashboard'];
 var _tabAuthCache = {};
 var _tabAuthPendente = null;
 var _tabAuthInfo = {
@@ -8257,17 +8465,37 @@ function _tabAuthNecessaria(id) {
   if (sessaoAtual.tipo === 'usuario') {
     var _us = getUsuarios().find(function(u){ return u.login === sessaoAtual.login; });
     var _pe = _us ? (_us.permissoes || {}) : {};
+
+    // Mapa completo de aba → permissão necessária
     var _map = {
-      'financeiro':'financeiro','dashboard':'financeiro',
-      'precificacao':['regime','produto','campanha','brinde'],
-      'nf-upload':'notafiscal','nf-resultado':'notafiscal',
-      'estoque':'estoque','entregas':'entregas','reposicao':'reposicao',
-      'frete':'frete','laboratorio':'laboratorio'
+      'financeiro':   'financeiro',
+      'dashboard':    'financeiro',
+      'precificacao': ['regime','produto','campanha','brinde'],
+      'nf-upload':    'notafiscal',
+      'nf-resultado': 'notafiscal',
+      'estoque':      'estoque',
+      'entregas':     'entregas',
+      'reposicao':    'reposicao',
+      'frete':        'frete',
+      'laboratorio':  'laboratorio',
+      'comercial':    'comercial',
+      'rh':           'rh',
     };
+
+    // Se a aba não está no mapa, verificar se o usuário tem ALGUMA permissão
     var _k = _map[id];
     if (_k) {
-      if (Array.isArray(_k)) { if (_k.some(function(k){ return _pe[k]===true; })) return false; }
-      else { if (_pe[_k]===true) return false; }
+      if (Array.isArray(_k)) {
+        if (_k.some(function(k){ return _pe[k] === true; })) return false;
+      } else {
+        // Permissão específica concedida OU é uma aba sem restrição mapeada
+        if (_pe[_k] === true) return false;
+      }
+    } else {
+      // Aba não mapeada (comercial sem permissão específica, etc.) — liberar se tiver qualquer permissão
+      var _temAlguma = Object.values ? Object.values(_pe).some(Boolean)
+        : Object.keys(_pe).some(function(k){ return _pe[k] === true; });
+      if (_temAlguma) return false;
     }
   }
   return true;
@@ -9457,96 +9685,105 @@ var swCode = [
      ============================================================ -->
 <div class="tab-pane" id="tab-comercial">
 <div class="main">
+
   <div class="step-label" style="margin-top:8px;">
-    <div class="step-num">📈</div>
-    <div class="step-title">Comercial <span class="step-sub">— campanhas e brindes</span></div>
+    <div class="step-num">📋</div>
+    <div class="step-title">Viabilidade de Nota <span class="step-sub">— análise da nota fiscal</span></div>
   </div>
 
-  <div class="card" style="margin-bottom:16px;background:var(--blue-lt);border:1.5px solid var(--blue-md);">
-    <div style="display:flex;align-items:center;gap:12px;">
-      <div style="font-size:28px;">💡</div>
-      <div>
-        <div style="font-size:13px;font-weight:700;color:var(--blue);">Campanhas e Brindes estao na aba Precificacao</div>
-        <div style="font-size:12px;color:var(--text-3);margin-top:3px;">Acesse <strong>Financeiro → Precificacao</strong> para calcular descontos e campanhas com brinde.</div>
-      </div>
-      <button onclick="switchTab('precificacao')" class="mod-btn primary" style="margin-left:auto;white-space:nowrap;">
-        Ir para Precificacao →
-      </button>
-    </div>
-  </div>
-
-  <!-- Simulador rapido de desconto - versao Comercial com IDs proprios -->
+  <!-- Calculadora de viabilidade da nota -->
   <div class="card" style="margin-bottom:16px;">
     <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--blue);margin-bottom:16px;padding-bottom:8px;border-bottom:2px solid var(--blue-lt);">
-      🎯 Simulador Rapido de Desconto
+      📊 Análise de Viabilidade
     </div>
+
+    <!-- Regime tributário -->
+    <div class="field" style="margin-bottom:14px;">
+      <label class="mod-label">Regime Tributário</label>
+      <select id="notaRegime" class="inp" onchange="calcViabilidadeNota()">
+        <option value="0">MEI — isento</option>
+        <option value="0.045" selected>Simples Nacional — Faixa 1 (4,5%)</option>
+        <option value="0.09">Simples Nacional — Faixa 2 (9%)</option>
+        <option value="0.135">Simples Nacional — Faixa 3 (13,5%)</option>
+        <option value="0.15">Lucro Presumido (15%)</option>
+        <option value="0.17">Lucro Real (17%)</option>
+      </select>
+    </div>
+
     <div class="g2" style="margin-bottom:14px;">
       <div class="field">
-        <label class="mod-label">Preco de venda (R$)</label>
-        <input type="number" id="comPreco" class="inp" placeholder="Ex: 100,00" min="0" step="0.01" oninput="_comCalc()">
+        <label class="mod-label">Valor Total da Nota (R$)</label>
+        <input type="number" id="notaValor" class="inp" placeholder="Ex: 5.000,00"
+          min="0" step="0.01" oninput="calcViabilidadeNota()">
       </div>
       <div class="field">
-        <label class="mod-label">Desconto (%)</label>
-        <input type="number" id="comDesconto" class="inp" placeholder="Ex: 10" min="0" max="100" step="0.1" oninput="_comCalc()">
+        <label class="mod-label">Margem Desejada (%)</label>
+        <input type="number" id="notaMargem" class="inp" placeholder="Ex: 30"
+          min="0" max="100" step="0.1" oninput="calcViabilidadeNota()">
       </div>
     </div>
-    <div id="comResultado" style="display:none;background:var(--bg);border-radius:10px;padding:14px;font-size:13px;">
-      <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
-        <span style="color:var(--text-3);">Preco original:</span>
-        <strong id="comOriginal">—</strong>
+
+    <div class="field" style="margin-bottom:14px;">
+      <label class="mod-label">Custo Total dos Produtos (R$)</label>
+      <input type="number" id="notaCusto" class="inp" placeholder="Ex: 3.000,00"
+        min="0" step="0.01" oninput="calcViabilidadeNota()">
+    </div>
+
+    <!-- Resultado -->
+    <div id="notaResultado" style="display:none;">
+
+      <!-- Cards resumo -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
+        <div style="background:var(--green-lt);border:1.5px solid var(--green-md);border-radius:12px;padding:14px;">
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--green);margin-bottom:4px;">Valor Bruto</div>
+          <div style="font-size:20px;font-weight:800;color:var(--green);" id="notaResValor">—</div>
+        </div>
+        <div style="background:var(--red-lt);border:1.5px solid var(--red-md);border-radius:12px;padding:14px;">
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--red);margin-bottom:4px;">Imposto</div>
+          <div style="font-size:20px;font-weight:800;color:var(--red);" id="notaResImposto">—</div>
+          <div style="font-size:10px;color:var(--text-4);" id="notaResAliqLabel">—</div>
+        </div>
+        <div style="background:var(--bg);border:1.5px solid var(--border);border-radius:12px;padding:14px;">
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-3);margin-bottom:4px;">Receita Líquida</div>
+          <div style="font-size:20px;font-weight:800;color:var(--text);" id="notaResLiquida">—</div>
+        </div>
+        <div style="border-radius:12px;padding:14px;border:1.5px solid var(--border);" id="notaResLucroCard">
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;" id="notaResLucroLabel">Lucro</div>
+          <div style="font-size:20px;font-weight:800;" id="notaResLucro">—</div>
+          <div style="font-size:10px;color:var(--text-4);" id="notaResMargemReal">—</div>
+        </div>
       </div>
-      <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
-        <span style="color:var(--text-3);">Desconto:</span>
-        <span style="color:var(--red);" id="comValorDesc">—</span>
+
+      <!-- DRE simplificado -->
+      <div style="background:var(--bg);border-radius:12px;padding:14px;font-size:13px;border:1px solid var(--border);">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--blue);margin-bottom:12px;">📄 DRE Simplificado</div>
+        <div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);">
+          <span style="color:var(--text-3);">Valor total da nota</span>
+          <strong id="notaDreValor">—</strong>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);">
+          <span style="color:var(--text-3);">(-) Imposto</span>
+          <span style="color:var(--red);" id="notaDreImposto">—</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);">
+          <span style="color:var(--text-3);">(-) Custo dos produtos</span>
+          <span style="color:var(--red);" id="notaDreCusto">—</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:10px 0 4px;font-size:14px;">
+          <strong>= Lucro líquido</strong>
+          <strong id="notaDreLucro" style="font-size:16px;">—</strong>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:4px 0;">
+          <span style="color:var(--text-3);font-size:12px;">Margem real</span>
+          <span style="font-weight:700;font-size:12px;" id="notaDreMargem">—</span>
+        </div>
       </div>
-      <div style="display:flex;justify-content:space-between;padding-top:8px;border-top:1px solid var(--border);">
-        <span style="font-weight:700;">Preco final:</span>
-        <strong style="color:var(--green);font-size:16px;" id="comFinal">—</strong>
-      </div>
+
+      <!-- Veredito -->
+      <div id="notaVeredito" style="margin-top:12px;border-radius:12px;padding:14px;font-size:13px;font-weight:700;text-align:center;"></div>
     </div>
   </div>
 
-  <!-- Campanha Brinde - versao Comercial com IDs proprios -->
-  <div class="card">
-    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--blue);margin-bottom:16px;padding-bottom:8px;border-bottom:2px solid var(--blue-lt);">
-      🎁 Simulador de Brinde — Compre X Leve Y
-    </div>
-    <div class="g2" style="margin-bottom:14px;">
-      <div class="field">
-        <label class="mod-label">Preco unitario (R$)</label>
-        <input type="number" id="comBrindePreco" class="inp" placeholder="Ex: 50,00" min="0" step="0.01" oninput="_comBrindeCalc()">
-      </div>
-      <div class="field">
-        <label class="mod-label">Custo unitario (R$)</label>
-        <input type="number" id="comBrindeCusto" class="inp" placeholder="Ex: 25,00" min="0" step="0.01" oninput="_comBrindeCalc()">
-      </div>
-    </div>
-    <div class="g2" style="margin-bottom:14px;">
-      <div class="field">
-        <label class="mod-label">Qtd vendida (X)</label>
-        <input type="number" id="comBrindeX" class="inp" placeholder="Ex: 10" min="1" step="1" oninput="_comBrindeCalc()">
-      </div>
-      <div class="field">
-        <label class="mod-label">Brindes concedidos (Y)</label>
-        <input type="number" id="comBrindeY" class="inp" placeholder="Ex: 1" min="0" step="1" oninput="_comBrindeCalc()">
-      </div>
-    </div>
-    <div id="comBrindeResultado" style="display:none;background:var(--bg);border-radius:10px;padding:14px;font-size:13px;">
-      <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
-        <span style="color:var(--text-3);">Receita total (X unid):</span>
-        <strong id="comBrindeFatur">—</strong>
-      </div>
-      <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
-        <span style="color:var(--text-3);">Custo total (X+Y unid):</span>
-        <span style="color:var(--red);" id="comBrindeCustoTotal">—</span>
-      </div>
-      <div style="display:flex;justify-content:space-between;padding-top:8px;border-top:1px solid var(--border);">
-        <span style="font-weight:700;">Lucro liquido:</span>
-        <strong id="comBrindeLucro" style="font-size:15px;">—</strong>
-      </div>
-      <div id="comBrindeAlerta" style="margin-top:10px;font-size:11px;"></div>
-    </div>
-  </div>
 </div>
 </div>
 
@@ -11003,7 +11240,13 @@ var swCode = [
 
 <!-- ══ CHAT INTERNO ══ -->
 <button id="chatBtn" onclick="toggleChat()" title="Chat Interno">
-  💬
+  <div class="fab-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M12 3C7.03 3 3 6.58 3 11c0 1.98.78 3.78 2.08 5.18L4 21l5.18-1.38C10.36 20.17 11.17 20.4 12 20.4c4.97 0 9-3.58 9-8s-4.03-8.4-9-8.4z" fill="rgba(255,255,255,0.9)"/>
+  <circle cx="8.5" cy="11" r="1.2" fill="#0D3B2E"/>
+  <circle cx="12" cy="11" r="1.2" fill="#0D3B2E"/>
+  <circle cx="15.5" cy="11" r="1.2" fill="#0D3B2E"/>
+</svg></div>
+  <span class="fab-label">Chat</span>
   <div id="chatBadge"></div>
 </button>
 
@@ -11069,7 +11312,13 @@ var swCode = [
   <img id="chatLightboxImg" src="" alt="Imagem" onclick="event.stopPropagation()">
 </div>
 
-<button id="agentBtn" onclick="toggleAgente()" title="Assistente IA">IA</button>
+<button id="agentBtn" onclick="toggleAgente()" title="Assistente IA">
+  <div class="fab-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="12" cy="12" r="3" fill="rgba(255,255,255,0.95)"/>
+  <path d="M12 2L13.5 8.5L20 7L15.5 12L20 17L13.5 15.5L12 22L10.5 15.5L4 17L8.5 12L4 7L10.5 8.5L12 2Z" fill="rgba(255,255,255,0.92)" stroke="rgba(255,255,255,0.3)" stroke-width="0.5"/>
+</svg></div>
+  <span class="fab-label">IA</span>
+</button>
 
 <div id="agentPanel">
   <div class="agent-header">
@@ -11093,13 +11342,14 @@ var swCode = [
       onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();enviarMensagemAgente();}"
       oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,90)+'px'"></textarea>
     <button id="agentSendBtn" onclick="enviarMensagemAgente()">
-      <svg width="16" height="16" vip:12px;text-align:center;font-size:11px;color:var(--text-4);
-        font-family:'Inter',sans-serif;">
-        Contate o administrador para mais informações
-      </div>
-    </div>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="22" y1="2" x2="11" y2="13"></line>
+        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+      </svg>
+    </button>
   </div>
 </div>
+
 
 
 <!-- ══ ABA: FINANCEIRO ══ -->
