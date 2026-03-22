@@ -1732,6 +1732,72 @@ transition: background .15s; }
 /* ── Scrollbar dark ── */
 [data-tema="dark"] ::-webkit-scrollbar-track { background: var(--bg2); }
 [data-tema="dark"] ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 4px; }
+/* ── Correções completas dark mode ── */
+
+/* Cards de resumo (estoque, entregas, etc) */
+[data-tema="dark"] .mod-sum-card {
+  background: var(--white) !important;
+  border-color: var(--border) !important;
+}
+[data-tema="dark"] .mod-sum-label { color: var(--text-3) !important; }
+[data-tema="dark"] .mod-sum-val   { color: var(--text) !important; }
+[data-tema="dark"] .mod-sum-sub   { color: var(--text-4) !important; }
+
+/* Métricas coloridas */
+[data-tema="dark"] .metrica-card.destaque { background: var(--blue-lt) !important; }
+[data-tema="dark"] .metrica-card.verde    { background: var(--green-lt) !important; }
+[data-tema="dark"] .metrica-card.vermelho { background: var(--red-lt) !important; }
+[data-tema="dark"] .metrica-card.laranja  { background: var(--orange-lt) !important; }
+
+/* Período pill */
+[data-tema="dark"] .periodo-pill.active {
+  background: var(--white) !important;
+  color: var(--text) !important;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.4) !important;
+}
+
+/* Agente IA */
+[data-tema="dark"] .agent-input-row { background: var(--bg2) !important; border-top-color: var(--border) !important; }
+[data-tema="dark"] #agentInput      { background: #162018 !important; color: var(--text) !important; border-color: var(--border-2) !important; }
+
+/* Chat */
+[data-tema="dark"] .chat-canais    { background: var(--bg2) !important; border-right-color: var(--border) !important; }
+[data-tema="dark"] .chat-input-row { background: var(--bg2) !important; border-top-color: var(--border) !important; }
+
+/* Recovery / modal de recuperação */
+[data-tema="dark"] .recovery-box {
+  background: var(--white) !important;
+  border-color: var(--border) !important;
+}
+
+/* Avaliação */
+[data-tema="dark"] .aval-box {
+  background: var(--white) !important;
+  border-color: var(--border) !important;
+}
+
+/* Bottom nav */
+[data-tema="dark"] #bottomNav {
+  background: rgba(14,26,18,0.96) !important;
+  border-top-color: var(--border) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* FAB buttons */
+[data-tema="dark"] .fab-action-btn {
+  background: var(--white) !important;
+  color: var(--text) !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.4) !important;
+}
+
+/* Scrollbar webkit */
+[data-tema="dark"] ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.18) !important; }
+
+/* Perm toggle */
+[data-tema="dark"] .toggle-row  { background: rgba(255,255,255,0.08) !important; }
+[data-tema="dark"] .toggle-knob { background: #fff !important; }
+
 /* ── ADM sections ── */
 [data-tema="dark"] .adm-section {
   background: var(--white) !important;
