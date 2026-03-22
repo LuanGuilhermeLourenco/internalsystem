@@ -1521,25 +1521,153 @@ transition: background .15s; }
 
 /* ══ DARK MODE ══════════════════════════════════════ */
 [data-tema="dark"] {
-  --bg:       #0f1a14;
-  --bg2:      #1c2e1e;
-  --white:    #1e2e20;
-  --border:   rgba(255,255,255,0.10);
-  --border-2: rgba(255,255,255,0.15);
-  --text:     #eef4f0;
-  --text-2:   #c8dace;
-  --text-3:   #a8c4ae;
-  --text-4:   #6a8870;
-  --blue-lt:  rgba(37,99,235,0.18);
-  --blue-md:  rgba(37,99,235,0.35);
-  --green-lt: rgba(5,150,105,0.18);
-  --green-md: rgba(5,150,105,0.35);
-  --red-lt:   rgba(220,38,38,0.18);
-  --red-md:   rgba(220,38,38,0.35);
-  --orange-lt:rgba(224,123,57,0.18);
-  --orange-md:rgba(224,123,57,0.35);
+  --bg:         #0e1a12;
+  --bg2:        #162018;
+  --white:      #1c2a1e;
+  --border:     rgba(255,255,255,0.10);
+  --border-2:   rgba(255,255,255,0.16);
+  --text:       #eef4f0;
+  --text-2:     #c8dace;
+  --text-3:     #a8c4ae;
+  --text-4:     #6a8870;
+  --blue-lt:    rgba(37,99,235,0.18);
+  --blue-md:    rgba(37,99,235,0.35);
+  --green-lt:   rgba(5,150,105,0.18);
+  --green-md:   rgba(5,150,105,0.35);
+  --red-lt:     rgba(220,38,38,0.18);
+  --red-md:     rgba(220,38,38,0.35);
+  --orange-lt:  rgba(224,123,57,0.18);
+  --orange-md:  rgba(224,123,57,0.35);
+  --yellow-lt:  rgba(217,119,6,0.18);
+  --shadow-xs:  0 1px 4px rgba(0,0,0,0.4);
 }
+
+/* ── Base ── */
 [data-tema="dark"] body { background: var(--bg); color: var(--text); }
+
+/* ── Login ── */
+[data-tema="dark"] #loginScreen {
+  background: rgba(8,18,12,0.75);
+  backdrop-filter: blur(20px) saturate(1.4) brightness(0.6);
+  -webkit-backdrop-filter: blur(20px) saturate(1.4) brightness(0.6);
+}
+[data-tema="dark"] .login-box {
+  background: rgba(28,42,30,0.97);
+  border-color: rgba(255,255,255,0.12);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3), 0 8px 32px rgba(0,0,0,0.5);
+}
+[data-tema="dark"] .login-title { color: var(--text); }
+[data-tema="dark"] .login-sub   { color: var(--text-3); }
+[data-tema="dark"] .login-label { color: var(--text-3); }
+[data-tema="dark"] .login-badge { background: rgba(255,255,255,0.08); color: var(--text-2); border-color: var(--border); }
+
+/* ── Cards e Modais ── */
+[data-tema="dark"] .card { background: var(--white); border-color: var(--border); }
+[data-tema="dark"] .mod-card { background: var(--white); border-color: var(--border); }
+[data-tema="dark"] .mod-modal-bg .mod-modal,
+[data-tema="dark"] .mod-modal-bg .modal-body { background: var(--white); }
+[data-tema="dark"] .mod-label  { color: var(--text-3); }
+[data-tema="dark"] .step-label { background: rgba(255,255,255,0.04); }
+[data-tema="dark"] .destaque   { background: rgba(37,99,235,0.12); }
+[data-tema="dark"] .verde      { background: rgba(5,150,105,0.12); }
+[data-tema="dark"] .vermelho   { background: rgba(220,38,38,0.12); }
+[data-tema="dark"] .laranja    { background: rgba(217,119,6,0.12); }
+
+/* ── Inputs ── */
+[data-tema="dark"] .inp,
+[data-tema="dark"] .mod-input,
+[data-tema="dark"] .login-input,
+[data-tema="dark"] select.inp,
+[data-tema="dark"] textarea.inp { background: #162018; border-color: var(--border-2); color: var(--text); }
+[data-tema="dark"] .inp::placeholder,
+[data-tema="dark"] .login-input::placeholder,
+[data-tema="dark"] textarea.inp::placeholder { color: var(--text-4); }
+
+/* ── Botões ── */
+[data-tema="dark"] .mod-btn:not(.primary):not(.danger) {
+  background: #1c2a1e; border-color: var(--border-2); color: var(--text-2);
+}
+
+/* ── Navegação ── */
+[data-tema="dark"] #navWrapper { background: var(--bg2); border-color: var(--border); }
+[data-tema="dark"] .nav-subs-bar {
+  background: #1e2d20;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+[data-tema="dark"] .tabs-bar {
+  background: #1e2d20 !important;
+  border-bottom-color: rgba(255,255,255,0.08);
+  box-shadow: none;
+}
+[data-tema="dark"] .nav-sub { color: rgba(255,255,255,0.60); }
+[data-tema="dark"] .nav-sub:hover { color: rgba(255,255,255,0.88); background: rgba(255,255,255,0.06); }
+[data-tema="dark"] .nav-sub.ativo { color: #fff; border-color: #fff; font-weight: 700; }
+[data-tema="dark"] .tab-btn { color: rgba(255,255,255,0.60); }
+[data-tema="dark"] .tab-btn.active { color: #fff; border-bottom-color: #fff; }
+
+/* ── Tab pane ── */
+[data-tema="dark"] .tab-pane { background: var(--bg); }
+
+/* ── Precificação — cards de preço ── */
+[data-tema="dark"] #pcSemTaxa { background: rgba(124,58,237,0.15) !important; border-color: rgba(124,58,237,0.4) !important; }
+[data-tema="dark"] #pcCartao  { background: var(--blue-lt) !important; }
+[data-tema="dark"] #pcBoleto  { background: var(--green-lt) !important; }
+[data-tema="dark"] #pcPix     { background: var(--yellow-lt) !important; }
+[data-tema="dark"] .pc-method { opacity: 0.85; }
+[data-tema="dark"] .pc-price  { color: var(--text); }
+[data-tema="dark"] .pc-sub    { color: var(--text-3); }
+[data-tema="dark"] .price-card { background: var(--white) !important; }
+
+/* ── Alertas inline ── */
+[data-tema="dark"] .alert.green  { background: var(--green-lt); color: var(--text-2); border-color: var(--green-md); }
+[data-tema="dark"] .alert.blue   { background: var(--blue-lt);  color: var(--text-2); border-color: var(--blue-md);  }
+[data-tema="dark"] .alert.orange { background: var(--orange-lt);color: var(--text-2); border-color: var(--orange-md);}
+
+/* ── Tour ── */
+[data-tema="dark"] #tourCard    { background: var(--white); color: var(--text); }
+[data-tema="dark"] .tour-badge  { background: rgba(37,99,235,0.15); border-color: rgba(37,99,235,0.3); color: var(--text-2); }
+[data-tema="dark"] .tour-tip    { background: rgba(37,99,235,0.10); border-color: rgba(37,99,235,0.2); color: var(--text-2); }
+[data-tema="dark"] .tour-title  { color: var(--text); }
+
+/* ── Agente IA chips ── */
+[data-tema="dark"] .agent-chip  { background: rgba(5,150,105,0.15); border-color: rgba(5,150,105,0.3); color: var(--text-2); }
+[data-tema="dark"] .agent-chip:hover { background: rgba(5,150,105,0.25); }
+[data-tema="dark"] .agent-msg-bubble.bot { background: var(--white); color: var(--text-2); }
+[data-tema="dark"] .agent-msg-bubble.user { background: rgba(13,59,46,0.6); }
+
+/* ── Tabelas ── */
+[data-tema="dark"] tr:nth-child(even) { background: rgba(255,255,255,0.03); }
+[data-tema="dark"] td  { color: var(--text-2); }
+[data-tema="dark"] th  { color: var(--text-3); background: rgba(255,255,255,0.03); }
+
+/* ── Textos gerais ── */
+[data-tema="dark"] h1, [data-tema="dark"] h2, [data-tema="dark"] h3 { color: var(--text); }
+[data-tema="dark"] .step-title  { color: var(--text); }
+[data-tema="dark"] .step-sub    { color: var(--text-3); }
+[data-tema="dark"] .mod-title   { color: var(--text); }
+[data-tema="dark"] .mod-empty,
+[data-tema="dark"] .empty-state { color: var(--text-4); }
+
+/* ── Regime e seções da precificação ── */
+[data-tema="dark"] .regime-card       { background: var(--white); border-color: var(--border); color: var(--text-2); }
+[data-tema="dark"] .regime-card.selected { border-color: var(--blue-md); background: var(--blue-lt); }
+[data-tema="dark"] .dre-row           { border-bottom-color: var(--border); color: var(--text-2); }
+[data-tema="dark"] .simples-badge     { background: rgba(37,99,235,0.15); color: var(--text-2); }
+
+/* ── Chat ── */
+[data-tema="dark"] #chatPanel { background: var(--white); border-color: var(--border); }
+[data-tema="dark"] .chat-canal { color: var(--text-3); }
+[data-tema="dark"] .chat-canal.ativo { background: var(--bg2); color: var(--text); }
+[data-tema="dark"] .chat-msg.eu .chat-msg-bubble { background: rgba(13,59,46,0.7); color: var(--text); }
+[data-tema="dark"] .chat-msg .chat-msg-bubble { background: rgba(255,255,255,0.06); color: var(--text-2); }
+
+/* ── Ticker ── */
+[data-tema="dark"] .ticker-wrap { background: rgba(14,26,18,0.9); border-top-color: var(--border); }
+
+/* ── FABs ── */
+[data-tema="dark"] #agentPanel { background: rgba(28,42,30,0.96); }
+
 
 /* Cards e modais */
 [data-tema="dark"] .card,
