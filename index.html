@@ -1518,6 +1518,46 @@ transition: background .15s; }
   font-size: 8px; font-weight: 700; letter-spacing: 0.6px;
   text-transform: uppercase; color: rgba(255,255,255,0.85); line-height: 1;
 }
+
+/* ══ DARK MODE ══════════════════════════════════════ */
+[data-tema="dark"] {
+  --bg:       #0f1a14;
+  --bg2:      #162010;
+  --white:    #1a2a1e;
+  --border:   rgba(255,255,255,0.08);
+  --border-2: rgba(255,255,255,0.12);
+  --text:     #e8f0eb;
+  --text-2:   #c8dace;
+  --text-3:   #8aab90;
+  --text-4:   #556b5a;
+  --blue-lt:  rgba(37,99,235,0.15);
+  --blue-md:  rgba(37,99,235,0.3);
+  --green-lt: rgba(5,150,105,0.15);
+  --green-md: rgba(5,150,105,0.3);
+  --red-lt:   rgba(220,38,38,0.15);
+  --red-md:   rgba(220,38,38,0.3);
+  --orange-lt:rgba(224,123,57,0.15);
+  --orange-md:rgba(224,123,57,0.3);
+}
+[data-tema="dark"] body { background: var(--bg); color: var(--text); }
+[data-tema="dark"] .card,
+[data-tema="dark"] .mod-card { background: var(--white); border-color: var(--border); }
+[data-tema="dark"] .inp,
+[data-tema="dark"] .mod-input,
+[data-tema="dark"] .login-input { background: var(--bg2); border-color: var(--border-2); color: var(--text); }
+[data-tema="dark"] .inp::placeholder,
+[data-tema="dark"] .login-input::placeholder { color: var(--text-4); }
+[data-tema="dark"] .mod-btn:not(.primary):not(.danger) { background: var(--bg2); border-color: var(--border-2); color: var(--text-2); }
+[data-tema="dark"] .tab-pane { background: var(--bg); }
+[data-tema="dark"] #navWrapper,
+[data-tema="dark"] .nav-subs-bar { background: var(--bg2); border-color: var(--border); }
+[data-tema="dark"] .nav-sub { color: var(--text-3); }
+[data-tema="dark"] .nav-sub.ativo { color: var(--text); border-color: var(--text); }
+[data-tema="dark"] .mod-modal-bg .mod-modal,
+[data-tema="dark"] .mod-modal-bg .modal-body { background: var(--white); }
+[data-tema="dark"] .mod-label { color: var(--text-3); }
+[data-tema="dark"] tr:nth-child(even) { background: rgba(255,255,255,0.03); }
+[data-tema="dark"] .step-label { background: rgba(255,255,255,0.03); }
 </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
@@ -1741,6 +1781,7 @@ transition: background .15s; }
       <div class="user-pill-avatar" id="headerAvatar">?</div>
       <span class="user-pill-name" id="headerNome">—</span>
     </div>
+    <button id="btnToggleTema" onclick="toggleTema()" title="Alternar tema" style="background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.18);border-radius:10px;color:#fff;cursor:pointer;padding:6px 10px;font-size:16px;margin-right:6px;">🌙</button>
     <button id="btnSair" onclick="confirmarSaida()" title="Sair"
       style="background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.25);color:rgba(255,255,255,0.9);border-radius:8px;padding:7px 13px;cursor:pointer;font-family:'Inter',sans-serif;font-weight:600;font-size:11px;letter-spacing:0.3px;transition:all .2s;white-space:nowrap;display:flex;align-items:center;gap:5px;"
       onmouseover="this.style.background='rgba(220,38,38,0.55)';this.style.borderColor='rgba(252,165,165,0.5)'"
@@ -1912,6 +1953,8 @@ transition: background .15s; }
   <div class="card" style="margin-top:14px;">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
       <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--blue);">🕐 Últimas Precificações</div>
+      <input type="text" id="histPrecBusca" class="inp" placeholder="🔍 Buscar…"
+        style="max-width:130px;height:28px;font-size:11px;padding:0 8px;" oninput="filtrarHistPrecos()">
       <button onclick="limparHistoricoPrecos()" style="font-size:11px;color:var(--text-3);background:none;border:none;cursor:pointer;">Limpar</button>
     </div>
     <div id="dashHistPrecos">
@@ -2175,6 +2218,33 @@ transition: background .15s; }
   </div>
 
 
+  </div>
+
+
+  <!-- ── Cards extras dashboard ────────────────── -->
+  <div class="card" style="margin-bottom:16px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--blue);">💰 Faturamento do Mês</div>
+    </div>
+    <div style="font-size:26px;font-weight:800;color:var(--green);" id="dashFatMes">R$ 0,00</div>
+    <div style="font-size:12px;color:var(--text-3);margin-top:4px;" id="dashFatMesSub">0 pedidos entregues</div>
+  </div>
+
+  <div class="g2" style="gap:12px;margin-bottom:16px;">
+    <div class="card" style="padding:14px;">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--blue);margin-bottom:8px;">👥 Online agora</div>
+      <div style="font-size:32px;font-weight:800;color:var(--green);" id="dashOnline">0</div>
+      <div style="font-size:11px;color:var(--text-3);">usuário(s) ativo(s)</div>
+    </div>
+    <div class="card" style="padding:14px;">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--blue);margin-bottom:8px;">⚡ Última atividade</div>
+      <div style="font-size:12px;color:var(--text-2);line-height:1.5;" id="dashUltAtiv">—</div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:16px;">
+    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--blue);margin-bottom:12px;">🏆 Top Produtos em Pedidos</div>
+    <div id="dashTop3"><div style="color:var(--text-4);font-size:12px;text-align:center;padding:8px;">Nenhum pedido ainda.</div></div>
   </div>
 
 </div><!-- /tab-dashboard -->
@@ -4518,6 +4588,7 @@ function renderDashboard() {
   // Gráfico de entregas
   setTimeout(function(){ renderGraficoEntregas(_graficoPeriodo); }, 50);
   _initPeriodo();
+  setTimeout(renderDashboardExtras, 80);
 
   // ── Histórico de preços ──
   var hist = getHistoricoPrecos();
@@ -4791,6 +4862,7 @@ function _garantirUsuariosPadrao() {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
+  aplicarTema(localStorage.getItem('gl_tema')||'light');
   _garantirUsuariosPadrao();
   // Verificar manutenção logo ao carregar — bloquear não-ADM
   (function() {
@@ -6378,28 +6450,36 @@ function _log(acao, detalhe) {
   } catch(e) {}
 }
 
-function renderLogAtividades() {
+function renderLogAtividades(filtro) {
   var cont = document.getElementById('logAtivBody');
   if (!cont) return;
-  var logs = [];
-  try { logs = JSON.parse(localStorage.getItem('gl_log') || '[]'); } catch(e) {}
-  if (logs.length === 0) {
-    cont.innerHTML = '<div style="text-align:center;color:var(--text-4);font-size:13px;padding:20px 0;">Nenhuma atividade registrada.</div>';
-    return;
+  var logs = []; try { logs = JSON.parse(localStorage.getItem('gl_log')||'[]'); } catch(e){}
+  var busca = ((document.getElementById('logBusca')||{}).value||'').toLowerCase().trim();
+  if (busca) { logs = logs.filter(function(l){ return (l.acao||'').toLowerCase().includes(busca)||(l.detalhe||'').toLowerCase().includes(busca)||(l.nome||'').toLowerCase().includes(busca); }); }
+  var tipo = filtro || ((document.getElementById('logFiltroTipo')||{}).value||'todos');
+  if (tipo !== 'todos') {
+    logs = logs.filter(function(l){
+      var a = (l.acao||'').toLowerCase();
+      if (tipo==='login')     return a.includes('login');
+      if (tipo==='alteracao') return a.includes('edit')||a.includes('alter')||a.includes('salv')||a.includes('crио');
+      if (tipo==='exclusao')  return a.includes('exclu')||a.includes('delet')||a.includes('remov');
+      if (tipo==='export')    return a.includes('export');
+      return true;
+    });
   }
-  var fmt = function(ts) {
-    var d = new Date(ts);
-    return d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
-  };
-  cont.innerHTML = logs.slice(0,50).map(function(l) {
-    return '<div style="display:flex;gap:10px;padding:7px 0;border-bottom:1px solid var(--border);align-items:flex-start;">'
-      + '<div style="flex-shrink:0;width:120px;font-size:10px;color:var(--text-4);margin-top:2px;">' + fmt(l.ts) + '</div>'
-      + '<div style="flex-shrink:0;width:70px;font-size:11px;font-weight:700;color:var(--blue);">' + (l.login||'') + '</div>'
-      + '<div style="flex:1;font-size:12px;color:var(--text-2);">'
-        + '<span style="font-weight:700;">' + (l.acao||'') + '</span>'
-        + (l.detalhe ? ' <span style="color:var(--text-3);">— ' + l.detalhe + '</span>' : '')
-      + '</div>'
-    + '</div>';
+  var counter = document.getElementById('logCounter');
+  if (counter) counter.textContent = logs.length+' registro'+(logs.length!==1?'s':'');
+  if (!logs.length) { cont.innerHTML='<div style="text-align:center;color:var(--text-4);font-size:13px;padding:20px 0;">Nenhuma atividade encontrada.</div>'; return; }
+  var fmt = function(ts){ var d=new Date(ts); return d.toLocaleDateString('pt-BR')+' '+d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}); };
+  var icones = {'login':'🔐','logout':'🚪','edito':'✏️','crио':'➕','exclu':'🗑️','export':'📤','backup':'💾','import':'📥','ponto':'⏱️','senha':'🔑','permis':'🛡️','cadastr':'👤'};
+  var getIcone = function(a){ a=(a||'').toLowerCase(); for(var k in icones){if(a.includes(k))return icones[k];}return '📋'; };
+  cont.innerHTML = logs.slice(0,100).map(function(l){
+    return '<div style="display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);align-items:flex-start;">'
+      +'<div style="font-size:18px;flex-shrink:0;margin-top:2px;">'+getIcone(l.acao)+'</div>'
+      +'<div style="flex:1;min-width:0;">'
+        +'<div style="font-size:12px;font-weight:700;color:var(--text);">'+( l.acao||'')+(l.detalhe?' <span style="font-weight:400;color:var(--text-3);">— '+l.detalhe+'</span>':'')+'</div>'
+        +'<div style="font-size:10px;color:var(--text-4);margin-top:2px;"><span style="font-weight:600;color:var(--text-3);">'+(l.nome||l.login||'')+'</span> · '+fmt(l.ts)+'</div>'
+      +'</div></div>';
   }).join('');
 }
 
@@ -8242,6 +8322,119 @@ function _toggleSenhaLogin() {
     if (btn) btn.textContent = '👁';
   }
 }
+
+function exportarEstoqueCSV() {
+  var prods = getProdutos();
+  if (!prods.length) { alert('Nenhum produto para exportar.'); return; }
+  var linhas = ['# Estoque — Sistema Delivet Interno','# Gerado em: '+new Date().toLocaleString('pt-BR'),'',_csvLinha(['#','Nome','Categoria','Qtd','Mínimo','Custo (R$)','Unidade','Obs'])];
+  prods.forEach(function(p,i){ linhas.push(_csvLinha([i+1,p.nome||'',p.categoria||'',p.quantidade||p.qtd||0,p.minimo||p.min||0,parseFloat(p.custo||0).toFixed(2),p.unidade||'un',p.obs||''])); });
+  _baixarCSV('estoque_'+_dataHoje()+'.csv', linhas.join('\n'));
+  _log('Exportou estoque CSV', prods.length+' produtos');
+}
+function exportarLogCSV() {
+  var logs = []; try { logs = JSON.parse(localStorage.getItem('gl_log')||'[]'); } catch(e){}
+  if (!logs.length) { alert('Nenhuma atividade para exportar.'); return; }
+  var linhas = ['# Log de Atividades — Sistema Delivet Interno','# Gerado em: '+new Date().toLocaleString('pt-BR'),'',_csvLinha(['Data/Hora','Usuário','Login','Ação','Detalhe'])];
+  logs.forEach(function(l){ linhas.push(_csvLinha([new Date(l.ts).toLocaleString('pt-BR'),l.nome||'',l.login||'',l.acao||'',l.detalhe||''])); });
+  _baixarCSV('log_atividades_'+_dataHoje()+'.csv', linhas.join('\n'));
+}
+function exportarPontosCSV() {
+  var pontos = []; try { pontos = JSON.parse(localStorage.getItem('gl_pontos')||'[]'); } catch(e){}
+  if (!pontos.length) { alert('Nenhum registro de ponto para exportar.'); return; }
+  var tipoMap = {entrada:'Entrada',saida_almoco:'Saída Almoço',retorno_almoco:'Retorno Almoço',saida:'Saída'};
+  var linhas = ['# Registro de Pontos — Sistema Delivet Interno','# Gerado em: '+new Date().toLocaleString('pt-BR'),'',_csvLinha(['Data','Colaborador','Tipo','Horário','Observação'])];
+  pontos.forEach(function(p){ linhas.push(_csvLinha([(p.data||'').split('-').reverse().join('/'),p.colaborador||'',tipoMap[p.tipo]||p.tipo||'',p.horario||p.hora||'',p.obs||''])); });
+  _baixarCSV('pontos_'+_dataHoje()+'.csv', linhas.join('\n'));
+}
+function _baixarCSV(nome, conteudo) {
+  var bom = '\uFEFF';
+  var blob = new Blob([bom+conteudo],{type:'text/csv;charset=utf-8;'});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href=url; a.download=nome;
+  document.body.appendChild(a); a.click();
+  setTimeout(function(){ URL.revokeObjectURL(url); a.remove(); },500);
+}
+function _dataHoje() { return new Date().toISOString().split('T')[0]; }
+
+function renderDashboardExtras() {
+  var ents=[]; try{ents=JSON.parse(localStorage.getItem('gl_entregas')||'[]');}catch(e){}
+  var agora=new Date(), mes=agora.getMonth(), ano=agora.getFullYear();
+  var entMes=ents.filter(function(e){
+    if(e.status!=='entregue'||!e.data)return false;
+    var p=e.data.split('/');
+    if(p.length===3){var d=new Date(p[2],p[1]-1,p[0]);return d.getMonth()===mes&&d.getFullYear()===ano;}
+    return false;
+  });
+  var fatMes=entMes.reduce(function(s,e){return s+(parseFloat(e.valor)||0);},0);
+  var fatEl=document.getElementById('dashFatMes');
+  if(fatEl) fatEl.textContent='R$ '+fatMes.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+  var fatSub=document.getElementById('dashFatMesSub');
+  if(fatSub) fatSub.textContent=entMes.length+' pedido'+(entMes.length!==1?'s':'')+' entregue'+(entMes.length!==1?'s':'');
+  var prodCount={};
+  ents.forEach(function(e){if(e.descricao)prodCount[e.descricao]=(prodCount[e.descricao]||0)+1;});
+  var top3=Object.keys(prodCount).sort(function(a,b){return prodCount[b]-prodCount[a];}).slice(0,3);
+  var topEl=document.getElementById('dashTop3');
+  if(topEl){
+    if(!top3.length){topEl.innerHTML='<div style="color:var(--text-4);font-size:12px;text-align:center;padding:8px;">Nenhum pedido ainda.</div>';}
+    else{topEl.innerHTML=top3.map(function(nome,i){
+      var pct=Math.round((prodCount[nome]/ents.length)*100);
+      return '<div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--border);">'
+        +'<div style="font-size:16px;">'+['🥇','🥈','🥉'][i]+'</div>'
+        +'<div style="flex:1;min-width:0;"><div style="font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+nome+'</div>'
+        +'<div style="height:4px;background:var(--border);border-radius:2px;margin-top:4px;"><div style="height:4px;background:var(--blue);border-radius:2px;width:'+pct+'%;"></div></div></div>'
+        +'<div style="font-size:11px;font-weight:700;color:var(--blue);">'+prodCount[nome]+'x</div></div>';
+    }).join('');}
+  }
+  var presencas={}; try{presencas=JSON.parse(localStorage.getItem('gl_presencas')||'{}');}catch(e){}
+  var online=Object.values(presencas).filter(function(p){return Date.now()-p.ts<35000;});
+  var onlineEl=document.getElementById('dashOnline');
+  if(onlineEl){onlineEl.textContent=online.length;onlineEl.title=online.map(function(u){return u.nome;}).join(', ')||'Ninguém online';}
+  var logs=[]; try{logs=JSON.parse(localStorage.getItem('gl_log')||'[]');}catch(e){}
+  var ultEl=document.getElementById('dashUltAtiv');
+  if(ultEl&&logs.length){
+    var l=logs[0];
+    var diff=Math.floor((Date.now()-l.ts)/60000);
+    var tempo=diff<1?'agora':diff<60?diff+'min atrás':Math.floor(diff/60)+'h atrás';
+    ultEl.innerHTML='<strong>'+(l.nome||l.login)+'</strong> · '+l.acao+'<br><span style="font-size:10px;color:var(--text-4);">'+tempo+'</span>';
+  }
+}
+
+function filtrarHistPrecos() {
+  var busca=((document.getElementById('histPrecBusca')||{}).value||'').toLowerCase().trim();
+  var hist=getHistoricoPrecos();
+  if(busca) hist=hist.filter(function(h){return(h.produto||'').toLowerCase().includes(busca);});
+  var el=document.getElementById('dashHistPrecos');
+  if(!el)return;
+  if(!hist.length){el.innerHTML='<div style="color:var(--text-4);font-size:12px;text-align:center;padding:12px;">Nenhum resultado.</div>';return;}
+  el.innerHTML=hist.slice(0,15).map(function(h){
+    var margCor=parseFloat(h.margem||0)>=20?'var(--green)':parseFloat(h.margem||0)>=10?'var(--orange)':'var(--red)';
+    return '<div class="hist-preco-item">'
+      +'<div><div class="hist-preco-nome">'+(h.produto||'Produto')+'</div>'
+      +'<div class="hist-preco-data">'+h.data+' às '+(h.hora||'')+' · custo: R$ '+parseFloat(h.custo||0).toFixed(2).replace('.',',')+'</div></div>'
+      +'<div style="text-align:right;">'
+        +'<div class="hist-preco-val">R$ '+parseFloat(h.preco||0).toFixed(2).replace('.',',')+'</div>'
+        +'<div style="font-size:10px;font-weight:700;color:'+margCor+';">'+parseFloat(h.margem||0).toFixed(1)+'% margem</div>'
+      +'</div></div>';
+  }).join('');
+}
+function recarregarPreco(idx) {
+  var h=getHistoricoPrecos()[idx]; if(!h)return;
+  var s=function(id,v){var e=document.getElementById(id);if(e)e.value=v;};
+  s('nomeProd',h.produto||''); s('custo',h.custo||''); s('margem',h.margem||'');
+  if(typeof calc==='function')setTimeout(calc,50);
+  if(typeof switchTab==='function')switchTab('precificacao');
+}
+
+var _temaAtual = localStorage.getItem('gl_tema') || 'light';
+function aplicarTema(tema) {
+  _temaAtual = tema || _temaAtual;
+  document.documentElement.setAttribute('data-tema', _temaAtual);
+  localStorage.setItem('gl_tema', _temaAtual);
+  var btn = document.getElementById('btnToggleTema');
+  if (btn) btn.textContent = _temaAtual === 'dark' ? '☀️' : '🌙';
+}
+function toggleTema() { aplicarTema(_temaAtual === 'dark' ? 'light' : 'dark'); }
 </script>
 
 </div>
@@ -9832,7 +10025,8 @@ var swCode = [
       <input type="text" id="pontoObs" class="inp" placeholder="Ex: home office, atestado..." maxlength="120">
     </div>
     <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
-      <button class="mod-btn primary" onclick="registrarPonto()">🕐 Registrar Ponto</button>
+      <button class="mod-btn" onclick="exportarPontosCSV()" title="Exportar CSV" style="display:flex;align-items:center;gap:4px;">📤 CSV</button>
+        <button class="mod-btn primary" onclick="registrarPonto()">🕐 Registrar Ponto</button>
       <div id="pontoMsg" style="font-size:12px;font-weight:700;display:none;"></div>
     </div>
   </div>
@@ -10388,6 +10582,7 @@ var swCode = [
       <input class="mod-search" type="text" placeholder="🔍 Buscar produto..." oninput="renderEstoque(this.value)">
       <div style="display:flex; gap:8px; flex-wrap:wrap;">
         <button class="mod-btn neutral" onclick="abrirMovModal()">⇅ Movimentar Estoque</button>
+        <button class="mod-btn" onclick="exportarEstoqueCSV()" title="Exportar CSV" style="display:flex;align-items:center;gap:4px;">📤 CSV</button>
         <button class="mod-btn primary" onclick="abrirProdModal()">➕ Novo Produto</button>
       </div>
     </div>
@@ -10649,7 +10844,21 @@ var swCode = [
         <button onclick="limparLog()" style="font-size:11px;font-weight:700;color:var(--text-3);background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:4px 10px;cursor:pointer;">Limpar</button>
       </div>
     </div>
-    <div id="logAtivBody" style="max-height:220px;overflow-y:auto;">
+    <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;">
+      <input type="text" id="logBusca" class="inp" placeholder="🔍 Buscar atividade…"
+        style="flex:1;min-width:120px;height:30px;font-size:11px;padding:0 10px;"
+        oninput="renderLogAtividades()">
+      <select id="logFiltroTipo" class="inp" style="height:30px;font-size:11px;padding:0 6px;" onchange="renderLogAtividades()">
+        <option value="todos">Todos</option>
+        <option value="login">Login/Logout</option>
+        <option value="alteracao">Alterações</option>
+        <option value="exclusao">Exclusões</option>
+        <option value="export">Exportações</option>
+      </select>
+      <button onclick="exportarLogCSV()" class="mod-btn" style="height:30px;font-size:11px;padding:0 10px;" title="Exportar CSV">📤</button>
+    </div>
+    <div style="font-size:11px;color:var(--text-4);margin-bottom:6px;" id="logCounter"></div>
+    <div id="logAtivBody" style="max-height:320px;overflow-y:auto;">
       <div style="text-align:center;color:var(--text-4);font-size:13px;padding:20px 0;">Nenhuma atividade registrada.</div>
     </div>
   </div>
