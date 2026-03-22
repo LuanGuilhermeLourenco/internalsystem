@@ -3736,6 +3736,7 @@ function preencherPerfil() {
     var bR = document.getElementById('btnRelatorioGeral'); if (bR) bR.style.display = 'none';
   }
 }
+  var nn = document.getElementById('perfilNovoNome'); if (nn && sessaoAtual) nn.value = sessaoAtual.nome || '';
 
 function verificarSenhaAtual() {
   const senhaDigitada = document.getElementById('perfilSenhaAtual').value;
@@ -8836,6 +8837,53 @@ function aplicarTema(tema) {
   if (btn) btn.textContent = _temaAtual === 'dark' ? '☀️' : '🌙';
 }
 function toggleTema() { aplicarTema(_temaAtual === 'dark' ? 'light' : 'dark'); }
+
+function salvarNovoNome() {
+  var novoNome = (document.getElementById('perfilNovoNome') || {}).value || '';
+  var msgEl    = document.getElementById('perfilNomeMsg');
+  novoNome = novoNome.trim();
+
+  if (novoNome.length < 2) {
+    if (msgEl) { msgEl.textContent = '⚠️ Nome deve ter ao menos 2 caracteres.'; msgEl.style.background = '#FFF0F0'; msgEl.style.color = 'var(--red)'; msgEl.style.display = 'block'; }
+    return;
+  }
+
+  // ADM: alterar nome do ADM na sessão
+  if (sessaoAtual && sessaoAtual.tipo === 'adm') {
+    sessaoAtual.nome = novoNome;
+    document.getElementById('headerNome').textContent = novoNome;
+    document.getElementById('perfilNome').textContent  = novoNome;
+    var av = document.getElementById('perfilAvatar');
+    var ha = document.getElementById('headerAvatar');
+    var iniciais = novoNome.split(' ').map(function(p){ return p[0]; }).join('').substring(0,2).toUpperCase();
+    if (av) av.textContent = iniciais;
+    if (ha) ha.textContent = iniciais;
+    _log('Alterou nome', novoNome);
+    if (msgEl) { msgEl.textContent = '✅ Nome atualizado com sucesso!'; msgEl.style.background = '#E8F9EF'; msgEl.style.color = 'var(--green)'; msgEl.style.display = 'block'; setTimeout(function(){ msgEl.style.display = 'none'; }, 3000); }
+    return;
+  }
+
+  // Usuário normal: salvar no localStorage
+  var usuarios = getUsuarios();
+  var u = usuarios.find(function(x){ return x.login === sessaoAtual.login; });
+  if (!u) { if (msgEl) { msgEl.textContent = '❌ Usuário não encontrado.'; msgEl.style.background = '#FFF0F0'; msgEl.style.color = 'var(--red)'; msgEl.style.display = 'block'; } return; }
+
+  u.nome = novoNome;
+  salvarUsuarios(usuarios);
+  sessaoAtual.nome = novoNome;
+
+  // Atualizar UI
+  document.getElementById('headerNome').textContent = novoNome;
+  document.getElementById('perfilNome').textContent  = novoNome;
+  var av2 = document.getElementById('perfilAvatar');
+  var ha2 = document.getElementById('headerAvatar');
+  var ini = novoNome.split(' ').map(function(p){ return p[0]; }).join('').substring(0,2).toUpperCase();
+  if (av2) av2.textContent = ini;
+  if (ha2) ha2.textContent = ini;
+
+  _log('Alterou nome', novoNome);
+  if (msgEl) { msgEl.textContent = '✅ Nome atualizado com sucesso!'; msgEl.style.background = '#E8F9EF'; msgEl.style.color = 'var(--green)'; msgEl.style.display = 'block'; setTimeout(function(){ msgEl.style.display = 'none'; }, 3000); }
+}
 </script>
 
 </div>
@@ -10761,7 +10809,7 @@ var swCode = [
 <div class="main">
 
   <div class="step-label" style="margin-top:8px;">
-    <div class="step-num">👤</div>
+    <div class="step-num">🪪</div>
     <div class="step-title">Meu Perfil <span class="step-sub">— informações e alteração de senha</span></div>
   </div>
 
@@ -10851,7 +10899,7 @@ var swCode = [
 
     
     <div id="perfilSenhaStep3" style="display:none; text-align:center; padding:16px 0;">
-      <div style="font-size:44px; margin-bottom:12px;">🔐</div>
+      <div style="font-size:44px; margin-bottom:12px;">✅</div>
       <div style="font-family:'Inter',sans-serif; font-weight:700; font-size:20px; color:var(--green); margin-bottom:8px;">Senha alterada com sucesso!</div>
       <div style="font-size:13px; color:var(--gray); margin-bottom:20px;">Sua nova senha já está ativa.</div>
       <button onclick="resetarPerfilSenha()"
@@ -12113,4 +12161,30 @@ var swCode = [
 })();
 </script>
 </body>
-</html>
+</html><div class="card" style="margin-bottom:16px;">
+    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--blue);margin-bottom:16px;padding-bottom:8px;border-bottom:2px solid var(--blue-lt);">
+      ✏️ Alterar nome
+    </div>
+    <div style="font-size:12px;color:var(--text-3);margin-bottom:12px;line-height:1.6;">
+      Nome exibido no cabeçalho e no sistema.
+    </div>
+    <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;max-width:480px;">
+      <div style="flex:1;min-width:160px;">
+        <label class="login-label">Novo nome</label>
+        <input class="login-input" type="text" id="perfilNovoNome"
+          placeholder="Ex: Felipe Souza"
+          onkeydown="if(event.key==='Enter') salvarNovoNome()"
+          style="height:42px;">
+      </div>
+      <button onclick="salvarNovoNome()"
+        style="background:var(--blue);color:#fff;border:none;padding:0 24px;
+               border-radius:10px;font-family:'Inter',sans-serif;font-weight:700;
+               font-size:13px;cursor:pointer;white-space:nowrap;height:42px;">
+        💾 Salvar
+      </button>
+    </div>
+    <div id="perfilNomeMsg" style="display:none;margin-top:10px;font-size:12px;
+      font-weight:700;border-radius:8px;padding:8px 12px;"></div>
+  </div>
+
+  
