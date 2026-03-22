@@ -1522,42 +1522,84 @@ transition: background .15s; }
 /* ══ DARK MODE ══════════════════════════════════════ */
 [data-tema="dark"] {
   --bg:       #0f1a14;
-  --bg2:      #162010;
-  --white:    #1a2a1e;
-  --border:   rgba(255,255,255,0.08);
-  --border-2: rgba(255,255,255,0.12);
-  --text:     #e8f0eb;
+  --bg2:      #1c2e1e;
+  --white:    #1e2e20;
+  --border:   rgba(255,255,255,0.10);
+  --border-2: rgba(255,255,255,0.15);
+  --text:     #eef4f0;
   --text-2:   #c8dace;
-  --text-3:   #8aab90;
-  --text-4:   #556b5a;
-  --blue-lt:  rgba(37,99,235,0.15);
-  --blue-md:  rgba(37,99,235,0.3);
-  --green-lt: rgba(5,150,105,0.15);
-  --green-md: rgba(5,150,105,0.3);
-  --red-lt:   rgba(220,38,38,0.15);
-  --red-md:   rgba(220,38,38,0.3);
-  --orange-lt:rgba(224,123,57,0.15);
-  --orange-md:rgba(224,123,57,0.3);
+  --text-3:   #a8c4ae;
+  --text-4:   #6a8870;
+  --blue-lt:  rgba(37,99,235,0.18);
+  --blue-md:  rgba(37,99,235,0.35);
+  --green-lt: rgba(5,150,105,0.18);
+  --green-md: rgba(5,150,105,0.35);
+  --red-lt:   rgba(220,38,38,0.18);
+  --red-md:   rgba(220,38,38,0.35);
+  --orange-lt:rgba(224,123,57,0.18);
+  --orange-md:rgba(224,123,57,0.35);
 }
 [data-tema="dark"] body { background: var(--bg); color: var(--text); }
+
+/* Cards e modais */
 [data-tema="dark"] .card,
 [data-tema="dark"] .mod-card { background: var(--white); border-color: var(--border); }
-[data-tema="dark"] .inp,
-[data-tema="dark"] .mod-input,
-[data-tema="dark"] .login-input { background: var(--bg2); border-color: var(--border-2); color: var(--text); }
-[data-tema="dark"] .inp::placeholder,
-[data-tema="dark"] .login-input::placeholder { color: var(--text-4); }
-[data-tema="dark"] .mod-btn:not(.primary):not(.danger) { background: var(--bg2); border-color: var(--border-2); color: var(--text-2); }
-[data-tema="dark"] .tab-pane { background: var(--bg); }
-[data-tema="dark"] #navWrapper,
-[data-tema="dark"] .nav-subs-bar { background: var(--bg2); border-color: var(--border); }
-[data-tema="dark"] .nav-sub { color: var(--text-3); }
-[data-tema="dark"] .nav-sub.ativo { color: var(--text); border-color: var(--text); }
 [data-tema="dark"] .mod-modal-bg .mod-modal,
 [data-tema="dark"] .mod-modal-bg .modal-body { background: var(--white); }
 [data-tema="dark"] .mod-label { color: var(--text-3); }
+[data-tema="dark"] .step-label { background: rgba(255,255,255,0.04); }
+
+/* Inputs */
+[data-tema="dark"] .inp,
+[data-tema="dark"] .mod-input,
+[data-tema="dark"] .login-input,
+[data-tema="dark"] select.inp { background: #162018; border-color: var(--border-2); color: var(--text); }
+[data-tema="dark"] .inp::placeholder,
+[data-tema="dark"] .login-input::placeholder { color: var(--text-4); }
+
+/* Botões */
+[data-tema="dark"] .mod-btn:not(.primary):not(.danger) {
+  background: #1c2e1e; border-color: var(--border-2); color: var(--text-2);
+}
+
+/* Tab pane */
+[data-tema="dark"] .tab-pane { background: var(--bg); }
+
+/* ── Navegação (barra de grupos + subitens) ── */
+[data-tema="dark"] #navWrapper { background: var(--bg2); border-color: var(--border); }
+[data-tema="dark"] .nav-subs-bar {
+  background: #243328;
+  border-color: rgba(255,255,255,0.10);
+  border-top: 1px solid rgba(255,255,255,0.08);
+}
+[data-tema="dark"] .nav-sub {
+  color: rgba(255,255,255,0.65);
+}
+[data-tema="dark"] .nav-sub:hover {
+  color: rgba(255,255,255,0.9);
+  background: rgba(255,255,255,0.06);
+}
+[data-tema="dark"] .nav-sub.ativo {
+  color: #fff;
+  border-color: #fff;
+  font-weight: 700;
+}
+[data-tema="dark"] .nav-sub-icon { opacity: 0.9; }
+
+/* Tabelas */
 [data-tema="dark"] tr:nth-child(even) { background: rgba(255,255,255,0.03); }
-[data-tema="dark"] .step-label { background: rgba(255,255,255,0.03); }
+[data-tema="dark"] td, [data-tema="dark"] th { color: var(--text-2); }
+[data-tema="dark"] th { color: var(--text-3); }
+
+/* Textos gerais */
+[data-tema="dark"] h1,[data-tema="dark"] h2,[data-tema="dark"] h3,
+[data-tema="dark"] .step-title, [data-tema="dark"] .mod-title { color: var(--text); }
+[data-tema="dark"] .mod-empty,
+[data-tema="dark"] .empty-state { color: var(--text-4); }
+
+/* Tags e badges */
+[data-tema="dark"] .tag, [data-tema="dark"] .badge-pill { opacity: 0.9; }
+
 </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
