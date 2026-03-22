@@ -1552,10 +1552,17 @@ transition: background .15s; }
   -webkit-backdrop-filter: blur(20px) saturate(1.4) brightness(0.6);
 }
 [data-tema="dark"] .login-box {
-  background: rgba(28,42,30,0.97);
-  border-color: rgba(255,255,255,0.12);
-  box-shadow: 0 2px 4px rgba(0,0,0,0.3), 0 8px 32px rgba(0,0,0,0.5);
+  background: #1c2a1e !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border-color: rgba(255,255,255,0.15) !important;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.4), 0 8px 40px rgba(0,0,0,0.6) !important;
 }
+[data-tema="dark"] .login-title { color: #eef4f0 !important; }
+[data-tema="dark"] .login-sub   { color: #a8c4ae !important; }
+[data-tema="dark"] .login-label { color: #a8c4ae !important; }
+[data-tema="dark"] .login-badge { background: rgba(255,255,255,0.10) !important; color: #c8dace !important; }
+
 [data-tema="dark"] .login-title { color: var(--text); }
 [data-tema="dark"] .login-sub   { color: var(--text-3); }
 [data-tema="dark"] .login-label { color: var(--text-3); }
