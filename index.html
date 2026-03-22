@@ -1524,6 +1524,7 @@ transition: background .15s; }
   --bg:         #0e1a12;
   --bg2:        #162018;
   --white:      #1c2a1e;
+  --surface:    #172019;
   --border:     rgba(255,255,255,0.10);
   --border-2:   rgba(255,255,255,0.16);
   --text:       #eef4f0;
@@ -1678,6 +1679,56 @@ transition: background .15s; }
 
 /* ── FABs ── */
 [data-tema="dark"] #agentPanel { background: rgba(28,42,30,0.96); }
+/* ── Upload Zone (NF) ── */
+[data-tema="dark"] .upload-zone {
+  background: #162018 !important;
+  border-color: rgba(255,255,255,0.15) !important;
+}
+[data-tema="dark"] .uz-title { color: var(--text) !important; }
+[data-tema="dark"] .uz-sub   { color: var(--text-3) !important; }
+
+/* ── Tabs-bar (barra lilás) ── */
+[data-tema="dark"] .tabs-bar {
+  background: #1e2d20 !important;
+  border-bottom-color: rgba(255,255,255,0.08) !important;
+  box-shadow: none !important;
+}
+[data-tema="dark"] .tabs-bar .tab-btn { color: rgba(255,255,255,0.60) !important; }
+[data-tema="dark"] .tabs-bar .tab-btn.active,
+[data-tema="dark"] .tabs-bar .tab-btn.ativo { color: #fff !important; border-bottom-color: #fff !important; }
+
+/* ── Dash cards ::before decorativo ── */
+[data-tema="dark"] .dash-card::before { background: rgba(255,255,255,0.05) !important; }
+
+/* ── Cards com fundo branco residual ── */
+[data-tema="dark"] .card,
+[data-tema="dark"] .price-card { background: var(--white) !important; }
+
+/* ── Seletores de regime ── */
+[data-tema="dark"] .regime-card { background: var(--white) !important; color: var(--text-2) !important; }
+
+/* ── Modais internos ── */
+[data-tema="dark"] .mod-modal  { background: var(--white) !important; }
+[data-tema="dark"] .modal-body { background: var(--white) !important; }
+
+/* ── Notificações e alertas ── */
+[data-tema="dark"] .step-info,
+[data-tema="dark"] .info-box,
+[data-tema="dark"] .alert-box { background: var(--bg2) !important; color: var(--text-2) !important; }
+
+/* ── Textos que usam cor escura hardcoded ── */
+[data-tema="dark"] .uz-title,
+[data-tema="dark"] .step-title,
+[data-tema="dark"] .card-title,
+[data-tema="dark"] .mod-section-title { color: var(--text) !important; }
+
+/* ── Inputs select dentro de cards ── */
+[data-tema="dark"] select { background: #162018 !important; color: var(--text) !important; border-color: var(--border-2) !important; }
+
+/* ── Scrollbar dark ── */
+[data-tema="dark"] ::-webkit-scrollbar-track { background: var(--bg2); }
+[data-tema="dark"] ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 4px; }
+
 
 
 /* Cards e modais */
