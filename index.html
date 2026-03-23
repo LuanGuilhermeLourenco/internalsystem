@@ -2420,169 +2420,132 @@ transition: background .15s; }
      HTML >> ABA: DASHBOARD / FINANCEIRO
      ============================================================ -->
 <div class="tab-pane active" id="tab-dashboard">
-<div class="main" style="padding-bottom:24px;">
+<div class="main">
 
   <!-- ── Saudação ── -->
-  <div style="padding:16px 0 12px;display:flex;align-items:center;justify-content:space-between;">
+  <div style="margin:8px 0 16px;display:flex;align-items:center;justify-content:space-between;">
     <div>
-      <div style="font-size:18px;font-weight:800;color:var(--text);" id="dashSaudacao">Bom dia 🐾</div>
-      <div style="font-size:12px;color:var(--text-4);margin-top:2px;" id="dashDataHoje"></div>
+      <div style="font-size:18px;font-weight:800;color:var(--text);" id="dashSaudacao">Bom dia 👋</div>
+      <div style="font-size:12px;color:var(--text-3);margin-top:2px;" id="dashDataHoje"></div>
     </div>
-    <div style="display:flex;align-items:center;gap:8px;">
-      <div style="width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);"></div>
-      <span style="font-size:11px;font-weight:700;color:var(--text-3);" id="dashOnline">0 online</span>
-    </div>
+    <button onclick="abrirModalMetas()" style="background:var(--blue-lt);border:1px solid var(--blue-md);color:var(--blue);border-radius:10px;padding:7px 14px;font-size:11px;font-weight:700;cursor:pointer;">🎯 Metas</button>
   </div>
 
-  <!-- ── 4 KPIs principais ── -->
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
+  <!-- ── 4 métricas compactas ── -->
+  <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px;">
 
-    <div class="dash-card dash-green" onclick="switchTab('entregas')"
-      style="padding:16px 14px;border-radius:16px;">
-      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;opacity:0.75;margin-bottom:6px;">Faturamento do Mês</div>
-      <div style="font-size:24px;font-weight:900;line-height:1;" id="dashFatMes">R$ —</div>
-      <div style="font-size:11px;opacity:0.65;margin-top:4px;" id="dashFatMesSub">0 pedidos entregues</div>
+    <div onclick="switchTab('estoque')" style="background:var(--white);border:1px solid var(--border);border-radius:14px;padding:14px 16px;cursor:pointer;transition:transform .15s;" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform=''">
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--text-3);margin-bottom:6px;">📦 Estoque</div>
+      <div style="font-size:24px;font-weight:800;color:var(--text);font-family:'JetBrains Mono',monospace;" id="dashEstoqueVal">—</div>
+      <div style="font-size:11px;color:var(--text-3);margin-top:3px;" id="dashEstoqueSub">— produtos</div>
     </div>
 
-    <div class="dash-card dash-orange" id="dashAlertaCard" onclick="switchTab('estoque')"
-      style="padding:16px 14px;border-radius:16px;">
-      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;opacity:0.75;margin-bottom:6px;">Alertas de Estoque</div>
-      <div style="font-size:24px;font-weight:900;line-height:1;" id="dashAlertaVal">—</div>
-      <div style="font-size:11px;opacity:0.65;margin-top:4px;" id="dashAlertaSub">produtos</div>
+    <div id="dashAlertaCard" onclick="switchTab('estoque')" style="background:var(--white);border:1px solid var(--border);border-radius:14px;padding:14px 16px;cursor:pointer;transition:transform .15s;" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform=''">
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--text-3);margin-bottom:6px;">⚠️ Alertas</div>
+      <div style="font-size:24px;font-weight:800;color:var(--orange);font-family:'JetBrains Mono',monospace;" id="dashAlertaVal">—</div>
+      <div style="font-size:11px;color:var(--text-3);margin-top:3px;" id="dashAlertaSub">abaixo do mínimo</div>
     </div>
 
-    <div class="dash-card dash-blue" onclick="switchTab('entregas')"
-      style="padding:16px 14px;border-radius:16px;">
-      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;opacity:0.75;margin-bottom:6px;">Pedidos Pendentes</div>
-      <div style="font-size:24px;font-weight:900;line-height:1;" id="dashEntregasVal">—</div>
-      <div style="font-size:11px;opacity:0.65;margin-top:4px;" id="dashEntregasSub">de — total</div>
+    <div onclick="switchTab('entregas')" style="background:var(--white);border:1px solid var(--border);border-radius:14px;padding:14px 16px;cursor:pointer;transition:transform .15s;" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform=''">
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--text-3);margin-bottom:6px;">🚚 Pedidos</div>
+      <div style="font-size:24px;font-weight:800;color:var(--text);font-family:'JetBrains Mono',monospace;" id="dashEntregasVal">—</div>
+      <div style="font-size:11px;color:var(--text-3);margin-top:3px;" id="dashEntregasSub">pendentes</div>
     </div>
 
-    <div class="dash-card dash-purple" onclick="switchTab('reposicao')"
-      style="padding:16px 14px;border-radius:16px;">
-      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;opacity:0.75;margin-bottom:6px;">Cargas em Aberto</div>
-      <div style="font-size:24px;font-weight:900;line-height:1;" id="dashReposVal">—</div>
-      <div style="font-size:11px;opacity:0.65;margin-top:4px;" id="dashReposSub">reposições</div>
+    <div onclick="switchTab('reposicao')" style="background:var(--white);border:1px solid var(--border);border-radius:14px;padding:14px 16px;cursor:pointer;transition:transform .15s;" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform=''">
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--text-3);margin-bottom:6px;">🔄 Cargas</div>
+      <div style="font-size:24px;font-weight:800;color:var(--text);font-family:'JetBrains Mono',monospace;" id="dashReposVal">—</div>
+      <div style="font-size:11px;color:var(--text-3);margin-top:3px;" id="dashReposSub">em aberto</div>
     </div>
 
   </div>
 
-  <!-- ── Valor em estoque — card largo ── -->
-  <div class="card" style="margin-bottom:14px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;" onclick="switchTab('estoque')">
-    <div>
-      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-4);">Valor Total em Estoque</div>
-      <div style="font-size:26px;font-weight:900;color:var(--text);margin-top:2px;" id="dashEstoqueVal">—</div>
-    </div>
-    <div style="text-align:right;">
-      <div style="font-size:28px;">📦</div>
-      <div style="font-size:11px;color:var(--text-4);margin-top:2px;" id="dashEstoqueSub">— produtos</div>
-    </div>
-  </div>
-
-  
-  <div class="card" style="margin-bottom:14px;padding:14px 16px;" id="dashMetasCard">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--blue);">🎯 Metas</div>
-      <button onclick="abrirModalMetas()" style="font-size:11px;font-weight:700;color:var(--blue);background:var(--blue-lt);border:none;border-radius:6px;padding:4px 10px;cursor:pointer;">Definir</button>
-    </div>
+  <!-- ── Metas do mês ── -->
+  <div class="card" style="margin-bottom:14px;" id="dashMetasCard">
+    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--blue);margin-bottom:12px;">🎯 Metas do mês</div>
     <div id="dashMetasBody">
-      <div style="color:var(--text-3);font-size:13px;text-align:center;padding:16px 0;">
-        Nenhuma meta definida. Clique em <strong>Definir</strong> para começar.
+      <div style="color:var(--text-3);font-size:13px;text-align:center;padding:8px 0;">
+        Nenhuma meta definida. Toque em <strong>Metas</strong> para começar.
       </div>
     </div>
   </div>
 
-  
-  <div class="card" style="margin-bottom:14px;padding:14px 16px;">
+  <!-- ── Gráfico de entregas ── -->
+  <div class="card" style="margin-bottom:14px;">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--blue);">🕐 Precificações Recentes</div>
-      <input type="text" id="histPrecBusca" class="inp" placeholder="🔍 Buscar…"
-        style="max-width:130px;height:28px;font-size:11px;padding:0 8px;" oninput="filtrarHistPrecos()">
-      <button onclick="limparHistoricoPrecos()" style="font-size:11px;color:var(--text-3);background:none;border:none;cursor:pointer;">Limpar</button>
-    </div>
-    <div id="dashHistPrecos">
-      <div style="color:var(--text-3);font-size:13px;text-align:center;padding:16px 0;">
-        Nenhuma precificação registrada ainda.
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--blue);">📈 Entregas</div>
+      <div style="display:flex;gap:4px;">
+        <button onclick="renderGraficoEntregas('semana')" id="gBtnSemana" style="font-size:10px;font-weight:700;padding:3px 9px;border-radius:6px;border:1px solid var(--border);background:var(--bg);color:var(--text-3);cursor:pointer;">7d</button>
+        <button onclick="renderGraficoEntregas('mes')" id="gBtnMes" style="font-size:10px;font-weight:700;padding:3px 9px;border-radius:6px;border:1px solid var(--blue);background:var(--blue-lt);color:var(--blue);cursor:pointer;">30d</button>
+        <button onclick="renderGraficoEntregas('trimestre')" id="gBtnTrimestre" style="font-size:10px;font-weight:700;padding:3px 9px;border-radius:6px;border:1px solid var(--border);background:var(--bg);color:var(--text-3);cursor:pointer;">90d</button>
       </div>
     </div>
+    <div style="position:relative;height:140px;">
+      <canvas id="graficoEntregas" style="width:100%;height:140px;display:block;"></canvas>
+      <div id="graficoEmpty" style="display:none;position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--text-4);font-size:13px;">Nenhuma entrega ainda.</div>
+    </div>
+    <div id="graficoLegenda" style="display:flex;gap:12px;margin-top:8px;flex-wrap:wrap;font-size:11px;color:var(--text-3);"></div>
   </div>
 
-  
-  <div class="card" style="margin-bottom:14px;padding:14px 16px;">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--blue);">📈 Pedidos por Período</div>
-      <div style="display:flex;gap:6px;">
-        <button onclick="renderGraficoEntregas('semana')" id="gBtnSemana"
-          style="font-size:10px;font-weight:700;padding:3px 10px;border-radius:6px;border:1px solid var(--border);background:var(--bg);color:var(--text-3);cursor:pointer;">7d</button>
-        <button onclick="renderGraficoEntregas('mes')" id="gBtnMes"
-          style="font-size:10px;font-weight:700;padding:3px 10px;border-radius:6px;border:1px solid var(--blue);background:var(--blue-lt);color:var(--blue);cursor:pointer;">30d</button>
-        <button onclick="renderGraficoEntregas('trimestre')" id="gBtnTrimestre"
-          style="font-size:10px;font-weight:700;padding:3px 10px;border-radius:6px;border:1px solid var(--border);background:var(--bg);color:var(--text-3);cursor:pointer;">90d</button>
-      </div>
-    </div>
-    <div style="position:relative;height:160px;">
-      <canvas id="graficoEntregas" style="width:100%;height:160px;display:block;"></canvas>
-      <div id="graficoEmpty" style="display:none;position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--text-4);font-size:13px;">
-        Nenhuma entrega registrada ainda.
-      </div>
-    </div>
-    <div id="graficoLegenda" style="display:flex;gap:16px;margin-top:10px;flex-wrap:wrap;font-size:11px;color:var(--text-3);"></div>
-  </div>
-  <!-- Relatório por Período -->
-  <div class="card" style="margin-bottom:14px;padding:14px 16px;">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
-      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--blue);">
-        📅 Relatório por Período
-      </div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+  <!-- ── Seções secundárias em accordion ── -->
+  <!-- Relatório por Período (colapsado) -->
+  <details style="margin-bottom:10px;">
+    <summary style="background:var(--white);border:1px solid var(--border);border-radius:12px;padding:12px 16px;cursor:pointer;font-size:12px;font-weight:700;color:var(--text);list-style:none;display:flex;align-items:center;gap:8px;">
+      <span>📅</span> Relatório por Período
+    </summary>
+    <div style="background:var(--white);border:1px solid var(--border);border-top:none;border-radius:0 0 12px 12px;padding:16px;">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px;">
         <input type="date" id="relPeriodoIni" class="inp" style="height:34px;width:140px;">
         <span style="font-size:12px;color:var(--text-3);">até</span>
         <input type="date" id="relPeriodoFim" class="inp" style="height:34px;width:140px;">
-        <button onclick="gerarRelatorioPeriodo()" class="btn-primary" style="height:34px;padding:0 16px;font-size:12px;">
-          📊 Gerar
-        </button>
-        <button onclick="exportarRelatorioPeriodoPDF()" class="btn-secondary" style="height:34px;padding:0 14px;font-size:12px;" id="btnExportRelPDF" title="Exportar PDF">
-          🖨️ PDF
-        </button>
+        <button onclick="gerarRelatorioPeriodo()" class="btn-primary" style="height:34px;padding:0 14px;font-size:12px;">📊 Gerar</button>
+        <button onclick="exportarRelatorioPeriodoPDF()" class="btn-secondary" style="height:34px;padding:0 12px;font-size:12px;" id="btnExportRelPDF">🖨️ PDF</button>
+      </div>
+      <div id="relPeriodoResult" style="display:none;">
+        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px;">
+          <div style="background:var(--blue-lt);border-radius:10px;padding:12px;">
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;color:var(--blue);margin-bottom:4px;">Pedidos</div>
+            <div id="relTotalEntregas" style="font-size:20px;font-weight:800;color:var(--blue);">—</div>
+            <div id="relEntreguesSub" style="font-size:10px;color:var(--blue);opacity:.7;">no período</div>
+          </div>
+          <div style="background:var(--green-lt);border-radius:10px;padding:12px;">
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;color:var(--green);margin-bottom:4px;">Faturamento</div>
+            <div id="relFaturamento" style="font-size:20px;font-weight:800;color:var(--green);">—</div>
+            <div style="font-size:10px;color:var(--green);opacity:.7;">entregues</div>
+          </div>
+          <div style="background:var(--orange-lt);border-radius:10px;padding:12px;">
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;color:var(--orange);margin-bottom:4px;">Ticket Médio</div>
+            <div id="relTicketMedio" style="font-size:20px;font-weight:800;color:var(--orange);">—</div>
+            <div style="font-size:10px;color:var(--orange);opacity:.7;">por entrega</div>
+          </div>
+          <div style="background:var(--blue-lt);border-radius:10px;padding:12px;">
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;color:var(--blue);margin-bottom:4px;">Pendentes</div>
+            <div id="relPendentes" style="font-size:20px;font-weight:800;color:var(--blue);">—</div>
+            <div style="font-size:10px;color:var(--blue);opacity:.7;">no período</div>
+          </div>
+        </div>
+        <div id="relTopPrecos"></div>
+      </div>
+      <div id="relPeriodoEmpty" style="display:none;text-align:center;color:var(--text-4);font-size:13px;padding:12px 0;">Nenhuma entrega no período.</div>
+    </div>
+  </details>
+
+  <!-- Últimas Precificações (colapsado) -->
+  <details style="margin-bottom:10px;">
+    <summary style="background:var(--white);border:1px solid var(--border);border-radius:12px;padding:12px 16px;cursor:pointer;font-size:12px;font-weight:700;color:var(--text);list-style:none;display:flex;align-items:center;gap:8px;">
+      <span>🏷️</span> Últimas Precificações
+    </summary>
+    <div style="background:var(--white);border:1px solid var(--border);border-top:none;border-radius:0 0 12px 12px;padding:16px;">
+      <input type="text" id="histPrecBusca" class="inp" placeholder="🔍 Buscar produto…" style="width:100%;height:32px;font-size:11px;margin-bottom:10px;" oninput="filtrarHistPrecos()">
+      <div id="dashHistPrecos">
+        <div style="color:var(--text-3);font-size:13px;text-align:center;padding:8px 0;">Nenhuma precificação ainda.</div>
       </div>
     </div>
-    <div id="relPeriodoResult" style="display:none;">
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:14px;">
-        <div class="dash-card dash-blue" style="padding:14px;cursor:default;">
-          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;opacity:0.7;">Pedidos Vet</div>
-          <div id="relTotalEntregas" style="font-size:22px;font-weight:800;margin:4px 0;">—</div>
-          <div id="relEntreguesSub" style="font-size:11px;opacity:0.7;">no período</div>
-        </div>
-        <div class="dash-card dash-green" style="padding:14px;cursor:default;">
-          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;opacity:0.7;">Faturamento</div>
-          <div id="relFaturamento" style="font-size:22px;font-weight:800;margin:4px 0;">—</div>
-          <div style="font-size:11px;opacity:0.7;">entregues</div>
-        </div>
-        <div class="dash-card dash-orange" style="padding:14px;cursor:default;">
-          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;opacity:0.7;">Ticket Médio</div>
-          <div id="relTicketMedio" style="font-size:22px;font-weight:800;margin:4px 0;">—</div>
-          <div style="font-size:11px;opacity:0.7;">por entrega</div>
-        </div>
-        <div class="dash-card" style="padding:14px;cursor:default;background:var(--blue-lt);">
-          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--blue);opacity:0.8;">Pendentes</div>
-          <div id="relPendentes" style="font-size:22px;font-weight:800;margin:4px 0;color:var(--blue);">—</div>
-          <div style="font-size:11px;color:var(--blue);opacity:0.7;">no período</div>
-        </div>
-      </div>
-      <!-- Top produtos precificados -->
-      <div id="relTopPrecos" style="margin-top:4px;"></div>
-    </div>
-    <div id="relPeriodoEmpty" style="display:none;text-align:center;color:var(--text-4);font-size:13px;padding:16px 0;">
-      Nenhuma entrega encontrada no período selecionado.
-    </div>
-  </div>
-
-
+  </details>
 
 </div>
 
-
-  <!-- ============================================================
+<!-- ============================================================
        PLANILHA FINANCEIRA (integrada ao Dashboard)
        ============================================================ -->
   <div style="margin-top:20px;padding-top:20px;border-top:2px dashed var(--border);">
@@ -2774,174 +2737,176 @@ transition: background .15s; }
 <div class="tab-pane" id="tab-precificacao">
 <div class="main">
 
-  <!-- ═══ STEP 1: REGIME TRIBUTÁRIO ═══ -->
-  <div id="secao-regime">
-  <div class="step-label" style="margin-top:8px;">
-    <div class="step-num">1</div>
-    <div class="step-title">Regime Tributário <span class="step-sub">— selecione o enquadramento da sua empresa</span></div>
-  </div>
+  <!-- ── RESULTADO — card fixo no topo, sempre visível ── -->
+  <div class="card" style="margin-bottom:14px;border:2px solid var(--blue-md);position:sticky;top:56px;z-index:10;background:var(--white);">
+    <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--blue);margin-bottom:10px;">💰 Preço de Venda Sugerido</div>
+    <div class="price-cards" id="priceCards" style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;">
 
-  <div class="card">
-    <div class="regime-grid" id="regimeGrid">
-
-      <div class="regime-card selected" data-aliq="0.045" onclick="selectRegime(this)">
-        <div class="rc-badge">SELECIONADO</div>
-        <div class="rc-icon">🟢</div>
-        <div class="rc-name">Simples Nacional<br>Comércio</div>
-        <div class="rc-range">Faturamento até R$ 4,8M/ano</div>
-        <div class="rc-aliq" id="aliq-simples">4,5%</div>
+      <div class="price-card" id="pcSemTaxa" style="background:#F3F0FF;border-color:#7C3AED;padding:10px 12px;">
+        <div class="pc-icon" style="font-size:16px;">🏷️</div>
+        <div class="pc-method" style="color:#7C3AED;font-size:10px;">Preço Base</div>
+        <div class="pc-price" id="val-semtaxa" style="font-size:22px;">—</div>
+        <div class="pc-sub" id="sub-semtaxa" style="font-size:10px;">Sem taxa</div>
+        <div class="pc-lucro" id="luc-semtaxa" style="color:var(--green);font-size:10px;">—</div>
       </div>
 
-      <div class="regime-card" data-aliq="0.08" onclick="selectRegime(this)">
-        <div class="rc-icon">🔵</div>
-        <div class="rc-name">Lucro Presumido</div>
-        <div class="rc-range">Até R$ 78M/ano</div>
-        <div class="rc-aliq">8,0%</div>
+      <div class="price-card" id="pcCartao" style="background:var(--blue-lt);border-color:var(--blue);padding:10px 12px;">
+        <div class="pc-icon" style="font-size:16px;">💳</div>
+        <div class="pc-method" style="font-size:10px;">Cartão</div>
+        <div class="pc-price" id="val-cartao" style="font-size:22px;">—</div>
+        <div class="pc-sub" id="sub-cartao" style="font-size:10px;">—</div>
+        <div class="pc-lucro" id="luc-cartao" style="color:var(--green);font-size:10px;">—</div>
       </div>
 
-      <div class="regime-card" data-aliq="0.34" onclick="selectRegime(this)">
-        <div class="rc-icon">🔴</div>
-        <div class="rc-name">Lucro Real</div>
-        <div class="rc-range">Obrigatório acima de R$ 78M</div>
-        <div class="rc-aliq">34,0%</div>
+      <div class="price-card" id="pcBoleto" style="background:var(--green-lt);border-color:var(--green);padding:10px 12px;">
+        <div class="pc-icon" style="font-size:16px;">🧾</div>
+        <div class="pc-method" style="font-size:10px;">Boleto</div>
+        <div class="pc-price" id="val-boleto" style="font-size:22px;">—</div>
+        <div class="pc-sub" id="sub-boleto" style="font-size:10px;">—</div>
+        <div class="pc-lucro" id="luc-boleto" style="color:var(--green);font-size:10px;">—</div>
+      </div>
+
+      <div class="price-card" id="pcPix" style="background:var(--yellow-lt,#FFFBF0);border-color:var(--yellow,#D97706);padding:10px 12px;">
+        <div class="pc-icon" style="font-size:16px;">⚡</div>
+        <div class="pc-method" style="font-size:10px;">Pix</div>
+        <div class="pc-price" id="val-pix" style="font-size:22px;">—</div>
+        <div class="pc-sub" id="sub-pix" style="font-size:10px;">—</div>
+        <div class="pc-lucro" id="luc-pix" style="color:var(--green);font-size:10px;">—</div>
       </div>
 
     </div>
-
-    
-    <div style="margin-top:16px;" id="simpleFaixaWrap">
-      <div class="field">
-        <div class="field-label">
-          <span id="aliqPanelLabel">Alíquota exata do Simples Nacional</span>
-          <span class="edit-badge">✏️ ALTERAR</span>
-        </div>
-        <div class="input-wrap">
-          <input type="number" id="aliqSimples" class="has-suf" value="4.5" min="0" max="100" step="0.1" oninput="updateSimplesBadge(); calc()">
-          <span class="input-suf">%</span>
-        </div>
-        <div class="field-tip info">
-          💡 <strong>Simples Nacional — faixas:</strong> Faixa 1 (até R$180k): <strong>4,5%</strong> · Faixa 2 (até R$360k): <strong>5,25%</strong> · Faixa 3 (até R$720k): <strong>6%</strong> · Faixa 4 (até R$1,8M): <strong>7,5%</strong> · Faixa 5 (até R$3,6M): <strong>9%</strong> · Faixa 6 (até R$4,8M): <strong>10,5%</strong>. Consulte seu contador.
-        </div>
-      </div>
+    <div id="alert-preco" style="display:none;margin-top:10px;background:var(--red-lt);border:1px solid var(--red);border-radius:8px;padding:8px 12px;font-size:12px;color:var(--red);font-weight:700;">
+      <span id="alert-preco-text"></span>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:10px;" id="areaEmailOrcamento">
+      <button id="btnEmailOrcamento" onclick="emailOrcamento()" style="font-size:11px;font-weight:700;color:var(--blue);background:var(--blue-lt);border:1px solid var(--blue-md);border-radius:8px;padding:6px 14px;cursor:pointer;">📧 Enviar orçamento por email</button>
     </div>
   </div>
 
-  </div>
+  <!-- ── INPUTS — accordion ── -->
+  <details open style="margin-bottom:10px;">
+    <summary style="background:var(--white);border:1px solid var(--border);border-radius:12px;padding:12px 16px;cursor:pointer;font-size:12px;font-weight:700;color:var(--text);list-style:none;display:flex;align-items:center;gap:8px;">
+      <span>✏️</span> Produto &amp; Custos
+    </summary>
+    <div style="background:var(--white);border:1px solid var(--border);border-top:none;border-radius:0 0 12px 12px;padding:16px;">
 
-  <!-- ═══ STEP 2: PRODUTO + DRE UNIFICADO ═══ -->
-  <div id="secao-produto">
-  <div class="step-label">
-    <div class="step-num">2</div>
-    <div class="step-title">Produto &amp; Composição do Preço <span class="step-sub">— preencha e veja o resultado instantâneo</span></div>
-  </div>
-
-  <div class="card" style="padding:16px 20px;">
-
-    
-    <div class="step2-header" style="display:grid; gap:0 14px; margin-bottom:10px;">
-      <div style="grid-column:1/3; font-size:9px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:var(--blue); border-bottom:2px solid var(--blue-lt); padding-bottom:4px;">
-        ✏️ Produto
-      </div>
-      <div style="grid-column:3/5; font-size:9px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:var(--orange); border-bottom:2px solid var(--orange-lt); padding-bottom:4px;">
-        💳 Taxas
-      </div>
-    </div>
-
-    
-    <div style="margin-bottom:10px;">
-        <div style="font-size:10px; font-weight:700; color:var(--text-light); margin-bottom:4px;">
-          Nome do Produto <span style="font-size:9px;font-weight:400;color:var(--text-4);">(opcional — para o histórico)</span>
-        </div>
-        <input type="text" id="nomeProd" class="step2-input" oninput="_salvarEstadoPrec()"
-          placeholder="Ex: Ração Royal Canin 15kg, Vacina V8..." maxlength="60"
-          style="width:100%;height:32px;font-size:13px;border:1px solid var(--border);
-          border-radius:8px;padding:0 10px;font-family:'Inter',sans-serif;color:var(--text);">
-      </div>
-      <div class="step2-grid" style="display:grid; gap:8px 12px; align-items:start;">
-
-      
-      <div>
-        <div style="font-size:10px; font-weight:700; color:var(--text-light); margin-bottom:4px;">
-          Custo (Fornecedor) <span class="edit-badge" style="font-size:8px;">✏️</span>
-        </div>
-        <div class="input-wrap" style="margin-bottom:3px;">
-          <span class="input-pre">R$</span>
-          <input type="number" id="custo" class="has-pre" value="4.00" min="0" step="0.01" oninput="calc();_salvarEstadoPrec()" style="height:32px; font-size:13px;">
-        </div>
-        <div style="font-size:9px; color:var(--gray);">Valor por unidade.</div>
+      <!-- Nome do produto -->
+      <div style="margin-bottom:12px;">
+        <label style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-3);display:block;margin-bottom:4px;">Nome do produto <span style="font-weight:400;opacity:.6;">(opcional)</span></label>
+        <input type="text" id="nomeProd" class="inp" oninput="_salvarEstadoPrec()"
+          placeholder="Ex: Ração Royal Canin 15kg, Vacina V8..." maxlength="60" style="height:38px;">
       </div>
 
-      
-      <div>
-        <div style="font-size:10px; font-weight:700; color:var(--text-light); margin-bottom:4px;">
-          Margem de Lucro <span class="edit-badge" style="font-size:8px;">✏️</span>
-        </div>
-        <div class="input-wrap" style="margin-bottom:3px;">
-          <input type="number" id="margem" class="has-suf" value="50" min="1" max="300" step="1" oninput="calc()" style="height:32px; font-size:13px;">
-          <span class="input-suf">%</span>
-        </div>
-        <div style="font-size:9px; color:var(--gray);" id="margemTip">Revenda: 50–80%</div>
-      </div>
-
-      
-      <div style="background:var(--gray-lt); border-radius:10px; padding:10px 14px;">
-        <div style="font-size:10px; font-weight:700; color:var(--text-light); margin-bottom:6px; display:flex; align-items:center; gap:8px;">
-          <div class="toggle-switch" id="toggleCartao" onclick="toggleField('cartao')"
-            style="cursor:pointer; background:var(--blue); flex-shrink:0; width:36px; height:20px;">
-            <div class="toggle-knob" style="left:19px; width:14px; height:14px; top:3px;"></div>
+      <!-- Custo + Margem em linha -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
+        <div>
+          <label style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-3);display:block;margin-bottom:4px;">Custo (R$)</label>
+          <div class="input-wrap">
+            <span class="input-pre">R$</span>
+            <input type="number" id="custo" class="has-pre" value="4.00" min="0" step="0.01" oninput="calc();_salvarEstadoPrec()" style="height:38px;">
           </div>
-          💳 Cartão
         </div>
-        <div id="fieldCartao" style="display:flex; align-items:center; gap:6px;">
-          <span style="font-size:10px; color:var(--gray); white-space:nowrap;">Taxa</span>
-          <div class="input-wrap" style="flex:1; margin:0;">
-            <input type="number" id="taxaCartao" value="3.0" min="0" max="10" step="0.1" oninput="calc()"
-              class="has-suf" style="height:32px; font-size:13px;">
+        <div>
+          <label style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-3);display:block;margin-bottom:4px;">Margem (%)</label>
+          <div class="input-wrap">
+            <input type="number" id="margem" class="has-suf" value="50" min="1" max="300" step="1" oninput="calc()" style="height:38px;">
             <span class="input-suf">%</span>
           </div>
+          <div style="font-size:9px;color:var(--text-4);margin-top:3px;" id="margemTip">Revenda: 50–80%</div>
         </div>
       </div>
 
-      
-      <div style="background:var(--gray-lt); border-radius:10px; padding:10px 14px;">
-        <div style="font-size:10px; font-weight:700; color:var(--text-light); margin-bottom:6px; display:flex; align-items:center; gap:8px;">
-          <div class="toggle-switch" id="toggleBoleto" onclick="toggleField('boleto')"
-            style="cursor:pointer; flex-shrink:0; width:36px; height:20px;">
-            <div class="toggle-knob" style="width:14px; height:14px; top:3px;"></div>
+      <!-- Taxas compactas -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <div style="background:var(--bg2);border-radius:10px;padding:10px 12px;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+            <div class="toggle-switch" id="toggleCartao" onclick="toggleField('cartao')" style="cursor:pointer;background:var(--blue);flex-shrink:0;width:36px;height:20px;">
+              <div class="toggle-knob" style="left:19px;width:14px;height:14px;top:3px;"></div>
+            </div>
+            <span style="font-size:11px;font-weight:700;color:var(--text);">💳 Cartão</span>
           </div>
-          🧾 Boleto
+          <div id="fieldCartao" style="display:flex;align-items:center;gap:4px;">
+            <span style="font-size:10px;color:var(--text-3);">Taxa</span>
+            <div class="input-wrap" style="flex:1;margin:0;">
+              <input type="number" id="taxaCartao" value="3.0" min="0" max="10" step="0.1" oninput="calc()" class="has-suf" style="height:30px;font-size:12px;">
+              <span class="input-suf">%</span>
+            </div>
+          </div>
         </div>
-        <div id="fieldBoleto" style="display:flex; align-items:center; gap:6px; opacity:0.4; pointer-events:none;">
-          <span style="font-size:10px; color:var(--gray); white-space:nowrap;">Custo</span>
-          <div class="input-wrap" style="flex:1; margin:0;">
-            <span class="input-pre">R$</span>
-            <input type="number" id="custoBoleto" value="2.50" min="0" step="0.10" oninput="calc()"
-              class="has-pre" style="height:32px; font-size:13px;">
+        <div style="background:var(--bg2);border-radius:10px;padding:10px 12px;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+            <div class="toggle-switch" id="toggleBoleto" onclick="toggleField('boleto')" style="cursor:pointer;flex-shrink:0;width:36px;height:20px;">
+              <div class="toggle-knob" style="width:14px;height:14px;top:3px;"></div>
+            </div>
+            <span style="font-size:11px;font-weight:700;color:var(--text);">🧾 Boleto</span>
+          </div>
+          <div id="fieldBoleto" style="display:flex;align-items:center;gap:4px;opacity:0.4;pointer-events:none;">
+            <span style="font-size:10px;color:var(--text-3);">Custo</span>
+            <div class="input-wrap" style="flex:1;margin:0;">
+              <span class="input-pre">R$</span>
+              <input type="number" id="custoBoleto" value="2.50" min="0" step="0.10" oninput="calc()" class="has-pre" style="height:30px;font-size:12px;">
+            </div>
           </div>
         </div>
       </div>
-
-      
-
     </div>
-  </div>
+  </details>
 
-  <!-- ═══ CARD: COMPOSIÇÃO DO PREÇO ═══ -->
-  <div class="card" style="padding:16px 20px;">
-    <div style="font-size:9px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:var(--green); border-bottom:2px solid var(--green-lt); padding-bottom:4px; margin-bottom:12px;">
-      📊 Composição do preço
+  <!-- Regime Tributário — accordion colapsado -->
+  <details style="margin-bottom:10px;" id="secao-regime">
+    <summary style="background:var(--white);border:1px solid var(--border);border-radius:12px;padding:12px 16px;cursor:pointer;font-size:12px;font-weight:700;color:var(--text);list-style:none;display:flex;align-items:center;gap:8px;">
+      <span>🏛️</span> Regime Tributário
+    </summary>
+    <div style="background:var(--white);border:1px solid var(--border);border-top:none;border-radius:0 0 12px 12px;padding:16px;">
+      <div class="regime-grid" id="regimeGrid">
+        <div class="regime-card selected" data-aliq="0.045" onclick="selectRegime(this)">
+          <div class="rc-badge">SELECIONADO</div>
+          <div class="rc-icon">🟢</div>
+          <div class="rc-name">Simples Nacional<br>Comércio</div>
+          <div class="rc-range">Faturamento até R$ 4,8M/ano</div>
+          <div class="rc-aliq" id="aliq-simples">4,5%</div>
+        </div>
+        <div class="regime-card" data-aliq="0.08" onclick="selectRegime(this)">
+          <div class="rc-icon">🔵</div>
+          <div class="rc-name">Lucro Presumido</div>
+          <div class="rc-range">Até R$ 78M/ano</div>
+          <div class="rc-aliq">8,0%</div>
+        </div>
+        <div class="regime-card" data-aliq="0.34" onclick="selectRegime(this)">
+          <div class="rc-icon">🔴</div>
+          <div class="rc-name">Lucro Real</div>
+          <div class="rc-range">Acima de R$ 78M</div>
+          <div class="rc-aliq">34,0%</div>
+        </div>
+      </div>
+      <div style="margin-top:14px;" id="simpleFaixaWrap">
+        <div class="field">
+          <div class="field-label">
+            <span id="aliqPanelLabel">Alíquota exata do Simples Nacional</span>
+            <span class="edit-badge">✏️ ALTERAR</span>
+          </div>
+          <div class="input-wrap">
+            <input type="number" id="aliqSimples" class="has-suf" value="4.5" min="0" max="100" step="0.1" oninput="updateSimplesBadge(); calc()">
+            <span class="input-suf">%</span>
+          </div>
+          <div class="field-tip info">💡 <strong>Faixas:</strong> até R$180k: 4,5% · R$360k: 5,25% · R$720k: 6% · R$1,8M: 7,5% · R$3,6M: 9% · R$4,8M: 10,5%</div>
+        </div>
+      </div>
     </div>
-    <div id="dreBody"></div>
-  </div>
+  </details>
 
-  <!-- ═══ STEP 3: RESULTADOS ═══ -->
-  <div class="step-label">
-    <div class="step-num">3</div>
-    <div class="step-title">Preço de Venda Sugerido <span class="step-sub">— calculado automaticamente</span></div>
-  </div>
+  <!-- Composição do Preço (DRE) — accordion colapsado -->
+  <details style="margin-bottom:10px;" id="secao-produto">
+    <summary style="background:var(--white);border:1px solid var(--border);border-radius:12px;padding:12px 16px;cursor:pointer;font-size:12px;font-weight:700;color:var(--text);list-style:none;display:flex;align-items:center;gap:8px;">
+      <span>📊</span> Composição do Preço (DRE)
+    </summary>
+    <div style="background:var(--white);border:1px solid var(--border);border-top:none;border-radius:0 0 12px 12px;padding:16px;">
+      <div id="dreBody"></div>
+    </div>
+  </details>
 
-  <div class="card">
-    <div class="price-cards" id="priceCards">
+  <!-- Resultados de precificação -->
+  <div class="price-cards" id="priceCards" style="margin-bottom:10px;">
 
       <div class="price-card" id="pcSemTaxa" style="background:#F3F0FF; border-color:#7C3AED;">
         <div class="pc-icon">🏷️</div>
@@ -2975,20 +2940,18 @@ transition: background .15s; }
         <div class="pc-lucro" id="luc-pix" style="color:var(--green);">—</div>
       </div>
 
-    </div>
-
-    <div id="alert-preco" class="alert blue" style="margin-top:14px;">
-      <span class="alert-icon">💡</span>
-      <span id="alert-preco-text">Preencha os dados acima para ver os preços calculados.</span>
-    </div>
   </div>
 
+  <div id="alert-preco" class="alert blue" style="margin-top:6px;margin-bottom:10px;">
+    <span class="alert-icon">💡</span>
+    <span id="alert-preco-text">Preencha os dados acima para ver os preços calculados.</span>
   </div>
-  <div style="text-align:right; margin-top:-4px; margin-bottom:8px;" id="areaEmailOrcamento" style="display:none;">
+
+  <div style="text-align:right;margin-bottom:10px;" id="areaEmailOrcamento">
     <button onclick="emailOrcamento()" id="btnEmailOrcamento"
-      style="display:none; background:var(--green-lt); color:var(--green); border:1px solid var(--green-md);
-             border-radius:8px; padding:8px 16px; font-family:'Inter',sans-serif; font-weight:700;
-             font-size:12px; cursor:pointer; gap:6px; align-items:center;">
+      style="display:none;background:var(--green-lt);color:var(--green);border:1px solid var(--green-md);
+             border-radius:8px;padding:8px 16px;font-family:'Inter',sans-serif;font-weight:700;
+             font-size:12px;cursor:pointer;gap:6px;align-items:center;">
       📧 Enviar orçamento por email
     </button>
   </div>
