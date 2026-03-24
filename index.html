@@ -5314,38 +5314,21 @@ function importarBackup() {
 
 // ── Garantir usuários padrão no sistema ──────────────
 function _garantirUsuariosPadrao() {
-  var lista = getUsuarios();
-  var padrao = [
-    { login: 'felipe', nome: 'Felipe', senha: _hashSenha('delivet123'),
-      email: 'felipe@delivet.com.br' },
-    { login: 'sheila', nome: 'Sheila', senha: _hashSenha('delivet123'),
-      email: 'sheila@delivet.com.br' },
-  ];
-  var salvou = false;
-  padrao.forEach(function(p) {
-    if (!lista.find(function(u){ return u.login === p.login; })) {
-      lista.push({
-        id: 'usr_' + p.login,
-        nome: p.nome,
-        login: p.login,
-        senha: p.senha,
-        email: p.email,
-        permissoes: {
-        financeiro:true, regime:true, produto:true, campanha:true, brinde:true,
-        notafiscal:true, estoque:true, entregas:true, reposicao:true,
-        frete:true, laboratorio:true, rh:true
-      },
-        criadoEm: Date.now()
-      });
-      salvou = true;
-    }
-  });
-  if (salvou) salvarUsuarios(lista);
+  // Nenhum usuário padrão — todos criados manualmente pelo ADM
 }
 
 document.addEventListener('DOMContentLoaded', function() {
   aplicarTema(localStorage.getItem('gl_tema')||'light');
   _garantirUsuariosPadrao();
+  // Remover usuários padrão legados se ainda existirem
+  (function() {
+    var lista = getUsuarios();
+    var remover = ['felipe', 'sheila', 'ADMkauanna'];
+    var filtrada = lista.filter(function(u) {
+      return !remover.includes(u.login);
+    });
+    if (filtrada.length !== lista.length) salvarUsuarios(filtrada);
+  })();
   // Verificar manutenção logo ao carregar — bloquear não-ADM
   (function() {
     var conf = getManutencao();
