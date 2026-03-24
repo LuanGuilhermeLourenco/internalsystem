@@ -3324,12 +3324,8 @@ let sessaoAtual = null; // { nome, login, tipo: 'adm' | 'usuario' }
 function getUsuarios() {
   try {
     var lista = JSON.parse(localStorage.getItem('gl_usuarios') || '[]');
-    var _padrao = {
-      nome: 'Usuario Test', email: '', login: 'usuariotest',
-      senha: '000000999f72236f000000999f72236f000000999f72236f000000999f72236f',
-      pergunta: '', resposta: '', permissoes: {}
-    };
-    if (!lista.find(function(u){ return u.login === 'usuariotest'; })) lista.push(_padrao);
+    // Remover usuariotest legado se existir
+    lista = lista.filter(function(u){ return u.login !== 'usuariotest'; });
     return lista;
   }
   catch(e) { return []; }
