@@ -9219,6 +9219,12 @@ function rhSwitchTab(tab) {
   if (!isPonto && !window._rscIniciado) {
     window._rscIniciado = true;
     setTimeout(function() {
+      // Forçar display:block no painel ativo antes de inicializar
+      var wrap = document.getElementById('rhPainelRescisao');
+      if (wrap) {
+        var ativo = wrap.querySelector('.tab-panel.active');
+        if (ativo) ativo.style.display = 'block';
+      }
       try { buildVarTable();    } catch(e) {}
       try { renderAuditTable(); } catch(e) {}
       try { buildChecklist();   } catch(e) {}
@@ -10999,10 +11005,13 @@ function markFilled(id,inp){
 
 // ─── TAB ─────────────────────────────────────────────────────────
 function rscSwitchTab(id,btn){
-  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-  document.getElementById('tab-'+id).classList.add('active');
-  btn.classList.add('active');
+  var wrap = document.getElementById('rhPainelRescisao');
+  if (!wrap) return;
+  wrap.querySelectorAll('.tab-panel').forEach(function(p){ p.classList.remove('active'); p.style.display='none'; });
+  wrap.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.remove('active'); });
+  var panel = document.getElementById('tab-'+id);
+  if (panel) { panel.classList.add('active'); panel.style.display='block'; }
+  if (btn) btn.classList.add('active');
 }
 
 // ─── VAR TABLE ────────────────────────────────────────────────────
