@@ -2088,7 +2088,7 @@ transition: background .15s; }
 
 /* ══ Rescisão Trabalhista ══ */
 
-.rsc-wrap .container{max-width:1140px;margin:0 auto;padding:0 24px;position:relative;z-index:1}
+.rsc-wrap .rsc-container{padding:0 4px;position:relative;}
 @keyframes rscFadeDown{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
 @keyframes rscFadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 @keyframes rscPulse{0%,100%{opacity:1}50%{opacity:.4}}
@@ -2298,6 +2298,11 @@ transition: background .15s; }
 [data-tema="dark"] .rsc-wrap .var-table,
 [data-tema="dark"] .rsc-wrap .verbas-table { background: #1c2a1e !important; }
 [data-tema="dark"] .rsc-wrap .cards-grid { background: rgba(255,255,255,0.08) !important; }
+
+.rsc-wrap .rsc-tabs-nav { position:relative !important; top:auto !important; background:var(--surface) !important; z-index:1 !important; }
+.rsc-wrap .rsc-header { padding: 16px 0 10px !important; border-bottom: 1px solid var(--border) !important; }
+.rsc-wrap .rsc-footer { padding: 16px 0 !important; border-top: 1px solid var(--border) !important; }
+.rsc-wrap body\:\:before { display:none !important; }
 </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
@@ -11829,8 +11834,8 @@ window.addEventListener('load',()=>{
     <div class="rsc-wrap">
 <div id="toast" class="toast"></div>
 
-<div class="container">
-<header>
+<div class="rsc-container">
+<div class="rsc-header">
   <div class="header-badge">Auditoria Interna · CLT · Março 2026</div>
   <h1>Calculadora de Rescisão Trabalhista</h1>
   <div class="header-sub">
@@ -11840,9 +11845,9 @@ window.addEventListener('load',()=>{
     <span>Súm. 450 TST · Férias em dobro</span>
     <span>eSocial S-2299</span>
   </div>
-</header>
+</div>
 
-<nav class="tabs-nav">
+<div class="rsc-tabs-nav tabs-nav">
   <button class="tab-btn active" onclick="rscSwitchTab('premissas',this)">
     <svg class="tab-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="12" height="12" rx="2"/><path d="M5 8h6M5 5h4M5 11h3"/></svg>
     Premissas
@@ -11860,10 +11865,10 @@ window.addEventListener('load',()=>{
     Checklist Compliance
     <span class="tab-badge" id="badge-checklist"></span>
   </button>
-</nav>
+</div>
 
 <!-- ═══ ABA 1: PREMISSAS ═══ -->
-<section id="tab-premissas" class="tab-panel active">
+<div id="tab-premissas" class="tab-panel active">
 
   <p class="section-label">▌ A — Dados do Empregado</p>
   <div class="cards-grid">
@@ -12051,10 +12056,10 @@ window.addEventListener('load',()=>{
     </div>
   </div>
 
-</section>
+</div>
 
 <!-- ═══ ABA 2: CÁLCULO ═══ -->
-<section id="tab-calculo" class="tab-panel">
+<div id="tab-calculo" class="tab-panel">
 
   <div id="calc-error" class="error-box" style="display:none">
     Preencha os dados obrigatórios (★) na aba Premissas para calcular.
@@ -12236,10 +12241,10 @@ window.addEventListener('load',()=>{
     <tfoot><tr class="total-row"><td colspan="5">IRRF TOTAL</td><td class="num" id="irrf-total-mem">R$ 0,00</td></tr></tfoot>
   </table>
 
-</section>
+</div>
 
 <!-- ═══ ABA 3: AUDITORIA ═══ -->
-<section id="tab-auditoria" class="tab-panel">
+<div id="tab-auditoria" class="tab-panel">
   <div class="info-box">Matriz de auditoria de passivo trabalhista — CPC 25 / IAS 37. Insira os dados de cada rescisão auditada para mapear gaps entre verbas calculadas e pagas.</div>
   <div class="summary-bar">
     <div class="summary-pill"><div class="summary-pill-value" id="sum-total-calc" style="color:var(--accent)">R$ 0</div><div class="summary-pill-label">Total Calculado</div></div>
@@ -12272,10 +12277,10 @@ window.addEventListener('load',()=>{
     <button class="btn btn-secondary" onclick="exportAuditCSV()">↓ Exportar CSV</button>
     <button class="btn btn-danger" onclick="clearAudit()">Limpar tabela</button>
   </div>
-</section>
+</div>
 
 <!-- ═══ ABA 4: CHECKLIST ═══ -->
-<section id="tab-checklist" class="tab-panel">
+<div id="tab-checklist" class="tab-panel">
   <div class="summary-bar">
     <div class="summary-pill"><div class="summary-pill-value" id="ck-sim" style="color:var(--green)">0</div><div class="summary-pill-label">✅ Conformes</div></div>
     <div class="summary-pill"><div class="summary-pill-value" id="ck-nao" style="color:var(--red)">0</div><div class="summary-pill-label">❌ Não conformes</div></div>
@@ -12287,9 +12292,9 @@ window.addEventListener('load',()=>{
     <button class="btn btn-secondary" onclick="exportChecklistCSV()">↓ Exportar CSV</button>
     <button class="btn btn-danger" onclick="resetChecklist()" style="margin-left:8px">Resetar</button>
   </div>
-</section>
+</div>
 
-<footer>
+<div class="rsc-footer">
   <div class="footer-inner">
     <div class="footer-left">
       Sistema Prompt Auditoria Interna Sênior v2.1 · CLT · TST · CPC 25 · Março 2026<br>
@@ -12305,7 +12310,7 @@ window.addEventListener('load',()=>{
       <button class="btn btn-primary" onclick="window.print()">⎙ Imprimir</button>
     </div>
   </div>
-</footer>
+</div>
 </div>
     </div>
   </div>
