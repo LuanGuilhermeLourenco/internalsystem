@@ -9208,14 +9208,14 @@ function rhSwitchTab(tab) {
   if (ativo)   { ativo.style.borderBottomColor   = 'var(--blue)'; ativo.style.color   = 'var(--blue)'; }
   if (inativo) { inativo.style.borderBottomColor = 'transparent'; inativo.style.color = 'var(--text-3)'; }
 
-  // Inicializar rescisão ao abrir pela primeira vez
-  if (!isPonto && typeof buildVarTable === 'function' && !window._rscIniciado) {
+  // Inicializar rescisão ao abrir
+  if (!isPonto && !window._rscIniciado) {
     window._rscIniciado = true;
     setTimeout(function() {
-      buildVarTable();
-      renderAuditTable();
-      buildChecklist();
-    }, 50);
+      try { buildVarTable();    } catch(e) {}
+      try { renderAuditTable(); } catch(e) {}
+      try { buildChecklist();   } catch(e) {}
+    }, 100);
   }
 }
 </script>
