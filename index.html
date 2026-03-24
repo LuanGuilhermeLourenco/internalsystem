@@ -2113,7 +2113,7 @@ transition: background .15s; }
 .rsc-wrap .tab-badge.visible{display:inline-block}
 
 /* PANELS */
-.rsc-wrap .tab-panel{display:none !important;padding:28px 0 56px}
+.rsc-wrap .tab-panel{display:none;padding:28px 0 56px}
 .rsc-wrap .tab-panel.active{display:block !important;animation:rscFadeIn .25s both}
 .rsc-wrap .section-label{font-family:var(--mono);font-size:10px;color:var(--text-dim);letter-spacing:.12em;text-transform:uppercase;margin-bottom:14px;padding-bottom:9px;border-bottom:1px solid var(--border)}
 
@@ -2309,6 +2309,13 @@ transition: background .15s; }
 [data-tema="dark"] #rhSubRescisao { color: var(--text-3) !important; }
 [data-tema="dark"] #rhSubPonto[style*="var(--blue)"],
 [data-tema="dark"] #rhSubRescisao[style*="var(--blue)"] { color: var(--text) !important; }
+
+#rhPainelRescisao .tab-panel.active {
+  display: block !important;
+}
+#rhPainelRescisao .tab-panel:not(.active) {
+  display: none !important;
+}
 </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
