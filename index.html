@@ -9204,37 +9204,49 @@ function rhSwitchTab(tab) {
   var btnRescisao    = document.getElementById('rhSubRescisao');
   if (!painelPonto || !painelRescisao) return;
 
-  var isPonto = (tab === 'ponto');
+  var mostraPonto = (tab === 'ponto');
 
-  painelPonto.style.display    = isPonto ? '' : 'none';
-  painelRescisao.style.display = isPonto ? 'none' : '';
+  // Mostrar/ocultar painéis
+  painelPonto.style.display    = mostraPonto ? '' : 'none';
+  painelRescisao.style.display = mostraPonto ? 'none' : '';
 
-  // Estilo botão ativo
-  var ativo   = isPonto ? btnPonto    : btnRescisao;
-  var inativo = isPonto ? btnRescisao : btnPonto;
-  if (ativo)   { ativo.style.borderBottomColor   = 'var(--blue)'; ativo.style.color   = 'var(--blue)'; }
-  if (inativo) { inativo.style.borderBottomColor = 'transparent'; inativo.style.color = 'var(--text-3)'; }
+  // Estilo dos botões
+  if (btnPonto) {
+    btnPonto.style.borderBottomColor = mostraPonto ? 'var(--blue)' : 'transparent';
+    btnPonto.style.color = mostraPonto ? 'var(--blue)' : 'var(--text-3)';
+  }
+  if (btnRescisao) {
+    btnRescisao.style.borderBottomColor = mostraPonto ? 'transparent' : 'var(--blue)';
+    btnRescisao.style.color = mostraPonto ? 'var(--text-3)' : 'var(--blue)';
+  }
 
-  // Inicializar rescisão ao abrir
-  if (!isPonto) {
-    var wrap = document.getElementById('rhPainelRescisao');
-    if (!wrap) return;
-    // Forçar todos os painéis ocultos primeiro
-    wrap.querySelectorAll('.tab-panel').forEach(function(p) {
-      p.style.setProperty('display','none','important');
+  // Inicializar rescisão
+  if (!mostraPonto) {
+    // Forçar visibilidade de todos os tab-panel do protótipo
+    var paineis = painelRescisao.querySelectorAll('.tab-panel');
+    paineis.forEach(function(p) {
+      p.style.cssText += ';display:none!important;';
     });
-    // Mostrar o ativo
-    var ativo = wrap.querySelector('.tab-panel.active');
-    if (!ativo) { ativo = wrap.querySelector('#tab-premissas'); if(ativo) ativo.classList.add('active'); }
-    if (ativo) ativo.style.setProperty('display','block','important');
 
+    // Mostrar o painel ativo (premissas por padrão)
+    var painelAtivo = painelRescisao.querySelector('#tab-premissas');
+    if (!painelAtivo) painelAtivo = painelRescisao.querySelector('.tab-panel');
+    if (painelAtivo) {
+      painelAtivo.classList.add('active');
+      painelAtivo.style.cssText = painelAtivo.style.cssText.replace(/display\s*:[^;!]+!important/g,'');
+      painelAtivo.style.cssText += ';display:block!important;';
+    }
+
+    // Init uma única vez
     if (!window._rscIniciado) {
       window._rscIniciado = true;
       setTimeout(function() {
         try { buildVarTable();    } catch(e) {}
         try { renderAuditTable(); } catch(e) {}
         try { buildChecklist();   } catch(e) {}
-      }, 150);
+        // Forçar novamente após build
+        if (painelAtivo) painelAtivo.style.cssText += ';display:block!important;';
+      }, 200);
     }
   }
 }
