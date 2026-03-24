@@ -2085,6 +2085,219 @@ transition: background .15s; }
 }
 [data-tema="dark"] #mercadoTabela th { background: var(--bg2) !important; }
 [data-tema="dark"] #mercadoTabela tr { background: transparent; }
+
+/* ══ Rescisão Trabalhista ══ */
+
+.rsc-wrap .container{max-width:1140px;margin:0 auto;padding:0 24px;position:relative;z-index:1}
+@keyframes rscFadeDown{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes rscFadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+@keyframes rscPulse{0%,100%{opacity:1}50%{opacity:.4}}
+@keyframes rscFlash{0%{background:rgba(74,158,255,.15)}100%{background:transparent}}
+
+/* HEADER */
+.rsc-wrap header{padding:44px 0 26px;border-bottom:1px solid var(--border);animation:rscFadeDown .4s both}
+.rsc-wrap .header-badge{font-family:var(--mono);font-size:11px;color:var(--accent);letter-spacing:.12em;text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.rsc-wrap .header-badge::before{content:'';display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 10px var(--accent);animation:rscPulse 2.5s ease-in-out infinite}
+.rsc-wrap h1{font-family:var(--mono);font-size:clamp(18px,2.8vw,28px);font-weight:600;color:#e8edf5;letter-spacing:-.02em;line-height:1.2;margin-bottom:8px}
+.rsc-wrap .header-sub{font-size:13px;color:var(--text-muted);font-weight:300;display:flex;gap:16px;flex-wrap:wrap}
+.rsc-wrap .header-sub span::before{content:'—';color:var(--text-dim);margin-right:5px}
+
+/* TABS */
+.rsc-wrap .tabs-nav{display:flex;border-bottom:1px solid var(--border);margin-top:28px;overflow-x:auto;scrollbar-width:none;position:sticky;top:0;background:var(--bg);z-index:10;padding-top:2px}
+.rsc-wrap .tabs-nav::-webkit-scrollbar{display:none}
+.rsc-wrap .tab-btn{background:none;border:none;border-bottom:2px solid transparent;padding:11px 16px;font-family:var(--mono);font-size:11px;font-weight:500;color:var(--text-muted);cursor:pointer;white-space:nowrap;transition:all .2s;letter-spacing:.04em;margin-bottom:-1px;display:flex;align-items:center;gap:6px}
+.rsc-wrap .tab-btn:hover{color:var(--text);background:rgba(255,255,255,.02)}
+.rsc-wrap .tab-btn.active{color:var(--accent);border-bottom-color:var(--accent)}
+.rsc-wrap .tab-icon{width:14px;height:14px;opacity:.7}
+.rsc-wrap .tab-badge{background:var(--red);color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:10px;display:none}
+.rsc-wrap .tab-badge.visible{display:inline-block}
+
+/* PANELS */
+.rsc-wrap .tab-panel{display:none;padding:28px 0 56px}
+.rsc-wrap .tab-panel.active{display:block;animation:rscFadeIn .25s both}
+.rsc-wrap .section-label{font-family:var(--mono);font-size:10px;color:var(--text-dim);letter-spacing:.12em;text-transform:uppercase;margin-bottom:14px;padding-bottom:9px;border-bottom:1px solid var(--border)}
+
+/* CARDS GRID */
+.rsc-wrap .cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:1px;background:var(--border);border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:24px}
+.rsc-wrap .field-card{background:var(--surface);padding:14px 16px;transition:background .15s;position:relative}
+.rsc-wrap .field-card:hover{background:var(--surface2)}
+.rsc-wrap .field-card.required::after{content:'';position:absolute;top:0;left:0;width:2px;height:100%;background:rgba(74,158,255,.4)}
+.rsc-wrap .field-card.filled::after{background:rgba(61,214,140,.5)}
+.rsc-wrap .field-card.warn::after{background:var(--amber)}
+.rsc-wrap .field-label{font-family:var(--mono);font-size:10px;color:var(--text-muted);letter-spacing:.06em;margin-bottom:6px;text-transform:uppercase;display:flex;align-items:center;gap:5px}
+.rsc-wrap .req{color:var(--red);font-size:11px;line-height:1}
+.rsc-wrap .input-field{background:var(--bg);border:1px solid var(--border-bright);border-radius:4px;padding:7px 10px;font-family:var(--mono);font-size:13px;color:var(--accent);width:100%;outline:none;transition:all .18s;-webkit-appearance:none}
+.rsc-wrap .input-field:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-glow)}
+.rsc-wrap select.input-field{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='7' viewBox='0 0 11 7'%3E%3Cpath d='M1 1l4.5 4.5L10 1' stroke='%235a6378' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 9px center;padding-right:28px;appearance:none}
+.rsc-wrap .field-note{font-size:10.5px;color:var(--text-dim);margin-top:4px}
+.rsc-wrap .field-warn{font-size:10.5px;color:var(--amber);margin-top:4px;display:none}
+.rsc-wrap .field-warn.show{display:block}
+
+/* VAR TABLE */
+.rsc-wrap .var-table{width:100%;border-collapse:collapse;margin-bottom:24px;background:var(--surface);border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.rsc-wrap .var-table thead th{background:var(--surface2);padding:8px 12px;font-family:var(--mono);font-size:10px;color:var(--text-muted);letter-spacing:.06em;text-transform:uppercase;text-align:left;border-bottom:1px solid var(--border);font-weight:500}
+.rsc-wrap .var-table tbody td{padding:5px 12px;border-bottom:1px solid var(--border);vertical-align:middle}
+.rsc-wrap .var-table tbody tr:last-child td{border-bottom:none}
+.rsc-wrap .var-table tbody tr:hover td{background:rgba(255,255,255,.02)}
+.rsc-wrap .var-table .mes-label{font-family:var(--mono);font-size:11px;color:var(--text-muted);width:90px}
+.rsc-wrap .var-table input[type="number"]{background:transparent;border:1px solid transparent;border-radius:3px;padding:4px 7px;font-family:var(--mono);font-size:12px;color:var(--accent);width:118px;outline:none;transition:all .15s;text-align:right}
+.rsc-wrap .var-table input[type="number"]:hover{border-color:var(--border);background:var(--bg)}
+.rsc-wrap .var-table input[type="number"]:focus{border-color:var(--accent);background:var(--bg)}
+.rsc-wrap .var-table .total-row td{background:rgba(61,214,140,.04);font-weight:600;font-family:var(--mono);font-size:12px;color:var(--green);border-top:1px solid var(--border-bright)}
+
+/* RESULT CARDS */
+.rsc-wrap .result-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px;margin-bottom:24px}
+.rsc-wrap .result-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px 16px;position:relative;overflow:hidden;transition:transform .2s}
+.rsc-wrap .result-card:hover{transform:translateY(-1px)}
+.rsc-wrap .result-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.rsc-wrap .result-card.blue::before{background:var(--accent)}
+.rsc-wrap .result-card.green::before{background:var(--green)}
+.rsc-wrap .result-card.amber::before{background:var(--amber)}
+.rsc-wrap .result-card.red::before{background:var(--red)}
+.rsc-wrap .result-card.purple::before{background:var(--purple)}
+.rsc-wrap .result-label{font-family:var(--mono);font-size:10px;color:var(--text-muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px}
+.rsc-wrap .result-value{font-family:var(--mono);font-size:20px;font-weight:600;color:#e8edf5}
+.rsc-wrap .result-value.blue{color:var(--accent)}
+.rsc-wrap .result-value.green{color:var(--green)}
+.rsc-wrap .result-value.amber{color:var(--amber)}
+.rsc-wrap .result-value.red{color:var(--red)}
+.rsc-wrap .result-sub{font-size:10.5px;color:var(--text-dim);margin-top:3px}
+.rsc-wrap .result-card.highlight-changed{animation:rscFlash .5s ease}
+
+/* LIQUID BANNER */
+.rsc-wrap .liquid-banner{background:rgba(61,214,140,.05);border:1px solid rgba(61,214,140,.18);border-radius:8px;padding:16px 20px;margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.rsc-wrap .liquid-banner-label{font-family:var(--mono);font-size:10px;color:var(--green);letter-spacing:.1em;text-transform:uppercase;margin-bottom:3px}
+.rsc-wrap .liquid-banner-value{font-family:var(--mono);font-size:26px;font-weight:600;color:var(--green)}
+.rsc-wrap .liquid-banner-sub{font-size:11px;color:rgba(61,214,140,.5);margin-top:2px}
+
+/* VERBAS TABLE */
+.rsc-wrap .verbas-table{width:100%;border-collapse:collapse;margin-bottom:24px}
+.rsc-wrap .verbas-table thead th{background:var(--surface2);padding:8px 12px;font-family:var(--mono);font-size:10px;color:var(--text-muted);letter-spacing:.06em;text-transform:uppercase;text-align:left;border:1px solid var(--border);font-weight:500}
+.rsc-wrap .verbas-table tbody td{padding:9px 12px;border:1px solid var(--border);font-size:13px;background:var(--surface);vertical-align:middle;transition:background .1s}
+.rsc-wrap .verbas-table tbody tr:hover td{background:var(--surface2)}
+.rsc-wrap .verbas-table .num{font-family:var(--mono);text-align:right}
+.rsc-wrap .verbas-table .verba-name{font-weight:500;color:#dde3f0}
+.rsc-wrap .verbas-table .not-due td{opacity:.45}
+.rsc-wrap .verbas-table .total-row td{background:var(--surface2);font-family:var(--mono);font-weight:600;font-size:13px;border-top:2px solid var(--border-bright)}
+.rsc-wrap .verbas-table .liquid-row td{background:rgba(61,214,140,.05);font-family:var(--mono);font-weight:600;font-size:14px;color:var(--green);border-top:2px solid rgba(61,214,140,.25)}
+.rsc-wrap .verbas-table .discount-row td{font-family:var(--mono)}
+.rsc-wrap .badge-devida{background:var(--green-glow);color:var(--green);border:1px solid rgba(61,214,140,.25);font-family:var(--mono);font-size:10px;padding:2px 7px;border-radius:3px}
+.rsc-wrap .badge-nao{background:var(--red-glow);color:var(--red);border:1px solid rgba(255,92,92,.25);font-family:var(--mono);font-size:10px;padding:2px 7px;border-radius:3px}
+.rsc-wrap .badge-info{background:var(--amber-glow);color:var(--amber);border:1px solid rgba(245,166,35,.25);font-family:var(--mono);font-size:10px;padding:2px 7px;border-radius:3px}
+
+/* DATES */
+.rsc-wrap .dates-strip{display:flex;gap:1px;background:var(--border);border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:20px}
+.rsc-wrap .date-item{flex:1;background:var(--surface);padding:12px 14px;text-align:center;transition:background .15s}
+.rsc-wrap .date-item:hover{background:var(--surface2)}
+.rsc-wrap .date-item-label{font-family:var(--mono);font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px}
+.rsc-wrap .date-item-value{font-family:var(--mono);font-size:12px;color:#e8edf5;font-weight:500}
+.rsc-wrap .date-item-value.alert{color:var(--red)}
+.rsc-wrap .date-item-value.ok{color:var(--green)}
+
+/* ALERT BOXES */
+.rsc-wrap .warning-box{background:rgba(245,166,35,.05);border:1px solid rgba(245,166,35,.2);border-radius:6px;padding:12px 15px;font-size:13px;color:var(--amber);margin-bottom:16px;display:flex;gap:9px;align-items:flex-start}
+.rsc-wrap .warning-box::before{content:'⚠';font-size:14px;flex-shrink:0;margin-top:1px}
+.rsc-wrap .info-box{background:rgba(74,158,255,.04);border:1px solid rgba(74,158,255,.14);border-radius:6px;padding:12px 15px;font-size:13px;color:#7db8ff;margin-bottom:20px;display:flex;gap:9px}
+.rsc-wrap .info-box::before{content:'ℹ';font-size:14px;flex-shrink:0}
+.rsc-wrap .error-box{background:rgba(255,92,92,.05);border:1px solid rgba(255,92,92,.2);border-radius:6px;padding:12px 15px;font-size:13px;color:var(--red);margin-bottom:16px;display:flex;gap:9px;align-items:flex-start}
+.rsc-wrap .error-box::before{content:'✕';font-size:14px;flex-shrink:0}
+
+/* AUDIT TABLE */
+.rsc-wrap .audit-table{width:100%;border-collapse:collapse;margin-bottom:24px;font-size:12px}
+.rsc-wrap .audit-table thead th{background:var(--surface2);padding:8px 10px;font-family:var(--mono);font-size:9.5px;color:var(--text-muted);letter-spacing:.08em;text-transform:uppercase;text-align:left;border:1px solid var(--border);white-space:nowrap}
+.rsc-wrap .audit-table tbody td{padding:6px 10px;border:1px solid var(--border);background:var(--surface);vertical-align:middle}
+.rsc-wrap .audit-table tbody tr:hover td{background:var(--surface2)}
+.rsc-wrap .audit-table input,.audit-table select{background:transparent;border:1px solid transparent;border-radius:3px;padding:3px 6px;font-family:var(--mono);font-size:11px;color:var(--text);outline:none;width:100%;min-width:70px;transition:all .15s}
+.rsc-wrap .audit-table input:hover,.audit-table select:hover{border-color:var(--border);background:var(--bg)}
+.rsc-wrap .audit-table input:focus,.audit-table select:focus{border-color:var(--accent);background:var(--bg)}
+.rsc-wrap .audit-table .cod{font-family:var(--mono);font-size:11px;color:var(--text-muted);white-space:nowrap}
+.rsc-wrap .audit-table .total-row td{background:var(--surface2);font-family:var(--mono);font-weight:600;color:var(--amber);border-top:2px solid var(--border-bright)}
+
+/* CHECKLIST */
+.rsc-wrap .checklist-section{margin-bottom:20px}
+.rsc-wrap .checklist-section-title{font-family:var(--mono);font-size:10px;color:var(--accent);letter-spacing:.1em;text-transform:uppercase;padding:8px 13px;background:rgba(74,158,255,.04);border:1px solid rgba(74,158,255,.12);border-radius:5px 5px 0 0;border-bottom:none}
+.rsc-wrap .checklist-item{display:grid;grid-template-columns:34px 1fr 96px 160px 185px;border:1px solid var(--border);border-top:none;background:var(--surface);transition:background .15s}
+.rsc-wrap .checklist-item:last-child{border-radius:0 0 5px 5px}
+.rsc-wrap .checklist-item:hover{background:var(--surface2)}
+.rsc-wrap .checklist-item.status-sim{border-left:3px solid rgba(61,214,140,.55)}
+.rsc-wrap .checklist-item.status-nao{border-left:3px solid rgba(255,92,92,.55);background:rgba(255,92,92,.02)}
+.rsc-wrap .checklist-item.status-na{border-left:3px solid var(--border-bright)}
+.rsc-wrap .ci-num{padding:10px 11px;font-family:var(--mono);font-size:10px;color:var(--text-dim);border-right:1px solid var(--border);display:flex;align-items:center;justify-content:center}
+.rsc-wrap .ci-text{padding:10px 12px;font-size:13px;color:var(--text);border-right:1px solid var(--border);display:flex;align-items:center}
+.rsc-wrap .ci-status{padding:6px 8px;border-right:1px solid var(--border);display:flex;align-items:center;justify-content:center}
+.rsc-wrap .ci-status select{background:var(--bg);border:1px solid var(--border);border-radius:3px;padding:4px 6px;font-family:var(--mono);font-size:11px;color:var(--text);outline:none;cursor:pointer;width:76px;text-align:center;transition:border-color .15s}
+.rsc-wrap .ci-status select:focus{border-color:var(--accent)}
+.rsc-wrap .ci-base{padding:10px 12px;font-family:var(--mono);font-size:9.5px;color:var(--text-dim);border-right:1px solid var(--border);display:flex;align-items:center}
+.rsc-wrap .ci-evidencia{padding:6px 8px;display:flex;align-items:center}
+.rsc-wrap .ci-evidencia input{background:transparent;border:1px solid transparent;border-radius:3px;padding:4px 7px;font-size:11px;color:var(--text);outline:none;width:100%;transition:all .15s}
+.rsc-wrap .ci-evidencia input:hover{border-color:var(--border);background:var(--bg)}
+.rsc-wrap .ci-evidencia input:focus{border-color:var(--accent);background:var(--bg)}
+
+/* SUMMARY */
+.rsc-wrap .summary-bar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:24px}
+.rsc-wrap .summary-pill{background:var(--surface);border:1px solid var(--border);border-radius:7px;padding:10px 15px;display:flex;align-items:center;gap:10px}
+.rsc-wrap .summary-pill-value{font-family:var(--mono);font-size:18px;font-weight:600}
+.rsc-wrap .summary-pill-label{font-size:10.5px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;line-height:1.3}
+
+/* TOAST */
+.rsc-wrap .toast{position:fixed;bottom:24px;right:24px;background:var(--surface2);border:1px solid var(--border-bright);border-radius:7px;padding:11px 18px;font-family:var(--mono);font-size:12px;color:var(--text);z-index:999;opacity:0;transform:translateY(10px);transition:all .25s;pointer-events:none;box-shadow:0 8px 32px rgba(0,0,0,.4)}
+.rsc-wrap .toast.show{opacity:1;transform:translateY(0)}
+.rsc-wrap .toast.green{border-color:rgba(61,214,140,.35);color:var(--green)}
+.rsc-wrap .toast.red{border-color:rgba(255,92,92,.35);color:var(--red)}
+
+/* FOOTER */
+.rsc-wrap footer{border-top:1px solid var(--border);padding:20px 0;margin-top:14px}
+.rsc-wrap .footer-inner{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:12px}
+.rsc-wrap .footer-left{font-family:var(--mono);font-size:10.5px;color:var(--text-dim);line-height:1.8}
+.rsc-wrap .powered-by{margin-top:7px;font-family:var(--mono);font-size:11px;display:flex;align-items:center;gap:7px;border-top:1px solid var(--border);padding-top:7px}
+.rsc-wrap .pw-icon{color:var(--accent)}
+.rsc-wrap .pw-label{color:var(--text-dim)}
+.rsc-wrap .pw-name{color:var(--accent);font-weight:600;letter-spacing:.03em}
+.rsc-wrap .footer-right{display:flex;gap:8px;flex-wrap:wrap}
+
+/* BUTTONS */
+.rsc-wrap .btn{padding:8px 16px;border-radius:5px;font-family:var(--mono);font-size:11.5px;font-weight:500;cursor:pointer;border:none;transition:all .15s;letter-spacing:.03em;display:flex;align-items:center;gap:6px}
+.rsc-wrap .btn-primary{background:var(--accent);color:#0d0f14}
+.rsc-wrap .btn-primary:hover{background:#6ab4ff;transform:translateY(-1px)}
+.rsc-wrap .btn-secondary{background:var(--surface2);color:var(--text);border:1px solid var(--border-bright)}
+.rsc-wrap .btn-secondary:hover{background:var(--border)}
+.rsc-wrap .btn-danger{background:rgba(255,92,92,.1);color:var(--red);border:1px solid rgba(255,92,92,.25)}
+.rsc-wrap .btn-danger:hover{background:rgba(255,92,92,.18)}
+
+@media(max-width:768px){
+.rsc-wrap   .checklist-item{grid-template-columns:32px 1fr 80px}
+.rsc-wrap   .ci-base,.ci-evidencia{display:none}
+.rsc-wrap   .result-grid{grid-template-columns:1fr 1fr}
+.rsc-wrap   .dates-strip{flex-direction:column}
+}
+
+/* ── Dark mode — Rescisão Trabalhista ── */
+[data-tema="dark"] .rsc-wrap {
+  --bg:          #0e1a12;
+  --surface:     #1c2a1e;
+  --surface2:    #243328;
+  --border:      rgba(255,255,255,0.10);
+  --border-bright: rgba(255,255,255,0.16);
+  --text:        #c8dace;
+  --text-muted:  #6a8870;
+  --text-dim:    #3d5042;
+  --accent:      #4ade80;
+  --green:       #3dd68c;
+  --amber:       #f5a623;
+  --red:         #ff5c5c;
+  --purple:      #a78bfa;
+  color: #c8dace;
+}
+[data-tema="dark"] .rsc-wrap .input-field {
+  background: #162018 !important;
+  border-color: rgba(255,255,255,0.15) !important;
+  color: #c8dace !important;
+}
+[data-tema="dark"] .rsc-wrap .field-card { background: #1c2a1e !important; }
+[data-tema="dark"] .rsc-wrap .field-card:hover { background: #243328 !important; }
+[data-tema="dark"] .rsc-wrap .var-table,
+[data-tema="dark"] .rsc-wrap .verbas-table { background: #1c2a1e !important; }
+[data-tema="dark"] .rsc-wrap .cards-grid { background: rgba(255,255,255,0.08) !important; }
 </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
@@ -10705,6 +10918,715 @@ function mercadoExportarExcel() {
     alert('Erro ao gerar Excel: ' + e.message);
   }
 }
+
+
+
+// ─── UTILS ────────────────────────────────────────────────────────
+const brl = v => (v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+const fmt = d => d instanceof Date ? d.toLocaleDateString('pt-BR') : '—';
+const addDays = (d,n) => { const r=new Date(d); r.setDate(r.getDate()+n); return r; };
+const nextDay7 = d => new Date(d.getFullYear(), d.getMonth()+1, 7);
+const nextDay15 = d => new Date(d.getFullYear(), d.getMonth()+1, 15);
+
+function diffYears(d1,d2){
+  let y=d2.getFullYear()-d1.getFullYear();
+  const m1=d1.getMonth(),m2=d2.getMonth();
+  if(m2<m1||(m2===m1&&d2.getDate()<d1.getDate()))y--;
+  return Math.max(0,y);
+}
+function diffMonths(d1,d2){
+  return (d2.getFullYear()-d1.getFullYear())*12+(d2.getMonth()-d1.getMonth());
+}
+
+function toast(msg,type=''){
+  const el=document.getElementById('toast');
+  el.textContent=msg; el.className='toast show '+(type||'');
+  clearTimeout(el._t); el._t=setTimeout(()=>el.className='toast',2600);
+}
+
+function markFilled(id,inp){
+  const el=document.getElementById(id);
+  if(el) el.classList.toggle('filled',inp.value.trim()!=='');
+}
+
+// ─── TAB ─────────────────────────────────────────────────────────
+function rscSwitchTab(id,btn){
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ─── VAR TABLE ────────────────────────────────────────────────────
+function buildVarTable(){
+  const tb=document.getElementById('varTableBody'); tb.innerHTML='';
+  const meses=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  const now=new Date();
+  for(let i=0;i<12;i++){
+    const d=new Date(now.getFullYear(),now.getMonth()-11+i,1);
+    const lbl=meses[d.getMonth()]+'/'+d.getFullYear();
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td class="mes-label">${lbl}</td>
+      <td><input type="number" class="v-he" value="0" min="0" step="0.01" oninput="calcMedias()"></td>
+      <td><input type="number" class="v-co" value="0" min="0" step="0.01" oninput="calcMedias()"></td>
+      <td><input type="number" class="v-ad" value="0" min="0" step="0.01" oninput="calcMedias()"></td>
+      <td class="v-tot" style="font-family:var(--mono);font-size:12px;text-align:right;color:var(--text-muted)">0,00</td>`;
+    tb.appendChild(tr);
+  }
+}
+
+function calcMedias(){
+  let sHE=0,sCo=0,sAd=0;
+  document.querySelectorAll('#varTableBody tr').forEach(tr=>{
+    const he=+tr.querySelector('.v-he')?.value||0;
+    const co=+tr.querySelector('.v-co')?.value||0;
+    const ad=+tr.querySelector('.v-ad')?.value||0;
+    tr.querySelector('.v-tot').textContent=brl(he+co+ad);
+    sHE+=he; sCo+=co; sAd+=ad;
+  });
+  document.getElementById('mediaHE').textContent=brl(sHE/12);
+  document.getElementById('mediaCom').textContent=brl(sCo/12);
+  document.getElementById('mediaAdi').textContent=brl(sAd/12);
+  document.getElementById('mediaTotal').textContent=brl((sHE+sCo+sAd)/12);
+  onInputChange();
+}
+
+function getMediaVar(){
+  let s=0;
+  document.querySelectorAll('#varTableBody tr').forEach(tr=>{
+    s+=(+tr.querySelector('.v-he')?.value||0)+(+tr.querySelector('.v-co')?.value||0)+(+tr.querySelector('.v-ad')?.value||0);
+  });
+  return s/12;
+}
+
+// ─── INSS 2026 progressivo ────────────────────────────────────────
+const FAIXAS_INSS=[
+  {de:0,       ate:1621.00,   aliq:.075},
+  {de:1621.01, ate:2902.84,   aliq:.09 },
+  {de:2902.85, ate:4354.27,   aliq:.12 },
+  {de:4354.28, ate:8475.55,   aliq:.14 },
+];
+function calcINSS(base){
+  let inss=0,prev=0,detail=[];
+  for(const f of FAIXAS_INSS){
+    if(base<=prev)break;
+    const fatia=Math.min(base,f.ate)-prev;
+    if(fatia<=0)break;
+    const contrib=fatia*f.aliq;
+    detail.push({de:prev,ate:Math.min(base,f.ate),fatia,aliq:f.aliq,contrib});
+    inss+=contrib; prev=f.ate;
+  }
+  inss=Math.min(inss,988.07);
+  return {inss,detail};
+}
+
+// ─── IRRF 2026 (Lei 15.270/2025) ─────────────────────────────────
+function calcIRRF(baseLiq){
+  if(baseLiq<=2428.80)return 0;
+  let imp=0;
+  if(baseLiq<=2826.65)      imp=baseLiq*.075-182.16;
+  else if(baseLiq<=3751.05) imp=baseLiq*.15-394.16;
+  else if(baseLiq<=4664.68) imp=baseLiq*.225-675.49;
+  else                       imp=baseLiq*.275-908.74;
+  let red=0;
+  if(baseLiq<=5000)         red=312.89;
+  else if(baseLiq<=7350)    red=978.62-.133145*baseLiq;
+  return Math.max(0,imp-red);
+}
+
+// ─── AVISO / OJ 394 ──────────────────────────────────────────────
+function calcAvisoDias(anos,base,acrescimo){
+  return Math.min(90, base + Math.max(0,anos-1)*acrescimo);
+}
+
+// Regra 15 dias para 13º (dia rescisão >=15 → mês conta)
+function meses13(res,adm,fimAviso,tipoAviso){
+  // mês base: de jan (ou mês adm se adm neste ano) até mês rescisão
+  const anoRes=res.getFullYear();
+  const admAno=adm.getFullYear();
+  let mesBase;
+  if(admAno===anoRes){
+    mesBase=adm.getMonth(); // 0-based
+  }else{
+    mesBase=0;
+  }
+  let mesRes=res.getMonth();
+  let count=mesRes-mesBase+1; // +1 pois inclusivo
+  // regra 15 dias no mês da rescisão
+  if(res.getDate()<15) count--;
+  // OJ 394: se aviso indenizado ou parcialmente indenizado, e fim aviso em outro mês
+  if((tipoAviso==='indenizado'||tipoAviso==='parcial') && fimAviso && fimAviso.getMonth()!==res.getMonth()){
+    // verifica dias no mês do fim do aviso
+    if(fimAviso.getDate()>=15) count++;
+  }
+  return Math.max(1,Math.min(12,count));
+}
+
+// Regra meses férias proporcionais (regra 15 dias + OJ 394)
+function mesesFeriasProp(res,inicio,fimAviso,tipoAviso){
+  if(!inicio)return 0;
+  let m=diffMonths(inicio,res);
+  // dias no mês parcial
+  const diasParcial=res.getDate()-inicio.getDate()+1;
+  if(diasParcial>=15) m++;
+  // OJ 394
+  if((tipoAviso==='indenizado'||tipoAviso==='parcial') && fimAviso && fimAviso.getMonth()!==res.getMonth()){
+    if(fimAviso.getDate()>=15) m++;
+  }
+  return Math.max(0,Math.min(12,m));
+}
+
+// ─── MAIN CALCULAR ────────────────────────────────────────────────
+function onInputChange(){
+  // aviso parcial: mostrar campo de dias trabalhados
+  const tipoAviso=document.getElementById('tipoAviso').value;
+  document.getElementById('fc-diasAvTrab').style.display=tipoAviso==='parcial'?'block':'none';
+
+  // banco de horas warning
+  const bh=parseFloat(document.getElementById('bancoHoras').value)||0;
+  document.getElementById('warn-bh-neg').classList.toggle('show',bh<0);
+
+  // FGTS warning
+  const fgts=parseFloat(document.getElementById('saldoFGTS').value)||0;
+  document.getElementById('warn-fgts').classList.toggle('show',!fgts||fgts===0);
+
+  calcular();
+}
+
+function onFGTSChange(){
+  const v=parseFloat(document.getElementById('saldoFGTS').value)||0;
+  document.getElementById('warn-fgts').classList.toggle('show',!v);
+  calcular();
+}
+
+function calcular(){
+  const admStr=document.getElementById('dataAdmissao').value;
+  const resStr=document.getElementById('dataRescisao').value;
+  if(!admStr||!resStr){
+    document.getElementById('calc-error').style.display='flex';
+    document.getElementById('liquid-banner').style.display='none';
+    return;
+  }
+  document.getElementById('calc-error').style.display='none';
+
+  const adm=new Date(admStr+'T12:00:00');
+  const res=new Date(resStr+'T12:00:00');
+  if(res<=adm){ document.getElementById('calc-error').style.display='flex'; return; }
+
+  const tipo      = document.getElementById('tipoRescisao').value;
+  const tipoAviso = document.getElementById('tipoAviso').value;
+  const salFixo   = parseFloat(document.getElementById('salario').value)||0;
+  const saldoFGTS = parseFloat(document.getElementById('saldoFGTS').value)||0;
+  const fvenc     = parseInt(document.getElementById('feriasVencidas').value)||0;
+  const inicioStr = document.getElementById('inicioPeriodo').value;
+  const inicio    = inicioStr ? new Date(inicioStr+'T12:00:00') : null;
+  const deps      = parseInt(document.getElementById('dependentes').value)||0;
+  const pensao    = parseFloat(document.getElementById('pensao').value)||0;
+  const outrosDesc= parseFloat(document.getElementById('outrosDescontos').value)||0;
+  const bhRaw     = parseFloat(document.getElementById('bancoHoras').value)||0;
+  const bh        = Math.max(0,bhRaw); // saldo negativo ignorado (OJ 305)
+  const adicHEpct = parseFloat(document.getElementById('adicHE').value)||0.5;
+  const aliqFGTS  = parseFloat(document.getElementById('aliqFGTS').value)||0.08;
+  const pctM40    = (parseFloat(document.getElementById('pctMulta40').value)||40)/100;
+  const pctM10    = (parseFloat(document.getElementById('pctMulta10').value)||10)/100;
+  const diasBase  = parseInt(document.getElementById('diasBaseAviso').value)||30;
+  const acrescimo = parseInt(document.getElementById('acrescimoAviso').value)||3;
+  const diasAvTrab= parseInt(document.getElementById('diasAvisoTrabalhado').value)||0;
+
+  const mediaVar  = getMediaVar();
+  const salBase   = salFixo + mediaVar;
+  const anos      = diffYears(adm,res);
+  const diasAviso = calcAvisoDias(anos,diasBase,acrescimo);
+  const isSJC     = tipo==='sjc';
+
+  // ── Fim do aviso / contrato ──
+  let fimAviso=res, diasAvisoPagos=0, avisoDesc='', oj394=false;
+  if(tipoAviso==='indenizado'&&isSJC){
+    diasAvisoPagos=diasAviso;
+    fimAviso=addDays(res,diasAviso);
+    avisoDesc=`Indenizado — ${diasAviso} dias`;
+    oj394=fimAviso.getMonth()!==res.getMonth();
+  } else if(tipoAviso==='parcial'&&isSJC){
+    const diasInd=diasAviso-diasAvTrab;
+    diasAvisoPagos=diasInd;
+    fimAviso=addDays(res,diasInd);
+    avisoDesc=`Parcial: ${diasAvTrab}d trabalhados + ${diasInd}d indenizados`;
+    oj394=fimAviso.getMonth()!==res.getMonth();
+  } else if(tipoAviso==='trabalhado'){
+    fimAviso=res;
+    avisoDesc='Trabalhado — já incluído no período';
+  } else if(tipoAviso==='dispensado'){
+    fimAviso=res;
+    avisoDesc='Dispensado pelo empregador';
+  }
+
+  // OJ 394 warnings
+  document.getElementById('warn-oj394').style.display=oj394?'flex':'none';
+  document.getElementById('warn-bh-neg-calc').style.display=bhRaw<0?'flex':'none';
+
+  // ── Contagem meses ──
+  const m13    = meses13(res,adm,fimAviso,tipoAviso);
+  const mFProp = inicio ? mesesFeriasProp(res,inicio,fimAviso,tipoAviso) : 0;
+  const diasMes= res.getDate();
+
+  // ── Banco de horas ──
+  const valorHora = (salBase/220)*(1+adicHEpct);
+  const valBH     = bh>0 ? bh*valorHora : 0;
+
+  // ── Férias em dobro (Súmula 450 TST) ──
+  // Lê o campo feriasEmDobro do usuário e calcula o multiplicador correto.
+  // "todos"  → todos os fvenc períodos valem 2 × salário + 1/3
+  // "um"     → apenas 1 período em dobro, os restantes em simples
+  // "nenhum" → todos em simples (padrão)
+  const opcaoDobro = document.getElementById('feriasEmDobro')?.value || 'nenhum';
+  let feriasNormais, feriasTercVenc, dobroLabel='';
+  if(fvenc <= 0){
+    feriasNormais  = 0;
+    feriasTercVenc = 0;
+  } else if(opcaoDobro === 'todos'){
+    // Todos os períodos em dobro: cada período = 2 × salBase + 1/3
+    feriasNormais  = salBase * fvenc * 2;
+    feriasTercVenc = feriasNormais / 3;
+    dobroLabel = ` ⚠ DOBRO — Súm. 450 TST (${fvenc} período${fvenc>1?'s':''})`;
+  } else if(opcaoDobro === 'um'){
+    // 1 período em dobro + restantes simples
+    const periodosSimples = Math.max(0, fvenc - 1);
+    const valorDobro      = salBase * 2;          // 1 período × 2
+    const valorSimples    = salBase * periodosSimples;
+    feriasNormais  = valorDobro + valorSimples;
+    feriasTercVenc = feriasNormais / 3;
+    dobroLabel = ` ⚠ 1 período em dobro + ${periodosSimples} simples — Súm. 450 TST`;
+  } else {
+    // Simples (nenhum em dobro)
+    feriasNormais  = salBase * fvenc;
+    feriasTercVenc = feriasNormais / 3;
+  }
+  // Ativar/desativar warning visual de férias em dobro
+  const warnDobro = document.getElementById('warn-ferias-dobro');
+  if(warnDobro) warnDobro.style.display = (opcaoDobro !== 'nenhum' && fvenc > 0) ? 'flex' : 'none';
+
+  const feriasVencTotal = feriasNormais + feriasTercVenc;
+  const feriasProps    = mFProp>0 ? salBase/12*mFProp : 0;
+  const feriasTercProp = feriasProps/3;
+  const feriasPropTotal= feriasProps+feriasTercProp;
+  const trezeAvos      = salBase/12*m13;
+  const saldoSalario   = salBase/30*diasMes;
+  const avisoBruto     = (tipoAviso==='indenizado'||tipoAviso==='parcial')&&isSJC ? salBase/30*diasAvisoPagos : 0;
+  const multa40        = isSJC ? saldoFGTS*pctM40 : 0;
+  const multa10        = isSJC ? saldoFGTS*pctM10 : 0;
+
+  const totalBruto = saldoSalario+avisoBruto+feriasVencTotal+feriasPropTotal+trezeAvos+valBH+multa40+multa10;
+
+  // ── INSS ──
+  const baseINSS = saldoSalario+feriasVencTotal+trezeAvos;
+  const {inss,detail:inssDetail} = calcINSS(baseINSS);
+
+  // ── IRRF ──
+  const baseA_bruta = saldoSalario+feriasVencTotal;
+  const deducoesA   = inss + deps*189.59 + pensao;
+  const baseA_liq   = Math.max(0,baseA_bruta-deducoesA);
+  const irrf_a      = calcIRRF(baseA_liq);
+
+  const baseB_bruta = trezeAvos;
+  const deducoesB   = deps*189.59+pensao;
+  const baseB_liq   = Math.max(0,baseB_bruta-deducoesB);
+  const irrf_b      = calcIRRF(baseB_liq);
+  const irrfTotal   = irrf_a+irrf_b;
+
+  const totalDesc   = inss+irrfTotal+outrosDesc;
+  const liquido     = totalBruto-totalDesc;
+  const fgtsMes     = salFixo*aliqFGTS;
+
+  // ─ Salvar estado para export ─
+  window._lastCalc={
+    totalBruto,totalDesc,liquido,inss,irrfTotal,
+    saldoSalario,avisoBruto,feriasVencTotal,feriasPropTotal,trezeAvos,valBH,multa40,multa10,
+    baseA_bruta,deducoesA,baseA_liq,irrf_a,baseB_bruta,deducoesB,baseB_liq,irrf_b,
+    fgtsMes,anos,diasAviso,m13,mFProp,salBase,diasMes,oj394
+  };
+
+  // ─ UI: dados derivados ─
+  set('r-anos', anos);
+  set('r-aviso-dias', diasAviso+' dias');
+  set('r-aviso-formula','MIN(90; '+diasBase+'+(anos−1)×'+acrescimo+')');
+  set('r-fim-aviso', fmt(fimAviso));
+  set('r-aviso-tipo-sub', avisoDesc);
+  set('r-meses-ferias', mFProp+' meses');
+  set('r-meses-13', m13+' meses');
+  set('r-sal-base','R$ '+brl(salBase));
+  set('r-dias-mes', diasMes+' dias');
+  if(bh>0){
+    document.getElementById('rc-bh').style.display='block';
+    set('r-bh', brl(bh)+' h');
+    set('r-bh-sub','Valor: R$ '+brl(valBH)+' | OJ 305 SDI-1 TST');
+  } else {
+    document.getElementById('rc-bh').style.display='none';
+  }
+
+  // ─ Verbas ─
+  const verbas=[
+    {name:'1. Saldo de salário',         due:true,  val:saldoSalario,
+     calc:`R$ ${brl(salBase)} ÷ 30 × ${diasMes} dias`,        base:'Art. 477 CLT'},
+    {name:'2. Aviso prévio indenizado',  due:avisoBruto>0, val:avisoBruto,
+     calc:avisoBruto>0?`R$ ${brl(salBase)} ÷ 30 × ${diasAvisoPagos} dias`:'Não devida neste tipo/modalidade', base:'Art. 487 + Lei 12.506/2011'},
+    {name:'3. Férias vencidas + 1/3',    due:fvenc>0, val:feriasVencTotal,
+     calc:(()=>{
+       if(!fvenc) return 'Sem períodos vencidos';
+       const mult = opcaoDobro==='todos' ? `${fvenc}× R$ ${brl(salBase)} ×2`
+                  : opcaoDobro==='um'    ? `1× R$ ${brl(salBase)} ×2 + ${Math.max(0,fvenc-1)}× R$ ${brl(salBase)}`
+                  : `${fvenc}× R$ ${brl(salBase)}`;
+       return `${mult} × 4/3 = R$ ${brl(feriasVencTotal)}${dobroLabel}`;
+     })(),
+     base:'Arts. 129+146 CLT · Súm. 171 + 450 TST'},
+    {name:'4. Férias proporcionais + 1/3',due:mFProp>0, val:feriasPropTotal,
+     calc:mFProp>0?`R$ ${brl(salBase)} ÷ 12 × ${mFProp} × 4/3`:'0 meses no período aquisitivo', base:'Art. 147 CLT'},
+    {name:'5. 13º salário proporcional', due:true,  val:trezeAvos,
+     calc:`R$ ${brl(salBase)} ÷ 12 × ${m13} meses`,           base:'Lei 4.090/1962'},
+    {name:'6. Banco de horas (saldo +)', due:valBH>0, val:valBH,
+     calc:valBH>0?`${brl(bh)}h × R$ ${brl(valorHora)}/h (${(adicHEpct*100).toFixed(0)}% HE)`:'Sem saldo positivo', base:'OJ 305 SDI-1 TST'},
+    {name:'7. Multa FGTS '+Math.round(pctM40*100)+'% (empregado)', due:isSJC, val:multa40,
+     calc:isSJC?`R$ ${brl(saldoFGTS)} × ${Math.round(pctM40*100)}%`:'Não devida neste tipo', base:'Art. 18 Lei 8.036/1990'},
+    {name:'8. Multa FGTS '+Math.round(pctM10*100)+'% (União)',     due:isSJC, val:multa10,
+     calc:isSJC?`R$ ${brl(saldoFGTS)} × ${Math.round(pctM10*100)}%`:'Não devida neste tipo', base:'LC 110/2001'},
+  ];
+
+  document.getElementById('verbas-body').innerHTML=verbas.map(v=>`
+    <tr class="${!v.due?'not-due':''}">
+      <td class="verba-name">${v.name}</td>
+      <td style="font-size:12px;color:var(--text-muted);font-family:var(--mono)">${v.calc}</td>
+      <td class="num" style="font-weight:500;color:${v.due&&v.val>0?'#e8edf5':'var(--text-dim)'}">
+        ${v.due&&v.val>0?'R$ '+brl(v.val):'—'}</td>
+      <td style="text-align:center">
+        <span class="${v.due?'badge-devida':'badge-nao'}">${v.due?'✅ Sim':'❌ Não'}</span>
+      </td>
+      <td style="font-size:11px;color:var(--text-dim);font-family:var(--mono)">${v.base}</td>
+    </tr>`).join('');
+
+  set('total-bruto','R$ '+brl(totalBruto));
+
+  // ─ Descontos ─
+  const descs=[
+    {name:'INSS (progressivo 2026)',
+     calc:`Base: R$ ${brl(baseINSS)} → ${inss>=988.07?'teto aplicado':'faixa a faixa'} · Aviso indenizado excluído (Súm. 305 TST)`,
+     val:inss, aliq:baseINSS>0?((inss/baseINSS)*100).toFixed(2)+'%':'—',
+     obs:'Portaria MPS/MF 13/2026 · Férias proporcionais excluídas (art. 28 §9º Lei 8.212/91)'},
+    {name:'IRRF — verbas gerais (Base A)',
+     calc:`Liq. A: R$ ${brl(baseA_liq)} (bruta − INSS − dep. − pensão)`,
+     val:irrf_a, aliq:irrf_a>0?'—':'Isento',
+     obs:'Lei 15.270/2025 · tributação normal'},
+    {name:'IRRF — 13º proporcional (Base B)',
+     calc:`Liq. B: R$ ${brl(baseB_liq)} (exclusiva na fonte)`,
+     val:irrf_b, aliq:irrf_b>0?'—':'Isento',
+     obs:'Lei 15.270/2025 · tributação exclusiva'},
+    ...(outrosDesc>0?[{name:'Outros descontos',
+     calc:'Plano de saúde, vale etc. (proporcional)',
+     val:outrosDesc, aliq:'—', obs:'Informado nas Premissas'}]:[]),
+  ];
+
+  document.getElementById('descontos-body').innerHTML=descs.map(d=>`
+    <tr class="discount-row">
+      <td style="color:var(--red);font-weight:500">${d.name}</td>
+      <td style="font-size:12px;color:var(--text-muted);font-family:var(--mono)">${d.calc}</td>
+      <td class="num" style="color:var(--red)">(R$ ${brl(d.val)})</td>
+      <td style="font-family:var(--mono);font-size:12px;color:var(--text-muted)">${d.aliq}</td>
+      <td style="font-size:11px;color:var(--text-dim)">${d.obs}</td>
+    </tr>`).join('');
+
+  set('total-descontos','(R$ '+brl(totalDesc)+')');
+  set('valor-liquido','R$ '+brl(liquido));
+
+  // ─ FGTS ─
+  set('r-fgts-mes','R$ '+brl(fgtsMes));
+  set('r-fgts-sub',`${Math.round(aliqFGTS*100)}% × salário fixo · até dia 7`);
+  set('r-multa40','R$ '+brl(multa40));
+  set('r-multa40-sub',isSJC?`${Math.round(pctM40*100)}% do saldo FGTS`:'Não devida (pedido de demissão)');
+  set('r-multa10','R$ '+brl(multa10));
+
+  // ─ Datas ─
+  set('d-rescisao',fmt(res));
+  set('d-prazo-verbas',fmt(addDays(res,10)));
+  set('d-fgts',fmt(nextDay7(res)));
+  set('d-esocial',fmt(nextDay15(res)));
+  set('d-aviso-fim',fmt(fimAviso)+(tipoAviso==='indenizado'?' (indenizado)':tipoAviso==='parcial'?' (parcial)':''));
+
+  // ─ Banner líquido ─
+  const banner=document.getElementById('liquid-banner');
+  banner.style.display='flex';
+  set('banner-liquido','R$ '+brl(liquido));
+  set('banner-tipo',(isSJC?'Sem justa causa':'Pedido de demissão')+' · '+(tipoAviso==='indenizado'?'Aviso indenizado':tipoAviso==='trabalhado'?'Aviso trabalhado':tipoAviso==='parcial'?'Aviso parcial':'Aviso dispensado'));
+  set('banner-bruto','R$ '+brl(totalBruto));
+  set('banner-desc','Descontos: R$ '+brl(totalDesc));
+
+  // ─ INSS detalhe ─
+  document.getElementById('inss-detail-body').innerHTML=inssDetail.map((f,i)=>`
+    <tr>
+      <td style="font-family:var(--mono);font-size:12px">${i+1}ª faixa</td>
+      <td style="font-family:var(--mono);font-size:12px">R$ ${brl(f.de)} → R$ ${brl(f.ate)}</td>
+      <td style="font-family:var(--mono);font-size:12px;text-align:right">R$ ${brl(f.fatia)}</td>
+      <td style="font-family:var(--mono);font-size:12px">${(f.aliq*100).toFixed(1)}%</td>
+      <td class="num" style="font-family:var(--mono);font-size:12px">R$ ${brl(f.contrib)}</td>
+    </tr>`).join('')+
+    (inss>=988.07?`<tr><td colspan="5" style="font-size:11px;color:var(--amber);font-family:var(--mono);padding:6px 12px">⚠ Teto aplicado — INSS limitado a R$ 988,07</td></tr>`:'');
+  set('inss-total-mem','R$ '+brl(inss));
+
+  // ─ IRRF detalhe ─
+  document.getElementById('irrf-detail-body').innerHTML=[
+    {label:'Base A — verbas gerais',comp:'Saldo salário + férias vencidas + 1/3 vencidas',bruta:baseA_bruta,ded:deducoesA,liq:baseA_liq,irrf:irrf_a,obs:'INSS + dependentes + pensão'},
+    {label:'Base B — 13º (exclusiva)',comp:'13º proporcional · tributação exclusiva na fonte',bruta:baseB_bruta,ded:deducoesB,liq:baseB_liq,irrf:irrf_b,obs:'Dependentes + pensão (sem INSS)'},
+  ].map(r=>`<tr>
+    <td style="font-weight:500;color:#dde3f0">${r.label}</td>
+    <td style="font-size:12px;color:var(--text-muted)">${r.comp}</td>
+    <td class="num" style="font-family:var(--mono);font-size:12px">R$ ${brl(r.bruta)}</td>
+    <td class="num" style="font-family:var(--mono);font-size:12px;color:var(--red)">(R$ ${brl(r.ded)})</td>
+    <td class="num" style="font-family:var(--mono);font-size:12px">R$ ${brl(r.liq)}</td>
+    <td class="num" style="font-family:var(--mono);font-size:12px;color:${r.irrf>0?'var(--red)':'var(--green)'}">
+      ${r.irrf>0?'R$ '+brl(r.irrf):'Isento'}</td>
+  </tr>`).join('');
+  set('irrf-total-mem','R$ '+brl(irrfTotal));
+}
+
+function set(id,v){const el=document.getElementById(id);if(el)el.textContent=v;}
+
+// ─── AUDITORIA ────────────────────────────────────────────────────
+const RECS={
+  '':'—',
+  'Provável':'Provisionar 100% + honorários ~15% · NBC TG 25',
+  'Possível':'Divulgar em nota explicativa com valor estimado · CPC 25',
+  'Remoto':'Nenhuma ação necessária · dispensada divulgação',
+};
+
+let auditRows=Array.from({length:15},(_,i)=>({
+  cod:`TR-${String(i+1).padStart(3,'0')}`,
+  nome:'',adm:'',res:'',tipo:'',aviso:'',calc:0,pago:0,risco:'',cls:'',rec:''
+}));
+
+function renderAuditTable(){
+  document.getElementById('audit-body').innerHTML=auditRows.map((r,idx)=>{
+    const gap=r.calc-r.pago;
+    const pct=r.calc>0?((gap/r.calc)*100).toFixed(1)+'%':'—';
+    const gc=gap>0?'var(--red)':gap<0?'var(--green)':'var(--text-muted)';
+    return `<tr>
+      <td class="cod">${r.cod}</td>
+      <td><input value="${r.nome}" oninput="auditRows[${idx}].nome=this.value" placeholder="Nome..."></td>
+      <td><input type="date" value="${r.adm}" oninput="auditRows[${idx}].adm=this.value"></td>
+      <td><input type="date" value="${r.res}" oninput="auditRows[${idx}].res=this.value"></td>
+      <td><select onchange="auditRows[${idx}].tipo=this.value">
+        <option value="">—</option>
+        <option value="SJC" ${r.tipo==='SJC'?'selected':''}>Sem justa causa</option>
+        <option value="PD"  ${r.tipo==='PD' ?'selected':''}>Pedido demissão</option>
+        <option value="JC"  ${r.tipo==='JC' ?'selected':''}>Justa causa</option>
+        <option value="AM"  ${r.tipo==='AM' ?'selected':''}>Acordo mútuo</option>
+      </select></td>
+      <td><input type="number" value="${r.aviso||''}" oninput="auditRows[${idx}].aviso=+this.value" style="width:60px;text-align:center" placeholder="dias"></td>
+      <td><input type="number" value="${r.calc||''}" oninput="auditRows[${idx}].calc=+this.value;updateAuditTotals()" step="0.01" style="text-align:right" placeholder="0,00"></td>
+      <td><input type="number" value="${r.pago||''}" oninput="auditRows[${idx}].pago=+this.value;updateAuditTotals()" step="0.01" style="text-align:right" placeholder="0,00"></td>
+      <td style="font-family:var(--mono);font-size:12px;font-weight:600;text-align:right;color:${gc}">${(r.calc||r.pago)?brl(gap):'—'}</td>
+      <td style="font-family:var(--mono);font-size:11px;text-align:center;color:var(--text-muted)">${pct}</td>
+      <td><select onchange="auditRows[${idx}].risco=this.value;renderAuditTable()">
+        <option value="">—</option>
+        <option value="Provável" ${r.risco==='Provável'?'selected':''}>Provável</option>
+        <option value="Possível" ${r.risco==='Possível'?'selected':''}>Possível</option>
+        <option value="Remoto"   ${r.risco==='Remoto'  ?'selected':''}>Remoto</option>
+      </select></td>
+      <td><select onchange="auditRows[${idx}].cls=this.value">
+        <option value="">—</option>
+        <option value="DS" ${r.cls==='DS'?'selected':''}>Def. Significativa</option>
+        <option value="FM" ${r.cls==='FM'?'selected':''}>Fraqueza Material</option>
+        <option value="OC" ${r.cls==='OC'?'selected':''}>Observação</option>
+      </select></td>
+      <td style="font-size:10.5px;color:var(--text-muted);font-family:var(--mono);padding:6px 8px">${RECS[r.risco]||'—'}</td>
+    </tr>`;
+  }).join('');
+  updateAuditTotals();
+}
+
+function updateAuditTotals(){
+  let tc=0,tp=0;
+  auditRows.forEach(r=>{tc+=r.calc||0;tp+=r.pago||0;});
+  const tg=tc-tp;
+  set('aud-total-calc',brl(tc)); set('aud-total-pago',brl(tp)); set('aud-total-gap',brl(tg));
+  set('sum-total-calc','R$ '+brl(tc)); set('sum-total-pago','R$ '+brl(tp)); set('sum-gap','R$ '+brl(tg));
+}
+
+function addAuditRow(){
+  const n=auditRows.length+1;
+  auditRows.push({cod:`TR-${String(n).padStart(3,'0')}`,nome:'',adm:'',res:'',tipo:'',aviso:'',calc:0,pago:0,risco:'',cls:'',rec:''});
+  renderAuditTable(); toast('Linha TR-'+String(n).padStart(3,'0')+' adicionada','green');
+}
+function clearAudit(){
+  if(confirm('Limpar toda a tabela?')){
+    auditRows=Array.from({length:15},(_,i)=>({cod:`TR-${String(i+1).padStart(3,'0')}`,nome:'',adm:'',res:'',tipo:'',aviso:'',calc:0,pago:0,risco:'',cls:'',rec:''}));
+    renderAuditTable(); toast('Tabela limpa');
+  }
+}
+
+// ─── ESTABILIDADES PROVISÓRIAS ────────────────────────────────────
+function checkEstabilidade(){
+  const ids = ['estab-gestante','estab-acidente','estab-cipa','estab-sindical','estab-doenca','estab-preaposen'];
+  const temRisco = ids.some(id => {
+    const el = document.getElementById(id);
+    return el && el.value === 'sim';
+  });
+  const alert = document.getElementById('alert-estabilidade');
+  if(alert) alert.style.display = temRisco ? 'flex' : 'none';
+  // marcar badge na aba de cálculo se risco detectado
+  const badge = document.getElementById('badge-calculo');
+  if(badge){ badge.textContent='!'; badge.classList.toggle('visible', temRisco); }
+}
+
+// ─── CHECKLIST ────────────────────────────────────────────────────
+const CK=[
+  {section:'SEÇÃO A — CÁLCULO DAS VERBAS',items:[
+    {n:1, t:'Tipo de rescisão classificado corretamente?',                        b:'Art. 477/482/484-A CLT',   e:'TRCT + documentação disciplinar'},
+    {n:2, t:'Aviso prévio calculado conforme Lei 12.506/2011 (proporcional)?',    b:'Lei 12.506/2011',          e:'Planilha de cálculo + TRCT'},
+    {n:3, t:'Remuneração variável (HE, comissões) incluída na base?',             b:'Súmulas 264 + 253 TST',   e:'Holerites 12 meses'},
+    {n:4, t:'Férias + 1/3 calculadas corretamente (período aquisitivo)?',         b:'Art. 129+146 CLT',        e:'Ficha de férias'},
+    {n:5, t:'13º proporcional com número de meses correto?',                     b:'Lei 4.090/1962',          e:'TRCT'},
+    {n:6, t:'Saldo FGTS obtido do extrato Caixa (não estimado)?',                b:'Lei 8.036/1990',          e:'Extrato FGTS'},
+    {n:7, t:'Multa FGTS aplicada corretamente por tipo (40%/20%/zero)?',         b:'Art. 18 Lei 8.036/1990',  e:'Guia de recolhimento'},
+  ]},
+  {section:'SEÇÃO B — PRAZO E FORMALIDADE',items:[
+    {n:8, t:'Pagamento realizado em até 10 dias corridos (art. 477)?',            b:'Art. 477, §6º CLT',       e:'Comprovante pagamento'},
+    {n:9, t:'TRCT assinado pelo empregado?',                                      b:'Art. 477 CLT',            e:'TRCT físico ou digital'},
+    {n:10,t:'Assistência sindical ou MTE (empregados >1 ano)?',                  b:'Art. 477, §1º CLT',       e:'Ata sindical ou termo MTE'},
+    {n:11,t:'Justa causa: rito disciplinar completo (adv→susp→JC)?',             b:'Art. 482 CLT + TST',      e:'Dossiê disciplinar'},
+  ]},
+  {section:'SEÇÃO C — eSocial E FGTS',items:[
+    {n:12,t:'Evento S-2299 enviado ao eSocial?',                                  b:'Manual eSocial S-2299',   e:'Protocolo eSocial'},
+    {n:13,t:'S-2299 enviado no prazo (até dia 15 do mês seguinte)?',             b:'IN RFB — prazo eSocial',  e:'Data protocolo'},
+    {n:14,t:'FGTS da rescisão recolhido na competência correta?',                b:'Art. 15 Lei 8.036/1990',  e:'GFIP / GRRF'},
+    {n:15,t:'Multa FGTS (40%) creditada na conta FGTS do empregado?',           b:'Art. 18 Lei 8.036/1990',  e:'Extrato FGTS pós-rescisão'},
+  ]},
+  {section:'SEÇÃO D — PASSIVO E PROVISÃO (CPC 25 / CPC 33)',items:[
+    {n:16,t:'Verba rescisória provisionada antes da homologação?',               b:'CPC 25 / IAS 37',         e:'Lançamento contábil'},
+    {n:17,t:'Contingência classificada Provável/Possível/Remota?',               b:'NBC TG 25 (CPC 25)',      e:'Parecer advogado + provisão'},
+    {n:18,t:'Nota explicativa atualizada com estimativa de processos?',          b:'CPC 26 / CPC 51',         e:'Notas explicativas do balanço'},
+    {n:19,t:'PDV/reestruturação com rescisões programadas provisionado?',        b:'CPC 33 / IAS 19',         e:'Plano formal + aprovação diretoria'},
+    {n:20,t:'Passivo subsidiário de terceirização mapeado (Lei 13.429/2017)?',   b:'R-TR-09',                 e:'Contratos terceirização + CND'},
+  ]},
+  {section:'SEÇÃO E — ESTABILIDADES PROVISÓRIAS (CRÍTICO)',items:[
+    {n:21,t:'Empregada rescindida: verificado risco de gravidez? (Súm. 244 TST)',b:'Art. 10, II, b ADCT',     e:'Declaração + atestado médico'},
+    {n:22,t:'Afastado por acidente/doença ocupacional (CAT): 12m de estabilidade?',b:'Art. 118 Lei 8.213/91', e:'CAT + alta INSS + datas'},
+    {n:23,t:'Membro ou candidato à CIPA dispensado sem observar estabilidade?',  b:'Art. 10, II, a ADCT',     e:'Registro candidatura CIPA'},
+    {n:24,t:'Dirigente sindical registrado com estabilidade vigente?',           b:'Art. 543 CLT',            e:'Registro sindical + mandato'},
+    {n:25,t:'Portador de doença grave — presunção dispensa discriminatória?',    b:'Súmula 443 TST',          e:'Atestados + histórico clínico'},
+  ]},
+  {section:'SEÇÃO F — RISCOS DE AUDITORIA (R-TR-01 a R-TR-12)',items:[
+    {n:26,t:'R-TR-01: Subprovisão de passivo trabalhista (CPC 25)?',             b:'R-TR-01',                 e:'Comparar provisão × exposição estimada'},
+    {n:27,t:'R-TR-02: Justa causa sem rito disciplinar (adv → susp → JC)?',     b:'R-TR-02',                 e:'Dossiê: advertências + suspensões'},
+    {n:28,t:'R-TR-03: Variável omitida na base de cálculo (Súm. 264/253/172)?',  b:'R-TR-03',                 e:'Holerites 12 meses + espelho ponto'},
+    {n:29,t:'R-TR-04: Vínculo empregatício oculto (PJ/MEI/autônomo)?',          b:'R-TR-04',                 e:'Contratos + exclusividade + NFs'},
+    {n:30,t:'R-TR-05: Pagamento fora do prazo art. 477 (multa 1 sal. normativo)?',b:'R-TR-05',                e:'Data rescisão × comprovante pagamento'},
+    {n:31,t:'R-TR-06: Divergência eSocial / FGTS Digital (S-2299)?',            b:'R-TR-06',                 e:'Recibo S-2299 + FGTS Digital'},
+    {n:32,t:'R-TR-07: Pedido demissão sem assistência sindical (>1 ano)?',       b:'R-TR-07',                 e:'TRCT + assinatura sindical'},
+    {n:33,t:'R-TR-08: Dispensa com estabilidade provisória (nulidade)?',         b:'R-TR-08',                 e:'Ver Seção E acima'},
+    {n:34,t:'R-TR-09: Terceirização irregular / responsabilidade subsidiária?',  b:'R-TR-09',                 e:'CND prestadoras + contratos'},
+    {n:35,t:'R-TR-10: Desigualdade salarial de gênero (Lei 14.611/2023)?',       b:'R-TR-10',                 e:'Relatório semestral publicado'},
+    {n:36,t:'R-TR-11: Negociação individual em matéria reservada à CCT?',        b:'R-TR-11 · Art. 611-A CLT',e:'Acordos individuais firmados'},
+    {n:37,t:'R-TR-12: Prescrição intercorrente arguida na execução (art. 11-A)?',b:'R-TR-12',                 e:'Relatório execuções em aberto'},
+  ]},
+];
+
+function buildChecklist(){
+  const c=document.getElementById('checklist-container');
+  c.innerHTML=CK.map(sec=>`
+    <div class="checklist-section">
+      <div class="checklist-section-title">${sec.section}</div>
+      ${sec.items.map(item=>`
+        <div class="checklist-item" id="ci-${item.n}">
+          <div class="ci-num">${item.n}</div>
+          <div class="ci-text">${item.t}</div>
+          <div class="ci-status"><select onchange="updateChecklist()" id="ck-${item.n}">
+            <option value="">—</option>
+            <option value="sim" selected>Sim</option>
+            <option value="nao">Não</option>
+            <option value="na">N/A</option>
+          </select></div>
+          <div class="ci-base">${item.b}</div>
+          <div class="ci-evidencia"><input type="text" placeholder="${item.e}" id="cev-${item.n}"></div>
+        </div>`).join('')}
+    </div>`).join('');
+  updateChecklist();
+}
+
+function updateChecklist(){
+  let sim=0,nao=0,na=0;
+  CK.forEach(sec=>sec.items.forEach(item=>{
+    const sel=document.getElementById(`ck-${item.n}`);
+    const ci=document.getElementById(`ci-${item.n}`);
+    if(!sel)return;
+    const v=sel.value;
+    ci.className='checklist-item status-'+v;
+    if(v==='sim')sim++; else if(v==='nao')nao++; else if(v==='na')na++;
+  }));
+  const pct=sim+nao>0?Math.round(sim/(sim+nao)*100)+'%':'—';
+  set('ck-sim',sim); set('ck-nao',nao); set('ck-na',na); set('ck-pct',pct);
+  const badge=document.getElementById('badge-checklist');
+  if(nao>0){badge.textContent=nao;badge.classList.add('visible');}
+  else badge.classList.remove('visible');
+}
+
+function resetChecklist(){
+  if(confirm('Resetar todos os status para "Sim"?')){
+    CK.forEach(sec=>sec.items.forEach(item=>{
+      const s=document.getElementById(`ck-${item.n}`);if(s)s.value='sim';
+      const e=document.getElementById(`cev-${item.n}`);if(e)e.value='';
+    }));
+    updateChecklist(); toast('Checklist resetado','green');
+  }
+}
+
+// ─── EXPORTS ─────────────────────────────────────────────────────
+function dlCSV(fn,rows){
+  const csv=rows.map(r=>r.map(c=>'"'+String(c||'').replace(/"/g,'""')+'"').join(',')).join('\n');
+  const a=Object.assign(document.createElement('a'),{href:URL.createObjectURL(new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'})),download:fn});
+  a.click(); URL.revokeObjectURL(a.href); toast('Exportado: '+fn,'green');
+}
+function exportVerbaCSV(){
+  if(!window._lastCalc){toast('Calcule as verbas primeiro','red');return;}
+  const c=window._lastCalc;
+  dlCSV('verbas_rescisao.csv',[
+    ['Verba','Valor Bruto (R$)'],
+    ['Saldo de salário',c.saldoSalario.toFixed(2)],
+    ['Aviso prévio indenizado',c.avisoBruto.toFixed(2)],
+    ['Férias vencidas + 1/3',c.feriasVencTotal.toFixed(2)],
+    ['Férias proporcionais + 1/3',c.feriasPropTotal.toFixed(2)],
+    ['13º proporcional',c.trezeAvos.toFixed(2)],
+    ['Banco de horas',c.valBH.toFixed(2)],
+    ['Multa FGTS 40%',c.multa40.toFixed(2)],
+    ['Multa FGTS 10%',c.multa10.toFixed(2)],
+    ['',''],
+    ['TOTAL BRUTO',c.totalBruto.toFixed(2)],
+    ['(−) INSS',c.inss.toFixed(2)],
+    ['(−) IRRF Base A',c.irrf_a.toFixed(2)],
+    ['(−) IRRF Base B',c.irrf_b.toFixed(2)],
+    ['(=) VALOR LÍQUIDO',c.liquido.toFixed(2)],
+  ]);
+}
+function exportAuditCSV(){
+  dlCSV('auditoria_passivo.csv',[
+    ['Cód','Empregado','Admissão','Rescisão','Tipo','Aviso','Calculado','Pago','Gap','% Desvio','Risco','Classificação','Recomendação'],
+    ...auditRows.map(r=>[r.cod,r.nome,r.adm,r.res,r.tipo,r.aviso,r.calc,r.pago,(r.calc-r.pago).toFixed(2),
+      r.calc>0?(((r.calc-r.pago)/r.calc)*100).toFixed(1)+'%':'—',r.risco,r.cls,RECS[r.risco]||''])
+  ]);
+}
+function exportChecklistCSV(){
+  dlCSV('checklist.csv',
+    [['#','Item','Status','Base Legal','Evidência'],
+    ...CK.flatMap(sec=>sec.items.map(item=>[
+      item.n,item.t,
+      document.getElementById(`ck-${item.n}`)?.value||'',
+      item.b,
+      document.getElementById(`cev-${item.n}`)?.value||''
+    ]))]);
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────
+window.addEventListener('load',()=>{
+  buildVarTable();
+  renderAuditTable();
+  buildChecklist();
+});
 </script>
 <!-- ══ ABA ADM ══ -->
 
@@ -10894,6 +11816,500 @@ function mercadoExportarExcel() {
   </div>
 </div>
 </div>
+
+  <!-- ══ CALCULADORA DE RESCISÃO TRABALHISTA ══ -->
+  <div class="card" style="margin-top:16px;padding:0;overflow:hidden;border-radius:14px;">
+    <div style="padding:14px 16px;background:linear-gradient(135deg,#0D3B2E,#162018);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;">
+      <span style="font-size:22px;">⚖️</span>
+      <div>
+        <div style="font-size:13px;font-weight:800;color:#fff;">Calculadora de Rescisão Trabalhista</div>
+        <div style="font-size:10px;color:rgba(255,255,255,0.55);">CLT · INSS/IRRF 2026 · Auditoria de Passivo · Checklist Compliance</div>
+      </div>
+    </div>
+    <div class="rsc-wrap">
+<div id="toast" class="toast"></div>
+
+<div class="container">
+<header>
+  <div class="header-badge">Auditoria Interna · CLT · Março 2026</div>
+  <h1>Calculadora de Rescisão Trabalhista</h1>
+  <div class="header-sub">
+    <span>CLT + Reforma Trabalhista 2017</span>
+    <span>INSS/IRRF 2026</span>
+    <span>OJ 394 + OJ 305 SDI-1</span>
+    <span>Súm. 450 TST · Férias em dobro</span>
+    <span>eSocial S-2299</span>
+  </div>
+</header>
+
+<nav class="tabs-nav">
+  <button class="tab-btn active" onclick="rscSwitchTab('premissas',this)">
+    <svg class="tab-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="12" height="12" rx="2"/><path d="M5 8h6M5 5h4M5 11h3"/></svg>
+    Premissas
+  </button>
+  <button class="tab-btn" onclick="rscSwitchTab('calculo',this)">
+    <svg class="tab-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 13l4-4 3 3 3-7"/></svg>
+    Cálculo de Verbas<span class="tab-badge" id="badge-calculo"></span>
+  </button>
+  <button class="tab-btn" onclick="rscSwitchTab('auditoria',this)">
+    <svg class="tab-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 12l4-4 2 2 6-6"/><circle cx="13" cy="3" r="1.5"/></svg>
+    Auditoria de Passivo
+  </button>
+  <button class="tab-btn" onclick="rscSwitchTab('checklist',this)">
+    <svg class="tab-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 8l3 3 7-7"/><rect x="1" y="1" width="14" height="14" rx="2"/></svg>
+    Checklist Compliance
+    <span class="tab-badge" id="badge-checklist"></span>
+  </button>
+</nav>
+
+<!-- ═══ ABA 1: PREMISSAS ═══ -->
+<section id="tab-premissas" class="tab-panel active">
+
+  <p class="section-label">▌ A — Dados do Empregado</p>
+  <div class="cards-grid">
+    <div class="field-card required" id="fc-nome">
+      <div class="field-label">Nome do empregado</div>
+      <input class="input-field" type="text" id="nome" value="" placeholder="Nome Sobrenome" oninput="markFilled('fc-nome',this)">
+    </div>
+    <div class="field-card" id="fc-cpf">
+      <div class="field-label">Matrícula / CPF</div>
+      <input class="input-field" type="text" id="cpf" value="" placeholder="000.000.000-00">
+    </div>
+    <div class="field-card required" id="fc-cargo">
+      <div class="field-label">Departamento / Cargo</div>
+      <input class="input-field" type="text" id="cargo" value="" placeholder="Ex: TI / Analista de Sistemas">
+    </div>
+    <div class="field-card" id="fc-gestor">
+      <div class="field-label">Gestor responsável</div>
+      <input class="input-field" type="text" id="gestor" value="" placeholder="Nome do gestor">
+    </div>
+    <div class="field-card required" id="fc-adm">
+      <div class="field-label">Data de admissão <span class="req">★</span></div>
+      <input class="input-field" type="date" id="dataAdmissao" onchange="onInputChange()">
+      <div class="field-note">Obrigatório</div>
+    </div>
+    <div class="field-card required" id="fc-res">
+      <div class="field-label">Data de rescisão <span class="req">★</span></div>
+      <input class="input-field" type="date" id="dataRescisao" onchange="onInputChange()">
+      <div class="field-note">Último dia de trabalho efetivo</div>
+    </div>
+    <div class="field-card required" id="fc-tipo">
+      <div class="field-label">Tipo de rescisão <span class="req">★</span></div>
+      <select class="input-field" id="tipoRescisao" onchange="onInputChange()">
+        <option value="sjc">Sem justa causa</option>
+        <option value="pedido">Pedido de demissão</option>
+      </select>
+    </div>
+    <div class="field-card required" id="fc-sal">
+      <div class="field-label">Salário bruto mensal <span class="req">★</span></div>
+      <input class="input-field" type="number" id="salario" value="" step="0.01" min="0" placeholder="0,00" oninput="onInputChange()">
+      <div class="field-note">Salário fixo — sem variáveis</div>
+    </div>
+    <div class="field-card required" id="fc-aviso">
+      <div class="field-label">Modalidade do aviso <span class="req">★</span></div>
+      <select class="input-field" id="tipoAviso" onchange="onInputChange()">
+        <option value="indenizado">Indenizado (empregador paga)</option>
+        <option value="trabalhado">Trabalhado (empregado cumpre)</option>
+        <option value="parcial">Trabalhado parcialmente</option>
+        <option value="dispensado">Dispensado pelo empregador</option>
+      </select>
+    </div>
+    <div class="field-card" id="fc-diasAvTrab" style="display:none">
+      <div class="field-label">Dias do aviso efetivamente trabalhados</div>
+      <input class="input-field" type="number" id="diasAvisoTrabalhado" value="0" min="0" oninput="onInputChange()">
+      <div class="field-note">Para aviso parcialmente trabalhado</div>
+    </div>
+    <div class="field-card required" id="fc-fvenc">
+      <div class="field-label">Períodos de férias vencidas <span class="req">★</span></div>
+      <input class="input-field" type="number" id="feriasVencidas" value="0" min="0" max="10" oninput="onInputChange()">
+      <div class="field-note">Períodos inteiros não usufruídos</div>
+    </div>
+    <div class="field-card required" id="fc-inicio">
+      <div class="field-label">Início do período aquisitivo atual <span class="req">★</span></div>
+      <input class="input-field" type="date" id="inicioPeriodo" onchange="onInputChange()">
+      <div class="field-note">Para férias proporcionais</div>
+    </div>
+    <div class="field-card" id="fc-deps">
+      <div class="field-label">Dependentes IRRF</div>
+      <input class="input-field" type="number" id="dependentes" value="0" min="0" oninput="onInputChange()">
+      <div class="field-note">R$ 189,59/dependente — impacta IR</div>
+    </div>
+    <div class="field-card" id="fc-pensao">
+      <div class="field-label">Pensão alimentícia judicial (R$)</div>
+      <input class="input-field" type="number" id="pensao" value="0" min="0" step="0.01" oninput="onInputChange()">
+      <div class="field-note">Dedução integral da base IRRF</div>
+    </div>
+    <div class="field-card" id="fc-outrosDesc">
+      <div class="field-label">Outros descontos (R$)</div>
+      <input class="input-field" type="number" id="outrosDescontos" value="0" min="0" step="0.01" oninput="onInputChange()">
+      <div class="field-note">Plano de saúde, vale etc. (proporcional)</div>
+    </div>
+  </div>
+
+  <p class="section-label">▌ B — Banco de Horas (OJ 305 SDI-1 TST)</p>
+  <div class="cards-grid">
+    <div class="field-card" id="fc-bh">
+      <div class="field-label">Saldo de banco de horas</div>
+      <input class="input-field" type="number" id="bancoHoras" value="0" step="0.01" oninput="onInputChange()">
+      <div class="field-note">Positivo = pagar como HE · Negativo = NÃO descontar</div>
+      <div class="field-warn" id="warn-bh-neg">⚠ Saldo negativo — vedado o desconto (OJ 305 SDI-1 TST). Será ignorado.</div>
+    </div>
+    <div class="field-card" id="fc-adicHE">
+      <div class="field-label">Adicional hora extra (%)</div>
+      <select class="input-field" id="adicHE" onchange="onInputChange()">
+        <option value="0.5">50% (padrão legal)</option>
+        <option value="0.75">75% (acordo ou CCT)</option>
+        <option value="1.0">100% (feriado)</option>
+      </select>
+      <div class="field-note">Conforme CCT ou acordo coletivo</div>
+    </div>
+  </div>
+
+  <p class="section-label">▌ C — FGTS</p>
+  <div class="cards-grid">
+    <div class="field-card required warn" id="fc-fgts">
+      <div class="field-label">Saldo FGTS — extrato Caixa <span class="req">★</span></div>
+      <input class="input-field" type="number" id="saldoFGTS" value="" step="0.01" min="0" placeholder="0,00" oninput="onFGTSChange()">
+      <div class="field-warn show" id="warn-fgts">⚠ Obter extrato Caixa — nunca estimar. Multas incorretas geram passivo trabalhista.</div>
+    </div>
+    <div class="field-card" id="fc-aliqfgts">
+      <div class="field-label">Alíquota FGTS</div>
+      <select class="input-field" id="aliqFGTS" onchange="onInputChange()">
+        <option value="0.08">8% — geral</option>
+        <option value="0.02">2% — aprendiz</option>
+      </select>
+      <div class="field-note">Art. 15 Lei 8.036/1990</div>
+    </div>
+  </div>
+
+  <p class="section-label">▌ D — Remuneração Variável — Últimos 12 meses (Súmulas 264/253/172/354 TST)</p>
+  <table class="var-table">
+    <thead>
+      <tr>
+        <th>Mês / Ano</th>
+        <th>Horas Extras (R$)
+          <span class="tooltip-wrap"><span class="tooltip-icon">?</span><span class="tooltip-bubble">Inclui DSR sobre HE (Súm. 172 TST). Se houver supressão de HE habituais, verificar indenização Súm. 291 TST.</span></span>
+        </th>
+        <th>Comissões (R$)
+          <span class="tooltip-wrap"><span class="tooltip-icon">?</span><span class="tooltip-bubble">Comissões e percentagens (art. 457 CLT). Gorjetas habituais também integram (Súm. 354 TST — restaurantes, hotéis).</span></span>
+        </th>
+        <th>Adicionais (R$)
+          <span class="tooltip-wrap"><span class="tooltip-icon">?</span><span class="tooltip-bubble">Adicional noturno, insalubridade, periculosidade, gratificações (Súm. 253 TST). DSR sobre variáveis (Súm. 172).</span></span>
+        </th>
+        <th style="text-align:right">Total do mês (R$)</th>
+      </tr>
+    </thead>
+    <tbody id="varTableBody"></tbody>
+    <tfoot>
+      <tr class="total-row">
+        <td>MÉDIA MENSAL</td>
+        <td id="mediaHE" style="font-family:var(--mono);font-size:12px">0,00</td>
+        <td id="mediaCom" style="font-family:var(--mono);font-size:12px">0,00</td>
+        <td id="mediaAdi" style="font-family:var(--mono);font-size:12px">0,00</td>
+        <td id="mediaTotal" style="font-family:var(--mono);font-size:12px;text-align:right;color:var(--green)">0,00</td>
+      </tr>
+    </tfoot>
+  </table>
+  <div class="info-box" style="margin-bottom:20px;font-size:12px">
+    <div><strong>Súm. 172 TST:</strong> DSR sobre HE integra a remuneração → reflexo em férias, 13º e aviso. &nbsp;|&nbsp;
+    <strong>Súm. 291 TST:</strong> supressão de HE habituais gera indenização = valor das HE suprimidas × 50%. &nbsp;|&nbsp;
+    <strong>Súm. 354 TST:</strong> gorjetas habituais integram remuneração para todos os fins rescisórios.</div>
+  </div>
+
+  <p class="section-label">▌ E — Parâmetros Globais (editáveis conforme CCT)</p>
+  <div class="cards-grid">
+    <div class="field-card">
+      <div class="field-label">Multa FGTS empregado (%)</div>
+      <input class="input-field" type="number" id="pctMulta40" value="40" min="0" max="100" step="1" oninput="onInputChange()">
+      <div class="field-note">40% SJC · 20% acordo mútuo</div>
+    </div>
+    <div class="field-card">
+      <div class="field-label">Multa FGTS União (%)</div>
+      <input class="input-field" type="number" id="pctMulta10" value="10" min="0" max="100" step="1" oninput="onInputChange()">
+      <div class="field-note">10% — LC 110/2001</div>
+    </div>
+    <div class="field-card">
+      <div class="field-label">Dias base aviso prévio</div>
+      <input class="input-field" type="number" id="diasBaseAviso" value="30" min="1" oninput="onInputChange()">
+      <div class="field-note">30 dias padrão — Lei 12.506/2011</div>
+    </div>
+    <div class="field-card">
+      <div class="field-label">Acréscimo aviso / ano (dias)</div>
+      <input class="input-field" type="number" id="acrescimoAviso" value="3" min="0" oninput="onInputChange()">
+      <div class="field-note">3 dias por ano completo</div>
+    </div>
+    <div class="field-card">
+      <div class="field-label">Férias em dobro — Súm. 450 TST
+        <span class="tooltip-wrap"><span class="tooltip-icon">?</span><span class="tooltip-bubble">Se o prazo concessivo (12m após fim do período aquisitivo) foi ultrapassado sem concessão, férias são devidas em DOBRO. Cada período em dobro = 2 × salário + 1/3.</span></span>
+      </div>
+      <select class="input-field" id="feriasEmDobro" onchange="onInputChange()">
+        <option value="nenhum">Não — férias pagas normalmente</option>
+        <option value="todos">Sim — TODOS os períodos vencidos</option>
+        <option value="um">Sim — apenas 1 período em dobro</option>
+      </select>
+      <div class="field-note">Verificar prazo concessivo de cada período</div>
+    </div>
+  </div>
+
+</section>
+
+<!-- ═══ ABA 2: CÁLCULO ═══ -->
+<section id="tab-calculo" class="tab-panel">
+
+  <div id="calc-error" class="error-box" style="display:none">
+    Preencha os dados obrigatórios (★) na aba Premissas para calcular.
+  </div>
+
+  <div id="liquid-banner" class="liquid-banner" style="display:none">
+    <div>
+      <div class="liquid-banner-label">Valor líquido a receber</div>
+      <div class="liquid-banner-value" id="banner-liquido">R$ 0,00</div>
+      <div class="liquid-banner-sub" id="banner-tipo">—</div>
+    </div>
+    <div style="text-align:right">
+      <div style="font-family:var(--mono);font-size:10px;color:rgba(61,214,140,.5);text-transform:uppercase;letter-spacing:.08em;margin-bottom:2px">Bruto total</div>
+      <div style="font-family:var(--mono);font-size:15px;font-weight:600;color:#e8edf5" id="banner-bruto">R$ 0,00</div>
+      <div style="font-family:var(--mono);font-size:10.5px;color:rgba(61,214,140,.4);margin-top:2px" id="banner-desc">—</div>
+    </div>
+  </div>
+
+  <div id="warn-bh-neg-calc" class="warning-box" style="display:none">
+    Banco de horas com saldo negativo informado. OJ 305 SDI-1 TST veda o desconto — saldo ignorado no cálculo.
+  </div>
+  <div id="warn-ferias-dobro" class="warning-box" style="display:none">
+    ⚠ FÉRIAS EM DOBRO detectadas (Súmula 450 TST). Verifique os cards abaixo.
+  </div>
+  <div id="warn-oj394" class="info-box" style="display:none">
+    OJ 394 SDI-1 TST aplicada: dias de aviso indenizado estendem o contrato para fins de 13º e férias proporcionais.
+  </div>
+
+  <p class="section-label">▌ A — Dados Derivados</p>
+  <div class="result-grid">
+    <div class="result-card blue"><div class="result-label">Anos completos de serviço</div><div class="result-value blue" id="r-anos">—</div><div class="result-sub">Lei 12.506/2011</div></div>
+    <div class="result-card blue"><div class="result-label">Aviso prévio (dias)</div><div class="result-value blue" id="r-aviso-dias">—</div><div class="result-sub" id="r-aviso-formula">MIN(90 ; base+(anos−1)×acrés.)</div></div>
+    <div class="result-card blue"><div class="result-label">Fim do aviso / contrato</div><div class="result-value blue" id="r-fim-aviso">—</div><div class="result-sub" id="r-aviso-tipo-sub">—</div></div>
+    <div class="result-card blue"><div class="result-label">Meses férias proporcionais</div><div class="result-value blue" id="r-meses-ferias">—</div><div class="result-sub">Regra 15 dias + OJ 394</div></div>
+    <div class="result-card blue"><div class="result-label">Meses 13º proporcional</div><div class="result-value blue" id="r-meses-13">—</div><div class="result-sub">Regra 15 dias + OJ 394</div></div>
+    <div class="result-card purple"><div class="result-label">Salário base total</div><div class="result-value" id="r-sal-base" style="color:var(--purple)">R$ 0,00</div><div class="result-sub">Fixo + média variáveis (Súm. 264/253)</div></div>
+    <div class="result-card purple"><div class="result-label">Dias trabalhados no mês</div><div class="result-value" id="r-dias-mes" style="color:var(--purple)">—</div><div class="result-sub">Para saldo de salário</div></div>
+    <div class="result-card" id="rc-bh" style="display:none"><div class="result-label">Banco de horas (saldo)</div><div class="result-value" id="r-bh" style="color:var(--green)">—</div><div class="result-sub" id="r-bh-sub">OJ 305 SDI-1 TST</div></div>
+  </div>
+
+  <p class="section-label">▌ B — Verbas Rescisórias</p>
+  <table class="verbas-table">
+    <thead>
+      <tr>
+        <th style="width:185px">Verba</th>
+        <th>Memória de cálculo</th>
+        <th style="width:130px;text-align:right">Valor Bruto (R$)</th>
+        <th style="width:90px;text-align:center">Devida?</th>
+        <th>Base legal</th>
+      </tr>
+    </thead>
+    <tbody id="verbas-body"></tbody>
+    <tfoot>
+      <tr class="total-row">
+        <td colspan="2" style="color:#e8edf5">TOTAL BRUTO DAS VERBAS</td>
+        <td class="num" id="total-bruto" style="color:var(--amber)">R$ 0,00</td>
+        <td colspan="2"></td>
+      </tr>
+    </tfoot>
+  </table>
+
+  <p class="section-label">▌ C — Descontos</p>
+  <table class="verbas-table">
+    <thead>
+      <tr>
+        <th>Desconto</th>
+        <th>Base de cálculo / Método</th>
+        <th style="width:130px;text-align:right">Valor (R$)</th>
+        <th style="width:110px">Alíquota efetiva</th>
+        <th>Observação</th>
+      </tr>
+    </thead>
+    <tbody id="descontos-body"></tbody>
+    <tfoot>
+      <tr class="total-row">
+        <td colspan="2" style="color:#e8edf5">TOTAL DESCONTOS</td>
+        <td class="num" id="total-descontos" style="color:var(--red)">R$ 0,00</td>
+        <td colspan="2"></td>
+      </tr>
+      <tr class="liquid-row">
+        <td colspan="2">VALOR LÍQUIDO A RECEBER</td>
+        <td class="num" id="valor-liquido">R$ 0,00</td>
+        <td colspan="2"></td>
+      </tr>
+    </tfoot>
+  </table>
+
+  <p class="section-label">▌ D — FGTS e Obrigações do Empregador</p>
+  <div class="result-grid">
+    <div class="result-card green"><div class="result-label">FGTS do mês de rescisão</div><div class="result-value green" id="r-fgts-mes">R$ 0,00</div><div class="result-sub" id="r-fgts-sub">aliq% × salário · até dia 7</div></div>
+    <div class="result-card amber"><div class="result-label">Multa FGTS — empregado</div><div class="result-value amber" id="r-multa40">R$ 0,00</div><div class="result-sub" id="r-multa40-sub">Art. 18 Lei 8.036/1990</div></div>
+    <div class="result-card amber"><div class="result-label">Multa FGTS — União (GRRF)</div><div class="result-value amber" id="r-multa10">R$ 0,00</div><div class="result-sub">LC 110/2001 · guia separada</div></div>
+  </div>
+
+  <p class="section-label">▌ E — Verificação de Estabilidades Provisórias <span style="color:var(--red);font-size:10px">● CRÍTICO</span></p>
+  <div class="warning-box" style="margin-bottom:12px">
+    Responda cada item. Qualquer SIM interrompe a rescisão — a dispensa pode ser NULA com direito à reintegração ou indenização substitutiva + todas as verbas de SJC.
+  </div>
+  <div class="cards-grid" style="margin-bottom:24px">
+    <div class="field-card">
+      <div class="field-label">Gestante / adotante (Súm. 244 TST)
+        <span class="tooltip-wrap"><span class="tooltip-icon">?</span><span class="tooltip-bubble">Estabilidade OBJETIVA — mesmo que o empregador não soubesse da gravidez. Cobre da confirmação até 5 meses após o parto. Art. 10, II, b ADCT.</span></span>
+      </div>
+      <select class="input-field" id="estab-gestante" onchange="checkEstabilidade()">
+        <option value="nao">Não confirmado</option>
+        <option value="sim">⚠ SIM — possível gestante</option>
+      </select>
+    </div>
+    <div class="field-card">
+      <div class="field-label">Acidente de trabalho / doença ocupacional
+        <span class="tooltip-wrap"><span class="tooltip-icon">?</span><span class="tooltip-bubble">12 meses de estabilidade após alta médica previdenciária (art. 118 Lei 8.213/91). Verificar CAT emitida e data de alta.</span></span>
+      </div>
+      <select class="input-field" id="estab-acidente" onchange="checkEstabilidade()">
+        <option value="nao">Não — sem afastamento recente</option>
+        <option value="sim">⚠ SIM — afastamento por CAT recente</option>
+      </select>
+    </div>
+    <div class="field-card">
+      <div class="field-label">Membro ou candidato à CIPA
+        <span class="tooltip-wrap"><span class="tooltip-icon">?</span><span class="tooltip-bubble">Estabilidade do registro da candidatura até 1 ano após o mandato. Art. 10, II, a ADCT.</span></span>
+      </div>
+      <select class="input-field" id="estab-cipa" onchange="checkEstabilidade()">
+        <option value="nao">Não — sem registro na CIPA</option>
+        <option value="sim">⚠ SIM — membro/candidato CIPA</option>
+      </select>
+    </div>
+    <div class="field-card">
+      <div class="field-label">Dirigente ou representante sindical
+        <span class="tooltip-wrap"><span class="tooltip-icon">?</span><span class="tooltip-bubble">Art. 543 CLT — estabilidade do registro da candidatura até 1 ano após o mandato. Verificar registro no sindicato.</span></span>
+      </div>
+      <select class="input-field" id="estab-sindical" onchange="checkEstabilidade()">
+        <option value="nao">Não — sem mandato sindical</option>
+        <option value="sim">⚠ SIM — dirigente/representante</option>
+      </select>
+    </div>
+    <div class="field-card">
+      <div class="field-label">Portador de doença grave (Súm. 443 TST)
+        <span class="tooltip-wrap"><span class="tooltip-icon">?</span><span class="tooltip-bubble">Presunção de dispensa discriminatória. Inclui HIV, câncer, hepatite, alcoolismo crônico e outras doenças graves com estigma. Ônus da prova invertido.</span></span>
+      </div>
+      <select class="input-field" id="estab-doenca" onchange="checkEstabilidade()">
+        <option value="nao">Não — sem doença grave conhecida</option>
+        <option value="sim">⚠ SIM — doença grave em tratamento</option>
+      </select>
+    </div>
+    <div class="field-card">
+      <div class="field-label">Pré-aposentadoria (CCT/ACT aplicável)
+        <span class="tooltip-wrap"><span class="tooltip-icon">?</span><span class="tooltip-bubble">Estabilidade pré-aposentadoria geralmente de 12 a 24 meses antes da aposentadoria. Depende da CCT/ACT da categoria. Verificar convenção coletiva.</span></span>
+      </div>
+      <select class="input-field" id="estab-preaposen" onchange="checkEstabilidade()">
+        <option value="nao">Não verificado / não se aplica</option>
+        <option value="sim">⚠ SIM — verificar CCT da categoria</option>
+      </select>
+    </div>
+  </div>
+  <div id="alert-estabilidade" class="warning-box" style="display:none;background:rgba(255,92,92,.07);border-color:rgba(255,92,92,.35);color:var(--red)">
+    🚨 ESTABILIDADE PROVISÓRIA IDENTIFICADA — A rescisão pode ser NULA. Consulte jurídico especializado antes de qualquer ato rescisório. Risco: reintegração ou indenização substitutiva + verbas SJC completas (R-TR-08).
+  </div>
+
+  <p class="section-label">▌ F — Datas Críticas</p>
+  <div class="dates-strip">
+    <div class="date-item"><div class="date-item-label">Rescisão</div><div class="date-item-value" id="d-rescisao">—</div></div>
+    <div class="date-item"><div class="date-item-label">Prazo pagamento ⚠</div><div class="date-item-value alert" id="d-prazo-verbas">—</div></div>
+    <div class="date-item"><div class="date-item-label">FGTS até</div><div class="date-item-value" id="d-fgts">—</div></div>
+    <div class="date-item"><div class="date-item-label">S-2299 eSocial até</div><div class="date-item-value" id="d-esocial">—</div></div>
+    <div class="date-item"><div class="date-item-label">Fim do contrato</div><div class="date-item-value ok" id="d-aviso-fim">—</div></div>
+  </div>
+
+  <p class="section-label">▌ F — Memória do INSS (faixa a faixa)</p>
+  <table class="verbas-table" id="inss-detail-table">
+    <thead><tr><th>Faixa</th><th>Intervalo (R$)</th><th>Valor na faixa (R$)</th><th>Alíquota</th><th style="text-align:right">INSS faixa (R$)</th></tr></thead>
+    <tbody id="inss-detail-body"></tbody>
+    <tfoot><tr class="total-row"><td colspan="4">TOTAL INSS</td><td class="num" id="inss-total-mem">R$ 0,00</td></tr></tfoot>
+  </table>
+
+  <p class="section-label">▌ G — Memória do IRRF (Base A e Base B separadas)</p>
+  <table class="verbas-table">
+    <thead><tr><th>Base</th><th>Composição</th><th style="text-align:right">Bruta (R$)</th><th style="text-align:right">Deduções (R$)</th><th style="text-align:right">Líquida (R$)</th><th style="text-align:right">IRRF (R$)</th></tr></thead>
+    <tbody id="irrf-detail-body"></tbody>
+    <tfoot><tr class="total-row"><td colspan="5">IRRF TOTAL</td><td class="num" id="irrf-total-mem">R$ 0,00</td></tr></tfoot>
+  </table>
+
+</section>
+
+<!-- ═══ ABA 3: AUDITORIA ═══ -->
+<section id="tab-auditoria" class="tab-panel">
+  <div class="info-box">Matriz de auditoria de passivo trabalhista — CPC 25 / IAS 37. Insira os dados de cada rescisão auditada para mapear gaps entre verbas calculadas e pagas.</div>
+  <div class="summary-bar">
+    <div class="summary-pill"><div class="summary-pill-value" id="sum-total-calc" style="color:var(--accent)">R$ 0</div><div class="summary-pill-label">Total Calculado</div></div>
+    <div class="summary-pill"><div class="summary-pill-value" id="sum-total-pago">R$ 0</div><div class="summary-pill-label">Total Pago</div></div>
+    <div class="summary-pill"><div class="summary-pill-value" id="sum-gap" style="color:var(--red)">R$ 0</div><div class="summary-pill-label">Gap Total</div></div>
+  </div>
+  <div style="overflow-x:auto">
+    <table class="audit-table">
+      <thead><tr>
+        <th>Cód.</th><th style="min-width:115px">Empregado</th><th style="min-width:100px">Admissão</th>
+        <th style="min-width:100px">Rescisão</th><th style="min-width:105px">Tipo</th>
+        <th style="min-width:80px">Aviso (d)</th>
+        <th style="min-width:115px">Verba calc. (R$)</th><th style="min-width:115px">Verba paga (R$)</th>
+        <th style="min-width:95px">Gap (R$)</th><th style="min-width:70px">% Desvio</th>
+        <th style="min-width:110px">Risco CPC 25</th><th style="min-width:105px">Classificação</th>
+        <th style="min-width:160px">Recomendação</th>
+      </tr></thead>
+      <tbody id="audit-body"></tbody>
+      <tfoot><tr class="total-row">
+        <td colspan="6">TOTAL — GAP DE PASSIVO IDENTIFICADO</td>
+        <td id="aud-total-calc" style="text-align:right">0,00</td>
+        <td id="aud-total-pago" style="text-align:right">0,00</td>
+        <td id="aud-total-gap" style="text-align:right;color:var(--red)">0,00</td>
+        <td colspan="4"></td>
+      </tr></tfoot>
+    </table>
+  </div>
+  <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+    <button class="btn btn-secondary" onclick="addAuditRow()">+ Adicionar linha</button>
+    <button class="btn btn-secondary" onclick="exportAuditCSV()">↓ Exportar CSV</button>
+    <button class="btn btn-danger" onclick="clearAudit()">Limpar tabela</button>
+  </div>
+</section>
+
+<!-- ═══ ABA 4: CHECKLIST ═══ -->
+<section id="tab-checklist" class="tab-panel">
+  <div class="summary-bar">
+    <div class="summary-pill"><div class="summary-pill-value" id="ck-sim" style="color:var(--green)">0</div><div class="summary-pill-label">✅ Conformes</div></div>
+    <div class="summary-pill"><div class="summary-pill-value" id="ck-nao" style="color:var(--red)">0</div><div class="summary-pill-label">❌ Não conformes</div></div>
+    <div class="summary-pill"><div class="summary-pill-value" id="ck-na" style="color:var(--text-muted)">0</div><div class="summary-pill-label">N/A</div></div>
+    <div class="summary-pill"><div class="summary-pill-value" id="ck-pct" style="color:var(--accent)">—</div><div class="summary-pill-label">% Conformidade</div></div>
+  </div>
+  <div id="checklist-container"></div>
+  <div style="margin-top:12px">
+    <button class="btn btn-secondary" onclick="exportChecklistCSV()">↓ Exportar CSV</button>
+    <button class="btn btn-danger" onclick="resetChecklist()" style="margin-left:8px">Resetar</button>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-left">
+      Sistema Prompt Auditoria Interna Sênior v2.1 · CLT · TST · CPC 25 · Março 2026<br>
+      <span style="color:var(--text-dim)">★ campos obrigatórios · INSS progressivo (Port. 13/2026) · IRRF Lei 15.270/2025 · OJ 394/305 · Súm. 450 TST</span>
+      <div class="powered-by">
+        <span class="pw-icon">⚡</span>
+        <span class="pw-label">powered by</span>
+        <span class="pw-name">Luan Guilherme Lourenço</span>
+      </div>
+    </div>
+    <div class="footer-right">
+      <button class="btn btn-secondary" onclick="exportVerbaCSV()">↓ Exportar Verbas CSV</button>
+      <button class="btn btn-primary" onclick="window.print()">⎙ Imprimir</button>
+    </div>
+  </div>
+</footer>
+</div>
+    </div>
+  </div>
+
 
 
 <!-- ============================================================
