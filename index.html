@@ -9216,19 +9216,26 @@ function rhSwitchTab(tab) {
   if (inativo) { inativo.style.borderBottomColor = 'transparent'; inativo.style.color = 'var(--text-3)'; }
 
   // Inicializar rescisão ao abrir
-  if (!isPonto && !window._rscIniciado) {
-    window._rscIniciado = true;
-    setTimeout(function() {
-      // Forçar display:block no painel ativo antes de inicializar
-      var wrap = document.getElementById('rhPainelRescisao');
-      if (wrap) {
-        var ativo = wrap.querySelector('.tab-panel.active');
-        if (ativo) ativo.style.display = 'block';
-      }
-      try { buildVarTable();    } catch(e) {}
-      try { renderAuditTable(); } catch(e) {}
-      try { buildChecklist();   } catch(e) {}
-    }, 100);
+  if (!isPonto) {
+    var wrap = document.getElementById('rhPainelRescisao');
+    if (!wrap) return;
+    // Forçar todos os painéis ocultos primeiro
+    wrap.querySelectorAll('.tab-panel').forEach(function(p) {
+      p.style.setProperty('display','none','important');
+    });
+    // Mostrar o ativo
+    var ativo = wrap.querySelector('.tab-panel.active');
+    if (!ativo) { ativo = wrap.querySelector('#tab-premissas'); if(ativo) ativo.classList.add('active'); }
+    if (ativo) ativo.style.setProperty('display','block','important');
+
+    if (!window._rscIniciado) {
+      window._rscIniciado = true;
+      setTimeout(function() {
+        try { buildVarTable();    } catch(e) {}
+        try { renderAuditTable(); } catch(e) {}
+        try { buildChecklist();   } catch(e) {}
+      }, 150);
+    }
   }
 }
 </script>
@@ -11007,10 +11014,16 @@ function markFilled(id,inp){
 function rscSwitchTab(id,btn){
   var wrap = document.getElementById('rhPainelRescisao');
   if (!wrap) return;
-  wrap.querySelectorAll('.tab-panel').forEach(function(p){ p.classList.remove('active'); p.style.display='none'; });
+  wrap.querySelectorAll('.tab-panel').forEach(function(p){
+    p.classList.remove('active');
+    p.style.setProperty('display','none','important');
+  });
   wrap.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.remove('active'); });
   var panel = document.getElementById('tab-'+id);
-  if (panel) { panel.classList.add('active'); panel.style.display='block'; }
+  if (panel) {
+    panel.classList.add('active');
+    panel.style.setProperty('display','block','important');
+  }
   if (btn) btn.classList.add('active');
 }
 
