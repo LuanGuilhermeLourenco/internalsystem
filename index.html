@@ -2077,6 +2077,14 @@ transition: background .15s; }
 
 /* Saudação do dashboard */
 #dashSaudacao { font-size: 20px !important; }
+
+/* ── Dark mode — Aba Mercado ── */
+[data-tema="dark"] #tab-mercado .upload-zone {
+  background: #162018 !important;
+  border-color: rgba(255,255,255,0.15) !important;
+}
+[data-tema="dark"] #mercadoTabela th { background: var(--bg2) !important; }
+[data-tema="dark"] #mercadoTabela tr { background: transparent; }
 </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
@@ -2359,6 +2367,9 @@ transition: background .15s; }
       </button>
       <button class="nav-sub" id="tabNfUploadBtn" style="display:none;" onclick="switchTab('nf-upload')">
         <span class="nav-sub-icon">📄</span>Nota Fiscal
+      </button>
+      <button class="nav-sub" id="tabMercadoBtn" style="display:none;" onclick="switchTab('mercado')">
+        <span class="nav-sub-icon">🔍</span>Preço de Mercado
       </button>
       <button class="nav-sub" id="tabResultBtn" style="display:none;" onclick="switchTab('nf-resultado')">
         <span class="nav-sub-icon">📈</span>Campanhas
@@ -3335,6 +3346,11 @@ function aplicarPermissoes(perms) {
   });
   var btnPrec = document.getElementById('tabPrecBtn');
   if (btnPrec) btnPrec.style.display = algumaPrecVis ? 'flex' : 'none';
+
+  // --- Mercado ---
+  var mercVis = isAdm ? true : (p['notafiscal'] === true);
+  var btnMerc = document.getElementById('tabMercadoBtn');
+  if (btnMerc) btnMerc.style.display = mercVis ? 'flex' : 'none';
 
   // --- Nota Fiscal ---
   var nfVis = isAdm ? true : (p['notafiscal'] === true);
@@ -8424,6 +8440,7 @@ var _grupoDeAba = {
   'precificacao': 'financeiro',
   'nf-upload':    'financeiro',
   'nf-resultado': 'financeiro',
+  'mercado':      'financeiro',
   'estoque':      'operacoes',
   'entregas':     'operacoes',
   'reposicao':    'operacoes',
@@ -10382,6 +10399,312 @@ var swCode = [
     navigator.serviceWorker.register(url).catch(function(){});
   }
 })();
+
+// ═══════════════════════════════════════════════════════
+// ABA PESQUISA DE MERCADO — Comparação com Cobasi por lote
+// ═══════════════════════════════════════════════════════
+
+var _mercadoProdutos  = [];  // produtos carregados do Excel
+var _mercadoResultados = []; // resultados da pesquisa
+var _mercadoPesquisando = false;
+
+// Mapeamento família → marca real para busca
+var MERCADO_MARCAS = {
+  'QUALIPET PETISCOS':      'NATS bifinhos naturais Pet Dog',
+  'UPPER GROUP':            'Dogfy dental Petiscão ossos Natural Farm Mr Dry tapetes Cat Smart granulados',
+  'PET DELICIA PETISCOS':   'Pet Delícia',
+  'WOW PETISCOS':           'WOW Pet Food',
+  'FREBOPET':               'FreboPet NutriLovi',
+  'BIGBULL ACESSORIOS':     'BigBull',
+  'DOGSERA ACESSORIOS':     'DogSera',
+  'ELO IMPORTS ACESSORIOS': 'Elo Imports',
+  'FERREIRA ACESSORIOS':    'Ferreira',
+  'BELLAVYNI LAÇOS':        'Bellavyni',
+};
+
+function mercadoHandleDrop(e) {
+  e.preventDefault();
+  document.getElementById('mercadoUploadZone').classList.remove('drag');
+  var file = e.dataTransfer.files[0];
+  if (file) mercadoCarregarArquivo(file);
+}
+
+function mercadoCarregarArquivo(file) {
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      var data = new Uint8Array(e.target.result);
+      var wb   = XLSX.read(data, { type: 'array' });
+      var ws   = wb.Sheets[wb.SheetNames[0]];
+      var rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
+
+      // Header na linha 3 (idx 2), dados a partir da linha 4 (idx 3)
+      // Col B=1, D=3, H=7, P=15
+      _mercadoProdutos = [];
+      for (var i = 3; i < rows.length; i++) {
+        var row = rows[i];
+        var nome   = (row[1] || '').toString().trim();
+        var familia = (row[3] || '').toString().trim();
+        var preco  = parseFloat((row[7] || '0').toString().replace(',', '.')) || 0;
+        var marca  = (row[15] || '').toString().trim();
+        if (nome && preco > 0) {
+          _mercadoProdutos.push({ nome, familia, preco, marca, linha: i+1 });
+        }
+      }
+
+      var info = document.getElementById('mercadoFileInfo');
+      info.style.display = 'block';
+      info.textContent   = '✅ ' + _mercadoProdutos.length + ' produtos carregados de "' + file.name + '"';
+
+      document.getElementById('mercadoConfigCard').style.display = '';
+      document.getElementById('mercadoBtnWrap').style.display    = '';
+
+      // Popular famílias únicas no select
+      var familias = [...new Set(_mercadoProdutos.map(function(p){ return p.familia; }))].filter(Boolean).sort();
+      var sel = document.getElementById('mercadoFamilia');
+      // Manter opção "todas"
+      while (sel.options.length > 1) sel.remove(1);
+      familias.forEach(function(f) {
+        var opt = document.createElement('option');
+        opt.value = f; opt.textContent = f;
+        sel.appendChild(opt);
+      });
+
+    } catch(err) {
+      alert('Erro ao ler o arquivo. Verifique se é um Excel válido exportado do DELIVET.');
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+async function mercadoIniciarPesquisa() {
+  if (_mercadoPesquisando) return;
+  var apiKey = localStorage.getItem('gl_api_key');
+  if (!apiKey) {
+    alert('Configure sua chave API Claude na aba Perfil antes de usar a pesquisa de mercado.');
+    return;
+  }
+
+  var familia = document.getElementById('mercadoFamilia').value;
+  var loja    = document.getElementById('mercadoLoja').value;
+  var loteMax = parseInt(document.getElementById('mercadoLote').value);
+
+  // Filtrar produtos
+  var lista = familia === 'todas'
+    ? _mercadoProdutos
+    : _mercadoProdutos.filter(function(p){ return p.familia === familia; });
+
+  lista = lista.slice(0, loteMax);
+
+  if (!lista.length) { alert('Nenhum produto encontrado com os filtros selecionados.'); return; }
+
+  _mercadoPesquisando = true;
+  _mercadoResultados  = [];
+
+  // Mostrar progresso
+  document.getElementById('mercadoProgressCard').style.display    = '';
+  document.getElementById('mercadoResumoCard').style.display      = 'none';
+  document.getElementById('mercadoResultadosCard').style.display  = 'none';
+
+  var lojaLabel = {
+    cobasi: 'Cobasi (cobasi.com.br)',
+    petlove: 'Petlove',
+    petz: 'Petz',
+    mercadolivre: 'Mercado Livre',
+    geral: 'mercado online'
+  }[loja] || 'Cobasi';
+
+  for (var i = 0; i < lista.length; i++) {
+    var prod = lista[i];
+    var pct  = Math.round(((i+1)/lista.length)*100);
+
+    document.getElementById('mercadoProgressBar').style.width  = pct + '%';
+    document.getElementById('mercadoProgressCount').textContent = (i+1) + ' / ' + lista.length;
+    document.getElementById('mercadoProgressLabel').textContent = 'Pesquisando: ' + prod.nome.substring(0,45) + '…';
+    document.getElementById('mercadoProgressSub').textContent  = pct + '% concluído';
+
+    var marcaExtra = MERCADO_MARCAS[prod.familia] || prod.marca || '';
+    var resultado = await _mercadoPesquisarProduto(prod, lojaLabel, marcaExtra, apiKey);
+    _mercadoResultados.push(resultado);
+
+    // Atualizar resumo em tempo real
+    _mercadoAtualizarResumo();
+  }
+
+  _mercadoPesquisando = false;
+  document.getElementById('mercadoProgressLabel').textContent = '✅ Pesquisa concluída!';
+  document.getElementById('mercadoResumoCard').style.display     = '';
+  document.getElementById('mercadoResultadosCard').style.display = '';
+  _mercadoRenderTabela('todos');
+  _log('Pesquisa de mercado', lista.length + ' produtos pesquisados na ' + lojaLabel);
+}
+
+async function _mercadoPesquisarProduto(prod, lojaLabel, marcaExtra, apiKey) {
+  try {
+    var prompt = 'Pesquise o preço de venda do produto "' + prod.nome + '"'
+      + (marcaExtra ? ' da marca ' + marcaExtra : '')
+      + ' na loja ' + lojaLabel + '.'
+      + '\nMeu preço atual: R$ ' + prod.preco.toFixed(2)
+      + '\n\nResponda APENAS com JSON válido, sem texto extra, sem markdown:'
+      + '\n{'
+      + '\n  "preco_cobasi": 0.00,'
+      + '\n  "status": "abaixo|acima|similar|exclusivo",'
+      + '\n  "dif_pct": 0.0,'
+      + '\n  "fonte": "URL ou nome da página",'
+      + '\n  "obs": "frase curta"'
+      + '\n}'
+      + '\nRegras: status "abaixo" se meu preço < preço da loja; "acima" se meu preço > preço; "similar" se diferença < 10%; "exclusivo" se não encontrou.'
+      + '\nUse preço à vista (não parcelado, não programado).';
+
+    var resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 400,
+        tools: [{ type: 'web_search_20250305', name: 'web_search' }],
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+
+    var data = await resp.json();
+    var blocos = (data.content || []).filter(function(b){ return b.type === 'text'; });
+    var texto  = (blocos[blocos.length-1] || {}).text || '';
+    var clean  = texto.replace(/```json|```/g, '').trim();
+    // Extrair JSON do texto
+    var jsonMatch = clean.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) throw new Error('no json');
+    var m = JSON.parse(jsonMatch[0]);
+
+    return {
+      nome:     prod.nome,
+      familia:  prod.familia,
+      preco:    prod.preco,
+      cobasi:   parseFloat(m.preco_cobasi) || 0,
+      status:   m.status || 'exclusivo',
+      dif_pct:  parseFloat(m.dif_pct) || 0,
+      fonte:    m.fonte || '',
+      obs:      m.obs   || '',
+    };
+  } catch(e) {
+    return {
+      nome: prod.nome, familia: prod.familia, preco: prod.preco,
+      cobasi: 0, status: 'exclusivo', dif_pct: 0, fonte: '', obs: 'Erro na pesquisa'
+    };
+  }
+}
+
+function _mercadoAtualizarResumo() {
+  var counts = { abaixo:0, acima:0, similar:0, exclusivo:0 };
+  _mercadoResultados.forEach(function(r){ counts[r.status] = (counts[r.status]||0)+1; });
+  document.getElementById('mercadoQtdAbaixo').textContent   = counts.abaixo;
+  document.getElementById('mercadoQtdAcima').textContent    = counts.acima;
+  document.getElementById('mercadoQtdSimilar').textContent  = counts.similar;
+  document.getElementById('mercadoQtdExclusivo').textContent= counts.exclusivo;
+  document.getElementById('mercadoResumoCard').style.display = '';
+}
+
+function mercadoFiltrarResultados(filtro) {
+  ['todos','acima','abaixo','similar'].forEach(function(f) {
+    var btn = document.getElementById('mFilt' + f.charAt(0).toUpperCase() + f.slice(1));
+    if (btn) { btn.className = f === filtro ? 'mod-btn primary' : 'mod-btn'; btn.style.fontSize='10px'; btn.style.padding='4px 10px'; }
+  });
+  _mercadoRenderTabela(filtro);
+}
+
+function _mercadoRenderTabela(filtro) {
+  var lista = filtro === 'todos'
+    ? _mercadoResultados
+    : _mercadoResultados.filter(function(r){ return r.status === filtro; });
+
+  var statusCfg = {
+    abaixo:    { cor:'#059669', bg:'rgba(5,150,105,0.08)', icone:'🟢', label:'Abaixo' },
+    acima:     { cor:'#DC2626', bg:'rgba(220,38,38,0.08)', icone:'🔴', label:'Acima'  },
+    similar:   { cor:'#2563EB', bg:'rgba(37,99,235,0.08)', icone:'🔵', label:'Similar' },
+    exclusivo: { cor:'#6B7280', bg:'rgba(107,114,128,0.06)', icone:'⚪', label:'N/A'  },
+  };
+
+  var tbody = document.getElementById('mercadoTbody');
+  if (!lista.length) {
+    tbody.innerHTML = '<tr><td colspan="6" style="padding:20px;text-align:center;color:var(--text-4);font-size:12px;">Nenhum resultado nesta categoria.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = lista.map(function(r) {
+    var cfg  = statusCfg[r.status] || statusCfg.exclusivo;
+    var difStr = r.dif_pct ? (r.dif_pct > 0 ? '+' : '') + r.dif_pct.toFixed(1) + '%' : '—';
+    var cobasiStr = r.cobasi > 0 ? 'R$ ' + r.cobasi.toFixed(2).replace('.',',') : '—';
+    return '<tr style="border-bottom:1px solid var(--border);background:' + cfg.bg + ';">'
+      + '<td style="padding:8px 6px;font-weight:600;color:var(--text);max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="' + r.nome + '">' + r.nome + '</td>'
+      + '<td style="padding:8px 6px;color:var(--text-3);font-size:10px;">' + (r.familia || '—') + '</td>'
+      + '<td style="padding:8px 6px;text-align:right;font-weight:700;color:var(--text);">R$ ' + r.preco.toFixed(2).replace('.',',') + '</td>'
+      + '<td style="padding:8px 6px;text-align:right;font-weight:700;color:' + cfg.cor + ';">' + cobasiStr + '</td>'
+      + '<td style="padding:8px 6px;text-align:right;font-weight:700;color:' + cfg.cor + ';">' + difStr + '</td>'
+      + '<td style="padding:8px 6px;text-align:center;">' + cfg.icone + ' <span style="font-size:10px;font-weight:700;color:' + cfg.cor + ';">' + cfg.label + '</span></td>'
+      + '</tr>';
+  }).join('');
+}
+
+function mercadoExportarExcel() {
+  if (!_mercadoResultados.length) return;
+  try {
+    var wb = XLSX.utils.book_new();
+
+    // Aba 1 — Comparação completa
+    var rows1 = [['Produto','Família','Preço DELIVET','Preço Cobasi','Dif R$','Dif %','Status','Fonte','Observações']];
+    _mercadoResultados.forEach(function(r) {
+      var difR = r.cobasi > 0 ? (r.preco - r.cobasi).toFixed(2) : '—';
+      var difP = r.dif_pct ? r.dif_pct.toFixed(1) + '%' : '—';
+      rows1.push([r.nome, r.familia, r.preco, r.cobasi || '—', difR, difP,
+        { abaixo:'🟢 Abaixo', acima:'🔴 Acima', similar:'🔵 Similar', exclusivo:'⚪ N/A' }[r.status],
+        r.fonte, r.obs]);
+    });
+    var ws1 = XLSX.utils.aoa_to_sheet(rows1);
+    ws1['!cols'] = [{wch:40},{wch:20},{wch:14},{wch:14},{wch:10},{wch:10},{wch:12},{wch:30},{wch:40}];
+    XLSX.utils.book_append_sheet(wb, ws1, 'Comparação Completa');
+
+    // Aba 2 — Resumo
+    var counts = { abaixo:0, acima:0, similar:0, exclusivo:0 };
+    var difTotal = 0; var difCount = 0;
+    _mercadoResultados.forEach(function(r) {
+      counts[r.status]++;
+      if (r.dif_pct) { difTotal += r.dif_pct; difCount++; }
+    });
+    var rows2 = [
+      ['Resumo Executivo — Pesquisa de Mercado Delivet'],
+      ['Data da pesquisa:', new Date().toLocaleString('pt-BR')],
+      ['Total pesquisado:', _mercadoResultados.length],
+      [''],
+      ['Status','Qtd','%'],
+      ['🟢 Abaixo da Cobasi', counts.abaixo, ((counts.abaixo/_mercadoResultados.length)*100).toFixed(1)+'%'],
+      ['🔴 Acima da Cobasi',  counts.acima,  ((counts.acima/_mercadoResultados.length)*100).toFixed(1)+'%'],
+      ['🔵 Similar',          counts.similar,((counts.similar/_mercadoResultados.length)*100).toFixed(1)+'%'],
+      ['⚪ Não encontrado',   counts.exclusivo,((counts.exclusivo/_mercadoResultados.length)*100).toFixed(1)+'%'],
+      [''],
+      ['Diferença média (%):', difCount > 0 ? (difTotal/difCount).toFixed(1)+'%' : '—'],
+    ];
+    var ws2 = XLSX.utils.aoa_to_sheet(rows2);
+    ws2['!cols'] = [{wch:30},{wch:10},{wch:10}];
+    XLSX.utils.book_append_sheet(wb, ws2, 'Resumo Executivo');
+
+    // Aba 3 — Ação necessária
+    var acima  = _mercadoResultados.filter(function(r){ return r.status === 'acima'; });
+    var oport  = _mercadoResultados.filter(function(r){ return r.status === 'abaixo' && r.dif_pct < -40; });
+    var rows3  = [['🔴 ACIMA DA COBASI — Revisar preço'],['Produto','Meu Preço','Cobasi','Dif %']];
+    acima.forEach(function(r){ rows3.push([r.nome, r.preco, r.cobasi, r.dif_pct.toFixed(1)+'%']); });
+    rows3.push([''],['💰 OPORTUNIDADE — Mais de 40% abaixo da Cobasi'],['Produto','Meu Preço','Cobasi','Dif %']);
+    oport.forEach(function(r){ rows3.push([r.nome, r.preco, r.cobasi, r.dif_pct.toFixed(1)+'%']); });
+    var ws3 = XLSX.utils.aoa_to_sheet(rows3);
+    ws3['!cols'] = [{wch:40},{wch:12},{wch:12},{wch:10}];
+    XLSX.utils.book_append_sheet(wb, ws3, 'Ação Necessária');
+
+    XLSX.writeFile(wb, 'pesquisa_mercado_delivet_' + new Date().toISOString().split('T')[0] + '.xlsx');
+    _log('Exportou pesquisa de mercado Excel', _mercadoResultados.length + ' produtos');
+  } catch(e) {
+    alert('Erro ao gerar Excel: ' + e.message);
+  }
+}
 </script>
 <!-- ══ ABA ADM ══ -->
 
@@ -11077,6 +11400,164 @@ var swCode = [
 
 </div>
 
+<!-- ══ ABA: MERCADO ══════════════════════════════ -->
+<div class="tab-pane" id="tab-mercado">
+<div class="main" style="padding-bottom:32px;">
+
+  <div class="step-label" style="margin-top:8px;">
+    <div class="step-num">🔍</div>
+    <div class="step-title">Pesquisa de Preço de Mercado <span class="step-sub">— comparação com Cobasi por lote</span></div>
+  </div>
+
+  <!-- Upload do catálogo -->
+  <div class="card" style="margin-bottom:14px;">
+    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--blue);margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid var(--blue-lt);">
+      📂 1. Importar catálogo DELIVET (.xlsx)
+    </div>
+    <div style="font-size:12px;color:var(--text-3);margin-bottom:12px;line-height:1.6;">
+      Exporte do sistema DELIVET e importe aqui. <strong>Coluna B</strong> = Produto · <strong>D</strong> = Família · <strong>H</strong> = Preço · <strong>P</strong> = Marca · Header na linha 3.
+    </div>
+    <div class="upload-zone" id="mercadoUploadZone" onclick="document.getElementById('mercadoFileInput').click()"
+      ondragover="event.preventDefault();this.classList.add('drag')"
+      ondragleave="this.classList.remove('drag')"
+      ondrop="mercadoHandleDrop(event)">
+      <input type="file" id="mercadoFileInput" accept=".xlsx,.xls,.csv" onchange="mercadoCarregarArquivo(this.files[0])" style="display:none;">
+      <div class="uz-icon">📊</div>
+      <div class="uz-title">Clique ou arraste o Excel aqui</div>
+      <div class="uz-sub">.xlsx · .xls · .csv exportado do DELIVET</div>
+    </div>
+    <div id="mercadoFileInfo" style="display:none;margin-top:10px;padding:10px 14px;background:var(--green-lt);border:1px solid var(--green-md);border-radius:10px;font-size:12px;font-weight:700;color:var(--green);"></div>
+  </div>
+
+  <!-- Configurações da pesquisa -->
+  <div class="card" style="margin-bottom:14px;" id="mercadoConfigCard" style="display:none;">
+    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--blue);margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid var(--blue-lt);">
+      ⚙️ 2. Configurar pesquisa
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
+      <div>
+        <label class="login-label">Loja para comparar</label>
+        <select class="inp" id="mercadoLoja" style="height:38px;">
+          <option value="cobasi">Cobasi (cobasi.com.br)</option>
+          <option value="petlove">Petlove</option>
+          <option value="petz">Petz</option>
+          <option value="mercadolivre">Mercado Livre</option>
+          <option value="geral">Mercado geral (todas)</option>
+        </select>
+      </div>
+      <div>
+        <label class="login-label">Pesquisar por família</label>
+        <select class="inp" id="mercadoFamilia" style="height:38px;">
+          <option value="todas">Todas as famílias</option>
+          <option value="PET DELICIA PETISCOS">Pet Delícia</option>
+          <option value="QUALIPET PETISCOS">Qualipet / NATS</option>
+          <option value="WOW PETISCOS">WOW Pet Food</option>
+          <option value="UPPER GROUP">Upper Group (Dogfy/Petiscão)</option>
+          <option value="FREBOPET">FreboPet</option>
+          <option value="BIGBULL ACESSORIOS">BigBull</option>
+          <option value="DOGSERA ACESSORIOS">DogSera</option>
+          <option value="ELO IMPORTS ACESSORIOS">Elo Imports</option>
+          <option value="FERREIRA ACESSORIOS">Ferreira</option>
+          <option value="BELLAVYNI LAÇOS">Bellavyni</option>
+        </select>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+      <div style="flex:1;min-width:120px;">
+        <label class="login-label">Máx. produtos por lote</label>
+        <select class="inp" id="mercadoLote" style="height:38px;">
+          <option value="10">10 produtos (teste rápido)</option>
+          <option value="25" selected>25 produtos</option>
+          <option value="50">50 produtos</option>
+          <option value="100">100 produtos</option>
+        </select>
+      </div>
+      <div style="flex:1;min-width:120px;"></div>
+    </div>
+  </div>
+
+  <!-- Botão iniciar -->
+  <div id="mercadoBtnWrap" style="display:none;margin-bottom:14px;">
+    <button onclick="mercadoIniciarPesquisa()"
+      style="width:100%;padding:14px;background:linear-gradient(135deg,#0D3B2E,#155C44);color:#fff;
+             border:none;border-radius:14px;font-family:'Inter',sans-serif;font-weight:800;
+             font-size:14px;cursor:pointer;letter-spacing:0.3px;">
+      🔍 Iniciar Pesquisa de Mercado
+    </button>
+  </div>
+
+  <!-- Progresso -->
+  <div class="card" style="margin-bottom:14px;display:none;" id="mercadoProgressCard">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+      <div style="font-size:12px;font-weight:700;color:var(--text);" id="mercadoProgressLabel">Iniciando…</div>
+      <div style="font-size:11px;color:var(--text-4);" id="mercadoProgressCount">0 / 0</div>
+    </div>
+    <div style="height:8px;background:var(--border);border-radius:4px;overflow:hidden;">
+      <div id="mercadoProgressBar" style="height:8px;background:linear-gradient(90deg,#0D3B2E,#2ecc71);border-radius:4px;width:0%;transition:width .4s;"></div>
+    </div>
+    <div style="font-size:11px;color:var(--text-4);margin-top:6px;" id="mercadoProgressSub">Aguarde — pesquisando preços…</div>
+  </div>
+
+  <!-- Resumo executivo -->
+  <div class="card" style="margin-bottom:14px;display:none;" id="mercadoResumoCard">
+    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--blue);margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid var(--blue-lt);">
+      📊 Resumo da Pesquisa
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:12px;">
+      <div style="background:var(--green-lt);border:1px solid var(--green-md);border-radius:10px;padding:12px;text-align:center;">
+        <div style="font-size:24px;font-weight:900;color:var(--green);" id="mercadoQtdAbaixo">0</div>
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;color:var(--green);opacity:0.8;">🟢 Abaixo da Cobasi</div>
+      </div>
+      <div style="background:var(--red-lt);border:1px solid var(--red-md);border-radius:10px;padding:12px;text-align:center;">
+        <div style="font-size:24px;font-weight:900;color:var(--red);" id="mercadoQtdAcima">0</div>
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;color:var(--red);opacity:0.8;">🔴 Acima da Cobasi</div>
+      </div>
+      <div style="background:var(--blue-lt);border:1px solid var(--blue-md);border-radius:10px;padding:12px;text-align:center;">
+        <div style="font-size:24px;font-weight:900;color:var(--blue);" id="mercadoQtdSimilar">0</div>
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;color:var(--blue);opacity:0.8;">🔵 Similar</div>
+      </div>
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center;">
+        <div style="font-size:24px;font-weight:900;color:var(--text-3);" id="mercadoQtdExclusivo">0</div>
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;color:var(--text-4);">⚪ Não encontrado</div>
+      </div>
+    </div>
+    <button onclick="mercadoExportarExcel()"
+      style="width:100%;padding:11px;background:var(--green);color:#fff;border:none;border-radius:10px;
+             font-family:'Inter',sans-serif;font-weight:700;font-size:13px;cursor:pointer;">
+      📥 Exportar planilha Excel de comparação
+    </button>
+  </div>
+
+  <!-- Tabela de resultados -->
+  <div class="card" style="display:none;" id="mercadoResultadosCard">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--blue);">📋 Resultados</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        <button onclick="mercadoFiltrarResultados('todos')" id="mFiltTodos" class="mod-btn primary" style="font-size:10px;padding:4px 10px;">Todos</button>
+        <button onclick="mercadoFiltrarResultados('acima')" id="mFiltAcima" class="mod-btn" style="font-size:10px;padding:4px 10px;">🔴 Acima</button>
+        <button onclick="mercadoFiltrarResultados('abaixo')" id="mFiltAbaixo" class="mod-btn" style="font-size:10px;padding:4px 10px;">🟢 Abaixo</button>
+        <button onclick="mercadoFiltrarResultados('similar')" id="mFiltSimilar" class="mod-btn" style="font-size:10px;padding:4px 10px;">🔵 Similar</button>
+      </div>
+    </div>
+    <div id="mercadoTabela" style="overflow-x:auto;">
+      <table style="width:100%;border-collapse:collapse;font-size:11px;">
+        <thead>
+          <tr style="background:var(--bg2);">
+            <th style="padding:8px;text-align:left;font-weight:700;color:var(--text-3);white-space:nowrap;">Produto</th>
+            <th style="padding:8px;text-align:left;font-weight:700;color:var(--text-3);">Família</th>
+            <th style="padding:8px;text-align:right;font-weight:700;color:var(--text-3);">Meu Preço</th>
+            <th style="padding:8px;text-align:right;font-weight:700;color:var(--text-3);">Cobasi</th>
+            <th style="padding:8px;text-align:right;font-weight:700;color:var(--text-3);">Dif %</th>
+            <th style="padding:8px;text-align:center;font-weight:700;color:var(--text-3);">Status</th>
+          </tr>
+        </thead>
+        <tbody id="mercadoTbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+</div>
 <!-- ══ ABA ESTOQUE ══ -->
 
 <!-- ============================================================
