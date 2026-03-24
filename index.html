@@ -2303,6 +2303,12 @@ transition: background .15s; }
 .rsc-wrap .rsc-header { padding: 16px 0 10px !important; border-bottom: 1px solid var(--border) !important; }
 .rsc-wrap .rsc-footer { padding: 16px 0 !important; border-top: 1px solid var(--border) !important; }
 .rsc-wrap body\:\:before { display:none !important; }
+
+/* ── RH sub-nav dark mode ── */
+[data-tema="dark"] #rhSubPonto,
+[data-tema="dark"] #rhSubRescisao { color: var(--text-3) !important; }
+[data-tema="dark"] #rhSubPonto[style*="var(--blue)"],
+[data-tema="dark"] #rhSubRescisao[style*="var(--blue)"] { color: var(--text) !important; }
 </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
@@ -9182,6 +9188,36 @@ function salvarNovoNome() {
   _log('Alterou nome', novoNome);
   if (msgEl) { msgEl.textContent = '✅ Nome atualizado com sucesso!'; msgEl.style.background = '#E8F9EF'; msgEl.style.color = 'var(--green)'; msgEl.style.display = 'block'; setTimeout(function(){ msgEl.style.display = 'none'; }, 3000); }
 }
+
+// ── RH sub-abas ──────────────────────────────────────
+function rhSwitchTab(tab) {
+  var painelPonto    = document.getElementById('rhPainelPonto');
+  var painelRescisao = document.getElementById('rhPainelRescisao');
+  var btnPonto       = document.getElementById('rhSubPonto');
+  var btnRescisao    = document.getElementById('rhSubRescisao');
+  if (!painelPonto || !painelRescisao) return;
+
+  var isPonto = (tab === 'ponto');
+
+  painelPonto.style.display    = isPonto ? '' : 'none';
+  painelRescisao.style.display = isPonto ? 'none' : '';
+
+  // Estilo botão ativo
+  var ativo   = isPonto ? btnPonto    : btnRescisao;
+  var inativo = isPonto ? btnRescisao : btnPonto;
+  if (ativo)   { ativo.style.borderBottomColor   = 'var(--blue)'; ativo.style.color   = 'var(--blue)'; }
+  if (inativo) { inativo.style.borderBottomColor = 'transparent'; inativo.style.color = 'var(--text-3)'; }
+
+  // Inicializar rescisão ao abrir pela primeira vez
+  if (!isPonto && typeof buildVarTable === 'function' && !window._rscIniciado) {
+    window._rscIniciado = true;
+    setTimeout(function() {
+      buildVarTable();
+      renderAuditTable();
+      buildChecklist();
+    }, 50);
+  }
+}
 </script>
 
 </div>
@@ -11628,9 +11664,7 @@ function exportChecklistCSV(){
 
 // ─── INIT ─────────────────────────────────────────────────────────
 window.addEventListener('load',()=>{
-  buildVarTable();
-  renderAuditTable();
-  buildChecklist();
+  // Rescisão inicializada ao abrir a sub-aba pela primeira vez
 });
 </script>
 <!-- ══ ABA ADM ══ -->
@@ -11745,7 +11779,27 @@ window.addEventListener('load',()=>{
 <!-- ============================================================
      HTML >> ABA: RH
      ============================================================ -->
-<div class="tab-pane" id="tab-rh">
+<div <div class="tab-pane" id="tab-rh">
+<div class="main" style="padding-bottom:32px;">
+
+  <!-- ── Sub-nav RH ── -->
+  <div style="display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:18px;margin-top:8px;">
+    <button id="rhSubPonto" onclick="rhSwitchTab('ponto')"
+      style="background:none;border:none;border-bottom:2px solid var(--blue);margin-bottom:-2px;
+             padding:8px 18px;font-family:'Inter',sans-serif;font-size:12px;font-weight:700;
+             color:var(--blue);cursor:pointer;display:flex;align-items:center;gap:6px;transition:all .15s;">
+      ⏱️ Registro de Ponto
+    </button>
+    <button id="rhSubRescisao" onclick="rhSwitchTab('rescisao')"
+      style="background:none;border:none;border-bottom:2px solid transparent;margin-bottom:-2px;
+             padding:8px 18px;font-family:'Inter',sans-serif;font-size:12px;font-weight:700;
+             color:var(--text-3);cursor:pointer;display:flex;align-items:center;gap:6px;transition:all .15s;">
+      ⚖️ Rescisão Trabalhista
+    </button>
+  </div>
+
+  <!-- ── Sub-aba: Ponto ── -->
+  <div id="rhPainelPonto">
 <div class="main">
   <div class="step-label" style="margin-top:8px;">
     <div class="step-num">👥</div>
@@ -11819,10 +11873,11 @@ window.addEventListener('load',()=>{
       </table>
     </div>
   </div>
-</div>
-</div>
+  </div>
 
-  <!-- ══ CALCULADORA DE RESCISÃO TRABALHISTA ══ -->
+  <!-- ── Sub-aba: Rescisão ── -->
+  <div id="rhPainelRescisao" style="display:none;">
+<!-- ══ CALCULADORA DE RESCISÃO TRABALHISTA ══ -->
   <div class="card" style="margin-top:16px;padding:0;overflow:hidden;border-radius:14px;">
     <div style="padding:14px 16px;background:linear-gradient(135deg,#0D3B2E,#162018);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;">
       <span style="font-size:22px;">⚖️</span>
@@ -12315,8 +12370,12 @@ window.addEventListener('load',()=>{
     </div>
   </div>
 
+</div>
+</div>
+  </div>
 
-
+</div>
+</div>
 <!-- ============================================================
      HTML >> ABA: PAINEL ADM
      ============================================================ -->
