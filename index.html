@@ -2316,6 +2316,10 @@ transition: background .15s; }
 #rhPainelRescisao .tab-panel:not(.active) {
   display: none !important;
 }
+
+/* ── Rescisão: painéis sem conflito com .tab-panel ── */
+.rsc-panel { display: none; padding: 28px 0 56px; }
+.rsc-panel-active { display: block; }
 </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
@@ -9223,14 +9227,14 @@ function rhSwitchTab(tab) {
   // Inicializar rescisão
   if (!mostraPonto) {
     // Forçar visibilidade de todos os tab-panel do protótipo
-    var paineis = painelRescisao.querySelectorAll('.tab-panel');
+    var paineis = painelRescisao.querySelectorAll('.rsc-panel');
     paineis.forEach(function(p) {
       p.style.cssText += ';display:none!important;';
     });
 
     // Mostrar o painel ativo (premissas por padrão)
     var painelAtivo = painelRescisao.querySelector('#tab-premissas');
-    if (!painelAtivo) painelAtivo = painelRescisao.querySelector('.tab-panel');
+    if (!painelAtivo) painelAtivo = painelRescisao.querySelector('.rsc-panel');
     if (painelAtivo) {
       painelAtivo.classList.add('active');
       painelAtivo.style.cssText = painelAtivo.style.cssText.replace(/display\s*:[^;!]+!important/g,'');
@@ -11026,16 +11030,12 @@ function markFilled(id,inp){
 function rscSwitchTab(id,btn){
   var wrap = document.getElementById('rhPainelRescisao');
   if (!wrap) return;
-  wrap.querySelectorAll('.tab-panel').forEach(function(p){
-    p.classList.remove('active');
-    p.style.setProperty('display','none','important');
+  wrap.querySelectorAll('.rsc-panel').forEach(function(p){
+    p.style.display = 'none';
   });
   wrap.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.remove('active'); });
   var panel = document.getElementById('tab-'+id);
-  if (panel) {
-    panel.classList.add('active');
-    panel.style.setProperty('display','block','important');
-  }
+  if (panel) { panel.style.display = 'block'; }
   if (btn) btn.classList.add('active');
 }
 
@@ -11964,7 +11964,7 @@ window.addEventListener('load',()=>{
 </div>
 
 <!-- ═══ ABA 1: PREMISSAS ═══ -->
-<div id="tab-premissas" class="tab-panel active">
+<div id="tab-premissas" class="rsc-panel rsc-panel-active">
 
   <p class="section-label">▌ A — Dados do Empregado</p>
   <div class="cards-grid">
@@ -12155,7 +12155,7 @@ window.addEventListener('load',()=>{
 </div>
 
 <!-- ═══ ABA 2: CÁLCULO ═══ -->
-<div id="tab-calculo" class="tab-panel">
+<div id="tab-calculo" class="rsc-panel">
 
   <div id="calc-error" class="error-box" style="display:none">
     Preencha os dados obrigatórios (★) na aba Premissas para calcular.
@@ -12340,7 +12340,7 @@ window.addEventListener('load',()=>{
 </div>
 
 <!-- ═══ ABA 3: AUDITORIA ═══ -->
-<div id="tab-auditoria" class="tab-panel">
+<div id="tab-auditoria" class="rsc-panel">
   <div class="info-box">Matriz de auditoria de passivo trabalhista — CPC 25 / IAS 37. Insira os dados de cada rescisão auditada para mapear gaps entre verbas calculadas e pagas.</div>
   <div class="summary-bar">
     <div class="summary-pill"><div class="summary-pill-value" id="sum-total-calc" style="color:var(--accent)">R$ 0</div><div class="summary-pill-label">Total Calculado</div></div>
@@ -12376,7 +12376,7 @@ window.addEventListener('load',()=>{
 </div>
 
 <!-- ═══ ABA 4: CHECKLIST ═══ -->
-<div id="tab-checklist" class="tab-panel">
+<div id="tab-checklist" class="rsc-panel">
   <div class="summary-bar">
     <div class="summary-pill"><div class="summary-pill-value" id="ck-sim" style="color:var(--green)">0</div><div class="summary-pill-label">✅ Conformes</div></div>
     <div class="summary-pill"><div class="summary-pill-value" id="ck-nao" style="color:var(--red)">0</div><div class="summary-pill-label">❌ Não conformes</div></div>
