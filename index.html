@@ -4346,7 +4346,7 @@ function preencherPerfil() {
 }
   var nn = document.getElementById('perfilNovoNome'); if (nn && sessaoAtual) nn.value = sessaoAtual.nome || '';
 
-function verificarSenhaAtual() {
+async function verificarSenhaAtual() {
   const senhaDigitada = document.getElementById('perfilSenhaAtual').value;
   const errEl = document.getElementById('perfilStep1Err');
   errEl.style.display = 'none';
@@ -4364,7 +4364,7 @@ function verificarSenhaAtual() {
   } else {
     const usuarios = getUsuarios();
     const u = usuarios.find(u => u.login === sessaoAtual.login);
-    senhaCorreta = u && u.senha === senhaDigitada;
+    senhaCorreta = u ? await _verificarSenha(senhaDigitada, u.senha) : false;
   }
 
   if (!senhaCorreta) {
@@ -4388,7 +4388,7 @@ function voltarPerfilStep1() {
   var __perfilStep2Err = document.getElementById('perfilStep2Err'); if (__perfilStep2Err) __perfilStep2Err.style.display = 'none';
 }
 
-function salvarNovaSenha() {
+async function salvarNovaSenha() {
   const nova     = document.getElementById('perfilNovaSenha').value;
   const confirma = document.getElementById('perfilConfirmaSenha').value;
   const errEl    = document.getElementById('perfilStep2Err');
@@ -4411,7 +4411,7 @@ function salvarNovaSenha() {
   if (sessaoAtual.tipo !== 'adm') {
     const usuarios = getUsuarios();
     const u = usuarios.find(u => u.login === sessaoAtual.login);
-    if (u) { u.senha = nova; salvarUsuarios(usuarios); }
+    if (u) { u.senha = await _hashPBKDF2(nova, null); salvarUsuarios(usuarios); }
   }
   // Nota: senha do ADM é hardcoded — informar que só pode ser alterada no código
 
@@ -7532,7 +7532,7 @@ function abrirModalEditUser(login) {
 function fecharModalEditUser() {
   document.getElementById('modalEditUser').style.display = 'none';
 }
-function salvarEditUser() {
+async function salvarEditUser() {
   var login  = document.getElementById('editUserLogin').value;
   var nome   = document.getElementById('editUserNome').value.trim();
   var email  = document.getElementById('editUserEmail').value.trim();
