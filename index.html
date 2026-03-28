@@ -4698,6 +4698,21 @@ function salvarEntrega() {
 }
 
 function mudarStatusEntrega(id, novoStatus) {
+  // Interceptar: abrir modal de canhoto ao confirmar entrega
+  if (novoStatus === 'entregue') {
+    abrirModalCanhoto(id);
+    // Reverter o select para o status anterior enquanto aguarda confirmação
+    setTimeout(function() {
+      var entregas = getEntregas();
+      var eAtual   = entregas.find(function(x){ return x.id === id; });
+      document.querySelectorAll('select').forEach(function(sel) {
+        if (sel.getAttribute('onchange') && sel.getAttribute('onchange').indexOf(id) !== -1) {
+          sel.value = eAtual ? eAtual.status : 'pendente';
+        }
+      });
+    }, 0);
+    return;
+  }
   var entregas = getEntregas();
   var e = entregas.find(function(x){ return x.id === id; });
   if (e) {
@@ -4862,7 +4877,7 @@ function renderEntregas(busca) {
     <tr>
       <td style="font-family:'Inter',sans-serif; font-weight:700; color:var(--blue);">#${e.num}</td>
       <td class="td-nome">${e.cliente}</td>
-      <td>${e.descricao}${e.obs ? '<div style="font-size:10px;color:var(--text-3);margin-top:2px;">📍 '+e.obs+'</div>' : ''}</td>
+      <td>${e.descricao}${e.obs ? '<div style="font-size:10px;color:var(--text-3);margin-top:2px;">'+e.obs+'</div>' : ''}${e.canhoto ? '<div style="margin-top:4px;"><span style=\'font-size:10px;font-weight:700;color:#059669;background:rgba(5,150,105,0.1);padding:2px 7px;border-radius:5px;cursor:pointer;\' onclick=\'canhotoVerFoto('+e.id+')\'>Canhoto ✓</span></div>' : ''}</td>
       <td>${dataFmt(e.data)}</td>
       <td>
         <select onchange="mudarStatusEntrega(${e.id}, this.value)"
@@ -10395,6 +10410,155 @@ var _FAT_STATUS = {
   vencido:  { cor:'#dc2626', label:'Vencido' },
   cancelado:{ cor:'#6b7280', label:'Cancelado' },
 };
+
+
+// ════════════════════════════════════════════════════════
+// CANHOTO DE ENTREGA — Foto + NF + Assinante
+// ════════════════════════════════════════════════════════
+
+var _canhotoFotoBase64 = null;
+
+function abrirModalCanhoto(entId) {
+  var entregas = getEntregas();
+  var e = entregas.find(function(x){ return x.id === entId; });
+  if (!e) return;
+
+  _canhotoFotoBase64 = null;
+
+  document.getElementById('canhotoEntregaId').value  = entId;
+  document.getElementById('canhotoEntregaNum').textContent = 'Pedido #' + (e.num || '');
+  document.getElementById('canhotoCliente').textContent    = (e.cliente || e.tutor || '');
+  document.getElementById('canhotoNF').value        = e.nf || '';
+  document.getElementById('canhotoAssinante').value = '';
+
+  // Resetar preview da foto
+  var prev = document.getElementById('canhotoFotoPreview');
+  prev.innerHTML =
+    '<svg width="32" height="32" fill="none" stroke="var(--text-4)" stroke-width="1.5" viewBox="0 0 24 24">' +
+    '<path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/>' +
+    '<circle cx="12" cy="13" r="4"/></svg>' +
+    '<span style="font-size:12px;color:var(--text-4);font-weight:500;">Toque para fotografar o canhoto</span>' +
+    '<span style="font-size:10px;color:var(--text-4);">ou selecione da galeria</span>';
+  prev.style.padding = '0';
+  prev.onclick = function(){ document.getElementById('canhotoFotoInput').click(); };
+
+  document.getElementById('modalCanhoto').style.display = 'flex';
+  setTimeout(function(){ document.getElementById('canhotoAssinante').focus(); }, 300);
+}
+
+function fecharModalCanhoto() {
+  document.getElementById('modalCanhoto').style.display = 'none';
+  _canhotoFotoBase64 = null;
+}
+
+function canhotoPreviewFoto(input) {
+  if (!input.files || !input.files[0]) return;
+  var file = input.files[0];
+
+  // Validar tamanho — max 3 MB
+  if (file.size > 3 * 1024 * 1024) {
+    _toast('Foto muito grande. Máximo 3 MB.', 'erro');
+    return;
+  }
+
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    _canhotoFotoBase64 = e.target.result;
+    var prev = document.getElementById('canhotoFotoPreview');
+    prev.innerHTML = '<img src="' + _canhotoFotoBase64 + '" style="width:100%;height:100%;object-fit:cover;border-radius:10px;">';
+    prev.style.padding = '0';
+    prev.onclick = function(){ document.getElementById('canhotoFotoInput').click(); };
+  };
+
+  // Comprimir imagem antes de armazenar
+  var img = new Image();
+  img.onload = function() {
+    var canvas = document.createElement('canvas');
+    var MAX = 1024;
+    var w = img.width, h = img.height;
+    if (w > MAX) { h = Math.round(h * MAX / w); w = MAX; }
+    if (h > MAX) { w = Math.round(w * MAX / h); h = MAX; }
+    canvas.width = w; canvas.height = h;
+    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+    _canhotoFotoBase64 = canvas.toDataURL('image/jpeg', 0.75);
+    var prev = document.getElementById('canhotoFotoPreview');
+    prev.innerHTML = '<img src="' + _canhotoFotoBase64 + '" style="width:100%;height:100%;object-fit:cover;border-radius:10px;">';
+    prev.onclick = function(){ document.getElementById('canhotoFotoInput').click(); };
+  };
+  img.src = URL.createObjectURL(file);
+}
+
+function canhotoConfirmar() {
+  var entId     = document.getElementById('canhotoEntregaId').value;
+  var nf        = document.getElementById('canhotoNF').value.trim();
+  var assinante = document.getElementById('canhotoAssinante').value.trim();
+
+  if (!assinante) {
+    _toast('Informe o nome de quem assinou.', 'erro');
+    document.getElementById('canhotoAssinante').focus();
+    return;
+  }
+
+  var entregas = getEntregas();
+  var e = entregas.find(function(x){ return x.id === parseInt(entId) || x.id === entId; });
+  if (!e) { _toast('Entrega não encontrada.', 'erro'); return; }
+
+  // Registrar canhoto
+  e.canhoto = {
+    assinante: assinante,
+    nf:        nf,
+    foto:      _canhotoFotoBase64 || null,
+    ts:        new Date().toISOString(),
+    operador:  sessaoAtual ? sessaoAtual.nome : 'Sistema',
+  };
+  if (nf) e.nf = nf; // sincronizar NF na entrega também
+
+  // Mudar status para entregue
+  var statusAnterior = e.status;
+  e.status = 'entregue';
+  if (!e.historico) e.historico = [];
+  e.historico.push({
+    de: statusAnterior, para: 'entregue',
+    ts: Date.now(),
+    operador: sessaoAtual ? sessaoAtual.nome : 'Sistema',
+    obs: 'Canhoto registrado — recebedor: ' + assinante + (nf ? ' | NF: ' + nf : ''),
+  });
+
+  salvarEntregas(entregas);
+  fecharModalCanhoto();
+  renderEntregas();
+  _notificarWhatsApp(e, 'entregue');
+  _log('Entrega confirmada', '#' + (e.num||'') + ' — recebedor: ' + assinante + (nf ? ' | NF: ' + nf : ''));
+  _toast('Entrega #' + (e.num||'') + ' confirmada! Recebedor: ' + assinante, 'ok');
+}
+
+// Ver foto do canhoto
+function canhotoVerFoto(entId) {
+  var entregas = getEntregas();
+  var e = entregas.find(function(x){ return x.id === entId; });
+  if (!e || !e.canhoto) { _toast('Nenhum canhoto registrado.', 'info'); return; }
+  var c = e.canhoto;
+
+  var modal = document.createElement('div');
+  modal.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.92);' +
+    'display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;';
+  modal.onclick = function(){ document.body.removeChild(modal); };
+
+  var info = '<div style="color:#fff;text-align:center;margin-bottom:12px;font-family:Inter,sans-serif;">' +
+    '<div style="font-size:14px;font-weight:700;">Canhoto — Pedido #' + (e.num||'') + '</div>' +
+    '<div style="font-size:12px;opacity:0.7;margin-top:4px;">Recebedor: ' + c.assinante +
+    (c.nf ? ' · NF: ' + c.nf : '') + '</div>' +
+    '<div style="font-size:11px;opacity:0.5;margin-top:2px;">' + new Date(c.ts).toLocaleString('pt-BR') +
+    ' · ' + (c.operador || '') + '</div></div>';
+
+  var img = c.foto
+    ? '<img src="' + c.foto + '" style="max-width:100%;max-height:60vh;border-radius:12px;object-fit:contain;">'
+    : '<div style="color:rgba(255,255,255,0.5);font-size:13px;padding:40px;">Foto não registrada</div>';
+
+  modal.innerHTML = info + img +
+    '<div style="color:rgba(255,255,255,0.4);font-size:11px;margin-top:12px;">Toque para fechar</div>';
+  document.body.appendChild(modal);
+}
 </script>
 
 </div>
@@ -14575,6 +14739,71 @@ window.addEventListener('load',()=>{
     </div>
   </div>
 </div>
+
+<!-- ══ MODAL: Confirmação de Entrega + Canhoto ══ -->
+<div id="modalCanhoto" style="display:none;position:fixed;inset:0;z-index:9998;
+  background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);
+  align-items:center;justify-content:center;padding:16px;">
+  <div style="background:var(--card,#fff);border-radius:16px;max-width:460px;width:100%;
+    box-shadow:0 20px 60px rgba(0,0,0,0.3);overflow:hidden;">
+    <div style="background:linear-gradient(135deg,#0D3B2E,#155C44);padding:16px 20px;
+      display:flex;justify-content:space-between;align-items:center;">
+      <div>
+        <div style="font-size:10px;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:1px;">Confirmar Entrega</div>
+        <div style="font-size:16px;font-weight:800;color:#fff;" id="canhotoEntregaNum">Pedido #0</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.7);margin-top:2px;" id="canhotoCliente"></div>
+      </div>
+      <button onclick="fecharModalCanhoto()"
+        style="background:rgba(255,255,255,0.15);border:none;color:#fff;border-radius:8px;
+          padding:6px 12px;cursor:pointer;font-size:18px;">✕</button>
+    </div>
+    <div style="padding:18px 20px;">
+      <input type="hidden" id="canhotoEntregaId">
+
+      <!-- Foto do canhoto -->
+      <div style="margin-bottom:14px;">
+        <label class="mod-label">Foto do Canhoto / Comprovante</label>
+        <div id="canhotoFotoPreview" style="width:100%;height:160px;border:2px dashed var(--border);
+          border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+          cursor:pointer;gap:8px;overflow:hidden;background:var(--bg);"
+          onclick="document.getElementById('canhotoFotoInput').click()">
+          <svg width="32" height="32" fill="none" stroke="var(--text-4)" stroke-width="1.5" viewBox="0 0 24 24">
+            <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/>
+            <circle cx="12" cy="13" r="4"/>
+          </svg>
+          <span style="font-size:12px;color:var(--text-4);font-weight:500;">Toque para fotografar o canhoto</span>
+          <span style="font-size:10px;color:var(--text-4);">ou selecione da galeria</span>
+        </div>
+        <input type="file" id="canhotoFotoInput" accept="image/*" capture="environment"
+          style="display:none;" onchange="canhotoPreviewFoto(this)">
+      </div>
+
+      <!-- Número da NF -->
+      <div class="field" style="margin-bottom:12px;">
+        <label class="mod-label">Número da Nota Fiscal</label>
+        <input type="text" id="canhotoNF" class="inp" placeholder="Ex: 000123" maxlength="20">
+      </div>
+
+      <!-- Nome de quem assinou -->
+      <div class="field" style="margin-bottom:16px;">
+        <label class="mod-label">Nome de quem assinou o canhoto *</label>
+        <input type="text" id="canhotoAssinante" class="inp"
+          placeholder="Nome completo do recebedor" maxlength="80">
+      </div>
+
+      <!-- Aviso foto opcional -->
+      <div style="background:rgba(13,59,46,0.06);border:1px solid rgba(13,59,46,0.15);
+        border-radius:10px;padding:10px 14px;margin-bottom:16px;font-size:11px;color:var(--text-3);">
+        A foto é opcional mas recomendada como comprovante de entrega. O nome do recebedor é obrigatório.
+      </div>
+
+      <button onclick="canhotoConfirmar()"
+        class="mod-btn primary" style="width:100%;padding:13px;font-size:13px;font-weight:800;">
+        Confirmar Entrega
+      </button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
 ">
@@ -16197,6 +16426,10 @@ window.addEventListener('load',()=>{
     <div class="mod-field">
       <label class="mod-label">Descrição do Pedido Vet</label>
       <input class="mod-input" type="text" id="entDescricao" maxlength="120" placeholder="Ex: Pedido #001 — 3 itens">
+    </div>
+    <div class="mod-field">
+      <label class="mod-label">Número da Nota Fiscal</label>
+      <input class="mod-input" type="text" id="entNF" maxlength="20" placeholder="Ex: 000123">
     </div>
     <div class="mod-form-grid">
       <div>
