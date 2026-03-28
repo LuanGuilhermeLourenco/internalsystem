@@ -3827,8 +3827,8 @@ function entrarNoSistema() {
 
   // Abas sempre visíveis
   document.getElementById('tabPerfilBtn').style.display = 'inline-flex';
-  var navWrapper = document.getElementById('navWrapper'); if (navWrapper) navWrapper.style.display = 'inline-flex';
-  var buscaWrap = document.getElementById('navBusca'); if (buscaWrap) buscaWrap.style.display = 'inline-flex';
+  var navWrapper = document.getElementById('navWrapper'); if (navWrapper) navWrapper.style.display = 'flex';
+  var buscaWrap = document.getElementById('navBusca'); if (buscaWrap) buscaWrap.style.display = 'flex';
   var avisosBtn = document.getElementById('tabAvisosBtn'); if (avisosBtn) avisosBtn.style.display = 'inline-flex';
   _agentMostrarBtn(true);
   _chatMostrarBtn(true);
@@ -3887,7 +3887,7 @@ function entrarNoSistema() {
   setTimeout(atualizarFirebaseStatusBadge, 300);
   // Busca global
   var bg = document.getElementById('buscaGlobalWrap');
-  if (bg) bg.style.display = 'inline-flex';
+  if (bg) bg.style.display = 'flex';
   // Timeout — carregar valor salvo
   var tsMin = getTimeoutMin();
   var tsEl = document.getElementById('timeoutSelect');
