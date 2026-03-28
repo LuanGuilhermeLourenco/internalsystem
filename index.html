@@ -2597,6 +2597,9 @@ transition: background .15s; }
       <button class="nav-sub" id="tabMercadoBtn" style="display:none;" onclick="switchTab('mercado')">
         <span class="nav-sub-icon">🔍</span>Preço de Mercado
       </button>
+      <button class="nav-sub" id="tabFaturamentoBtn" style="display:none;" onclick="switchTab('faturamento')">
+        <span class="nav-sub-icon">💰</span>Faturamento
+      </button>
       <button class="nav-sub" id="tabResultBtn" style="display:none;" onclick="switchTab('nf-resultado')">
         <span class="nav-sub-icon">📈</span>Campanhas
       </button>
@@ -2625,7 +2628,10 @@ transition: background .15s; }
     <!-- Subitens grupo Comercial -->
     <div id="subsComercial" style="display:none;">
       <button class="nav-sub" id="tabComercialBtn" style="display:none;" onclick="switchTab('comercial')">
-        <span class="nav-sub-icon">📈</span>Comercial
+        <span class="nav-sub-icon">📈</span>Viabilidade
+      </button>
+      <button class="nav-sub" id="tabPedidosVendaBtn" style="display:none;" onclick="switchTab('pedidos-venda')">
+        <span class="nav-sub-icon">🛒</span>Pedidos de Venda
       </button>
     </div>
     <!-- Subitens grupo RH -->
@@ -3584,6 +3590,16 @@ function aplicarPermissoes(perms) {
   });
   var btnPrec = document.getElementById('tabPrecBtn');
   if (btnPrec) btnPrec.style.display = algumaPrecVis ? 'flex' : 'none';
+
+  // --- Pedidos de Venda ---
+  var pvVis = isAdm ? true : (p['comercial'] === true);
+  var btnPv = document.getElementById('tabPedidosVendaBtn');
+  if (btnPv) btnPv.style.display = pvVis ? 'flex' : 'none';
+
+  // --- Faturamento ---
+  var fatVis = isAdm ? true : (p['notafiscal'] === true);
+  var btnFat = document.getElementById('tabFaturamentoBtn');
+  if (btnFat) btnFat.style.display = fatVis ? 'flex' : 'none';
 
   // --- Mercado ---
   var mercVis = isAdm ? true : (p['notafiscal'] === true);
@@ -8685,6 +8701,8 @@ var _grupoDeAba = {
   'frete':        'operacoes',
   'laboratorio':  'medicamentos',
   'comercial':    'comercial',
+  'pedidos-venda':'comercial',
+  'faturamento':  'financeiro',
   'rh':           'rh',
   'adm':          'config',
   'perfil':       'config',
@@ -9215,6 +9233,470 @@ function rhTab(tab) {
   pr.style.display = isPonto ? 'none' : 'block';
   if (bp) { bp.style.borderBottomColor = isPonto ? 'var(--blue)' : 'transparent'; bp.style.color = isPonto ? 'var(--blue)' : 'var(--text-3)'; }
   if (br) { br.style.borderBottomColor = isPonto ? 'transparent' : 'var(--blue)'; br.style.color = isPonto ? 'var(--text-3)' : 'var(--blue)'; }
+}
+
+// ════════════════════════════════════════════════════════
+// PEDIDOS DE VENDA — Força de Vendas
+// ════════════════════════════════════════════════════════
+
+function getPedidosVenda() {
+  try { return JSON.parse(localStorage.getItem('gl_pedidos_venda') || '[]'); } catch(e) { return []; }
+}
+function salvarPedidosVenda(arr) {
+  localStorage.setItem('gl_pedidos_venda', JSON.stringify(arr));
+}
+function _pvId() {
+  return 'PV' + Date.now().toString(36).toUpperCase();
+}
+
+function pvNovoItem() {
+  var tbody = document.getElementById('pvItensTbody');
+  if (!tbody) return;
+  var idx = tbody.rows.length;
+  var tr = document.createElement('tr');
+  tr.dataset.idx = idx;
+  tr.innerHTML =
+    '<td><input class="inp" type="text" placeholder="Descrição do produto" style="min-width:140px;" oninput="pvCalcTotal()"></td>' +
+    '<td><input class="inp" type="number" value="1" min="1" style="width:60px;" oninput="pvCalcTotal()"></td>' +
+    '<td><input class="inp" type="number" value="0" min="0" step="0.01" style="width:90px;" oninput="pvCalcTotal()"></td>' +
+    '<td><input class="inp" type="number" value="0" min="0" max="100" style="width:60px;" oninput="pvCalcTotal()">%</td>' +
+    '<td class="pv-subtotal" style="font-weight:700;color:var(--green);min-width:80px;">R$ 0,00</td>' +
+    '<td><button class="mod-btn danger" style="padding:4px 8px;font-size:11px;" onclick="pvRemItem(this)">✕</button></td>';
+  tbody.appendChild(tr);
+  pvCalcTotal();
+}
+
+function pvRemItem(btn) {
+  btn.closest('tr').remove();
+  pvCalcTotal();
+}
+
+function pvCalcTotal() {
+  var total = 0;
+  var rows = document.querySelectorAll('#pvItensTbody tr');
+  rows.forEach(function(tr) {
+    var inps = tr.querySelectorAll('input');
+    var qtd  = parseFloat(inps[1].value) || 0;
+    var preco = parseFloat(inps[2].value) || 0;
+    var desc  = parseFloat(inps[3].value) || 0;
+    var sub   = qtd * preco * (1 - desc/100);
+    total += sub;
+    tr.querySelector('.pv-subtotal').textContent = 'R$ ' + sub.toFixed(2).replace('.',',');
+  });
+  var el = document.getElementById('pvTotal');
+  if (el) el.textContent = 'R$ ' + total.toFixed(2).replace('.',',');
+}
+
+function pvSalvarPedido() {
+  var cliente = (document.getElementById('pvCliente') || {}).value || '';
+  var cnpj    = (document.getElementById('pvCnpj') || {}).value || '';
+  var cond    = (document.getElementById('pvCondicao') || {}).value || '';
+  var obs     = (document.getElementById('pvObs') || {}).value || '';
+  var venc    = (document.getElementById('pvVencimento') || {}).value || '';
+
+  if (!cliente.trim()) { alert('Informe o nome do cliente.'); return; }
+
+  var itens = [];
+  var rows  = document.querySelectorAll('#pvItensTbody tr');
+  if (!rows.length) { alert('Adicione pelo menos um item.'); return; }
+
+  var total = 0;
+  rows.forEach(function(tr) {
+    var inps = tr.querySelectorAll('input');
+    var prod  = inps[0].value.trim();
+    var qtd   = parseFloat(inps[1].value) || 0;
+    var preco = parseFloat(inps[2].value) || 0;
+    var desc  = parseFloat(inps[3].value) || 0;
+    var sub   = qtd * preco * (1 - desc/100);
+    if (prod) { itens.push({ prod, qtd, preco, desc, sub }); total += sub; }
+  });
+
+  if (!itens.length) { alert('Nenhum item válido.'); return; }
+
+  var sess = _getSessao();
+  var pedido = {
+    id:        _pvId(),
+    num:       0,
+    cliente:   cliente,
+    cnpj:      cnpj,
+    condicao:  cond,
+    vencimento:venc,
+    obs:       obs,
+    itens:     itens,
+    total:     total,
+    vendedora: sess ? sess.nome : '—',
+    loginVend: sess ? sess.login : '—',
+    status:    'aberto',
+    dataCriacao: new Date().toISOString(),
+    dataStatus:  new Date().toISOString(),
+    historico: [{ de: '—', para: 'aberto', data: new Date().toISOString(), user: sess ? sess.nome : '—' }]
+  };
+
+  var lista = getPedidosVenda();
+  // Numerar sequencialmente
+  var maxNum = lista.reduce(function(m, p){ return p.num > m ? p.num : m; }, 0);
+  pedido.num = maxNum + 1;
+  lista.push(pedido);
+  salvarPedidosVenda(lista);
+  _log('Pedido de venda', 'PV#' + pedido.num + ' — ' + cliente + ' — R$ ' + total.toFixed(2));
+  pvLimparForm();
+  pvRenderLista();
+  alert('✅ Pedido PV#' + pedido.num + ' salvo com sucesso!');
+}
+
+function pvLimparForm() {
+  var ids = ['pvCliente','pvCnpj','pvObs','pvVencimento'];
+  ids.forEach(function(id){ var el = document.getElementById(id); if(el) el.value = ''; });
+  var sel = document.getElementById('pvCondicao');
+  if (sel) sel.selectedIndex = 0;
+  var tbody = document.getElementById('pvItensTbody');
+  if (tbody) tbody.innerHTML = '';
+  pvNovoItem();
+  pvCalcTotal();
+}
+
+function pvRenderLista(filtro) {
+  var tbody = document.getElementById('pvListaTbody');
+  if (!tbody) return;
+  var sess = _getSessao();
+  var isAdm = sess && (sess.tipo === 'adm' || sess.tipo === 'financeiro');
+  var lista = getPedidosVenda();
+
+  // Filtro de status
+  if (filtro && filtro !== 'todos') {
+    lista = lista.filter(function(p){ return p.status === filtro; });
+  }
+  // Vendedora vê apenas os próprios
+  if (!isAdm) {
+    lista = lista.filter(function(p){ return p.loginVend === sess.login; });
+  }
+  // Ordenar mais recente primeiro
+  lista = lista.slice().reverse();
+
+  if (!lista.length) {
+    tbody.innerHTML = '<tr><td colspan="8" class="mod-empty">Nenhum pedido encontrado.</td></tr>';
+    return;
+  }
+
+  var STATUS_CFG = {
+    aberto:    { cor:'#2563EB', bg:'rgba(37,99,235,0.08)', label:'Em aberto' },
+    analise:   { cor:'#d97706', bg:'rgba(217,119,6,0.08)',  label:'Em análise' },
+    aprovado:  { cor:'#059669', bg:'rgba(5,150,105,0.08)',  label:'Aprovado' },
+    faturado:  { cor:'#0D3B2E', bg:'rgba(13,59,46,0.10)',  label:'Faturado' },
+    cancelado: { cor:'#dc2626', bg:'rgba(220,38,38,0.08)', label:'Cancelado' },
+  };
+
+  tbody.innerHTML = lista.map(function(p) {
+    var cfg = STATUS_CFG[p.status] || STATUS_CFG.aberto;
+    var dtCriacao = p.dataCriacao ? new Date(p.dataCriacao).toLocaleDateString('pt-BR') : '—';
+    var acoes = '';
+    if (isAdm) {
+      if (p.status === 'aberto' || p.status === 'analise') {
+        acoes += '<button class="mod-btn" style="font-size:10px;padding:3px 8px;" onclick="pvMudarStatus(\'' + p.id + '\',\'aprovado\')">✅ Aprovar</button> ';
+        acoes += '<button class="mod-btn danger" style="font-size:10px;padding:3px 8px;" onclick="pvMudarStatus(\'' + p.id + '\',\'cancelado\')">✕ Cancelar</button>';
+      }
+    }
+    if (!isAdm && p.status === 'aberto') {
+      acoes = '<button class="mod-btn" style="font-size:10px;padding:3px 8px;" onclick="pvMudarStatus(\'' + p.id + '\',\'analise\')">📤 Enviar</button>';
+    }
+    return '<tr>' +
+      '<td style="font-weight:700;color:var(--blue);">PV#' + p.num + '</td>' +
+      '<td>' + p.cliente + '</td>' +
+      '<td style="font-size:11px;color:var(--text-3);">' + p.vendedora + '</td>' +
+      '<td>' + dtCriacao + '</td>' +
+      '<td style="font-weight:700;">R$ ' + p.total.toFixed(2).replace('.',',') + '</td>' +
+      '<td>' + p.condicao + '</td>' +
+      '<td><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:6px;' +
+        'color:' + cfg.cor + ';background:' + cfg.bg + ';">' + cfg.label + '</span></td>' +
+      '<td style="display:flex;gap:4px;flex-wrap:wrap;">' +
+        '<button class="mod-btn" style="font-size:10px;padding:3px 8px;" onclick="pvVerPedido(\'' + p.id + '\')">👁 Ver</button>' +
+        acoes +
+      '</td></tr>';
+  }).join('');
+}
+
+function pvMudarStatus(id, novoStatus) {
+  var lista = getPedidosVenda();
+  var idx   = lista.findIndex(function(p){ return p.id === id; });
+  if (idx === -1) return;
+  var sess  = _getSessao();
+  var old   = lista[idx].status;
+  lista[idx].status = novoStatus;
+  lista[idx].dataStatus = new Date().toISOString();
+  lista[idx].historico = lista[idx].historico || [];
+  lista[idx].historico.push({ de: old, para: novoStatus, data: new Date().toISOString(), user: sess ? sess.nome : '—' });
+  salvarPedidosVenda(lista);
+  pvRenderLista();
+  fatRenderFila(); // atualizar fila de faturamento
+  _log('Status pedido', 'PV#' + lista[idx].num + ' → ' + novoStatus);
+}
+
+function pvVerPedido(id) {
+  var lista  = getPedidosVenda();
+  var p      = lista.find(function(x){ return x.id === id; });
+  if (!p) return;
+  var itensHtml = p.itens.map(function(it, i) {
+    return '<tr>' +
+      '<td>' + (i+1) + '</td>' +
+      '<td>' + it.prod + '</td>' +
+      '<td style="text-align:center;">' + it.qtd + '</td>' +
+      '<td style="text-align:right;">R$ ' + it.preco.toFixed(2).replace('.',',') + '</td>' +
+      '<td style="text-align:center;">' + (it.desc||0) + '%</td>' +
+      '<td style="text-align:right;font-weight:700;">R$ ' + it.sub.toFixed(2).replace('.',',') + '</td>' +
+    '</tr>';
+  }).join('');
+  var hist = (p.historico||[]).map(function(h) {
+    return '<div style="font-size:11px;color:var(--text-3);padding:4px 0;border-bottom:1px solid var(--border);">' +
+      new Date(h.data).toLocaleString('pt-BR') + ' · ' + h.user + ' · ' + (h.de||'—') + ' → ' + h.para + '</div>';
+  }).join('');
+  var modal = document.getElementById('pvModalVer');
+  if (!modal) return;
+  document.getElementById('pvModalNumero').textContent  = 'PV#' + p.num;
+  document.getElementById('pvModalCliente').textContent = p.cliente + (p.cnpj ? ' · ' + p.cnpj : '');
+  document.getElementById('pvModalVend').textContent    = p.vendedora;
+  document.getElementById('pvModalData').textContent    = new Date(p.dataCriacao).toLocaleDateString('pt-BR');
+  document.getElementById('pvModalCond').textContent    = p.condicao;
+  document.getElementById('pvModalVenc').textContent    = p.vencimento ? new Date(p.vencimento+'T12:00:00').toLocaleDateString('pt-BR') : '—';
+  document.getElementById('pvModalObs').textContent     = p.obs || '—';
+  document.getElementById('pvModalTotal').textContent   = 'R$ ' + p.total.toFixed(2).replace('.',',');
+  document.getElementById('pvModalItens').innerHTML     = itensHtml;
+  document.getElementById('pvModalHist').innerHTML      = hist;
+  modal.style.display = 'flex';
+}
+
+// ════════════════════════════════════════════════════════
+// FATURAMENTO
+// ════════════════════════════════════════════════════════
+
+function getFaturamentos() {
+  try { return JSON.parse(localStorage.getItem('gl_faturamentos') || '[]'); } catch(e) { return []; }
+}
+function salvarFaturamentos(arr) {
+  localStorage.setItem('gl_faturamentos', JSON.stringify(arr));
+}
+
+function fatRenderFila() {
+  var tbody = document.getElementById('fatFilaTbody');
+  if (!tbody) return;
+  var lista = getPedidosVenda().filter(function(p){ return p.status === 'aprovado'; });
+  if (!lista.length) {
+    tbody.innerHTML = '<tr><td colspan="6" class="mod-empty">Nenhum pedido aprovado aguardando faturamento.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = lista.map(function(p) {
+    var dt = p.dataCriacao ? new Date(p.dataCriacao).toLocaleDateString('pt-BR') : '—';
+    return '<tr>' +
+      '<td style="font-weight:700;color:var(--blue);">PV#' + p.num + '</td>' +
+      '<td>' + p.cliente + '</td>' +
+      '<td style="font-size:11px;color:var(--text-3);">' + p.vendedora + '</td>' +
+      '<td>' + dt + '</td>' +
+      '<td style="font-weight:700;">R$ ' + p.total.toFixed(2).replace('.',',') + '</td>' +
+      '<td><button class="mod-btn primary" style="font-size:11px;" onclick="fatAbrirModal(\'' + p.id + '\')">💰 Faturar</button></td>' +
+    '</tr>';
+  }).join('');
+}
+
+function fatAbrirModal(pvId) {
+  var lista = getPedidosVenda();
+  var p = lista.find(function(x){ return x.id === pvId; });
+  if (!p) return;
+  document.getElementById('fatPvId').value    = pvId;
+  document.getElementById('fatCliente').textContent = p.cliente;
+  document.getElementById('fatPvNum').textContent   = 'PV#' + p.num;
+  document.getElementById('fatValor').textContent   = 'R$ ' + p.total.toFixed(2).replace('.',',');
+  // Pré-preencher vencimento
+  var venc = p.vencimento || '';
+  document.getElementById('fatVencimento').value = venc;
+  document.getElementById('fatValorCob').value   = p.total.toFixed(2);
+  document.getElementById('fatJuros').value      = '0';
+  document.getElementById('fatMulta').value      = '0';
+  document.getElementById('fatDesconto').value   = '0';
+  document.getElementById('fatObs2').value       = '';
+  var modal = document.getElementById('fatModal');
+  if (modal) modal.style.display = 'flex';
+}
+
+function fatConfirmar() {
+  var pvId  = (document.getElementById('fatPvId') || {}).value;
+  var venc  = (document.getElementById('fatVencimento') || {}).value;
+  var valor = parseFloat((document.getElementById('fatValorCob') || {}).value) || 0;
+  var juros = parseFloat((document.getElementById('fatJuros') || {}).value) || 0;
+  var multa = parseFloat((document.getElementById('fatMulta') || {}).value) || 0;
+  var desc  = parseFloat((document.getElementById('fatDesconto') || {}).value) || 0;
+  var obs   = (document.getElementById('fatObs2') || {}).value || '';
+
+  if (!venc)  { alert('Informe a data de vencimento.'); return; }
+  if (!valor) { alert('Informe o valor a cobrar.'); return; }
+
+  var sess = _getSessao();
+  var fats = getFaturamentos();
+  var maxNum = fats.reduce(function(m,f){ return f.num > m ? f.num : m; }, 0);
+
+  // Nosso número sequencial (para boleto futuro)
+  var nossoNum = String(maxNum + 1).padStart(8, '0');
+
+  var fat = {
+    id:       'FAT' + Date.now().toString(36).toUpperCase(),
+    num:      maxNum + 1,
+    nossoNum: nossoNum,
+    pvId:     pvId,
+    pvNum:    0,
+    cliente:  '',
+    vencimento: venc,
+    valor:    valor,
+    juros:    juros,
+    multa:    multa,
+    desconto: desc,
+    obs:      obs,
+    status:   'aberto', // aberto / pago / vencido / cancelado
+    dataCriacao: new Date().toISOString(),
+    operador: sess ? sess.nome : '—',
+  };
+
+  // Copiar dados do pedido
+  var pvLista = getPedidosVenda();
+  var pv = pvLista.find(function(x){ return x.id === pvId; });
+  if (pv) {
+    fat.pvNum   = pv.num;
+    fat.cliente = pv.cliente;
+    fat.cnpj    = pv.cnpj || '';
+    fat.itens   = pv.itens;
+    // Marcar pedido como faturado
+    pvMudarStatus(pvId, 'faturado');
+  }
+
+  fats.push(fat);
+  salvarFaturamentos(fats);
+  _log('Faturamento', 'FAT#' + fat.num + ' — PV#' + fat.pvNum + ' — ' + fat.cliente);
+
+  var modal = document.getElementById('fatModal');
+  if (modal) modal.style.display = 'none';
+  fatRenderFila();
+  fatRenderLista();
+  alert('✅ Faturamento FAT#' + fat.num + ' gerado!\nNosso Número: ' + nossoNum);
+}
+
+function fatRenderLista(filtro) {
+  var tbody = document.getElementById('fatListaTbody');
+  if (!tbody) return;
+  var lista = getFaturamentos();
+  if (filtro && filtro !== 'todos') lista = lista.filter(function(f){ return f.status === filtro; });
+  lista = lista.slice().reverse();
+
+  if (!lista.length) {
+    tbody.innerHTML = '<tr><td colspan="7" class="mod-empty">Nenhum faturamento registrado.</td></tr>';
+    return;
+  }
+
+  var STATUS_FAT = {
+    aberto:    { cor:'#2563EB', label:'Em aberto' },
+    pago:      { cor:'#059669', label:'Pago' },
+    vencido:   { cor:'#dc2626', label:'Vencido' },
+    cancelado: { cor:'#6b7280', label:'Cancelado' },
+  };
+
+  tbody.innerHTML = lista.map(function(f) {
+    var cfg = STATUS_FAT[f.status] || STATUS_FAT.aberto;
+    var dtVenc = f.vencimento ? new Date(f.vencimento+'T12:00:00').toLocaleDateString('pt-BR') : '—';
+    return '<tr>' +
+      '<td style="font-weight:700;color:var(--green);">FAT#' + f.num + '</td>' +
+      '<td style="font-size:11px;color:var(--blue);">PV#' + f.pvNum + '</td>' +
+      '<td>' + f.cliente + '</td>' +
+      '<td>' + dtVenc + '</td>' +
+      '<td style="font-weight:700;">R$ ' + f.valor.toFixed(2).replace('.',',') + '</td>' +
+      '<td><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:6px;color:' + cfg.cor + ';">' + cfg.label + '</span></td>' +
+      '<td style="display:flex;gap:4px;flex-wrap:wrap;">' +
+        '<button class="mod-btn" style="font-size:10px;padding:3px 8px;" onclick="fatGerarBoleto(\'' + f.id + '\')">🖨 Boleto</button>' +
+        (f.status === 'aberto' ? '<button class="mod-btn primary" style="font-size:10px;padding:3px 8px;" onclick="fatMarcarPago(\'' + f.id + '\')">✅ Pago</button>' : '') +
+      '</td>' +
+    '</tr>';
+  }).join('');
+}
+
+function fatMarcarPago(id) {
+  var fats = getFaturamentos();
+  var idx  = fats.findIndex(function(f){ return f.id === id; });
+  if (idx === -1) return;
+  fats[idx].status   = 'pago';
+  fats[idx].dataPago = new Date().toISOString();
+  salvarFaturamentos(fats);
+  fatRenderLista();
+  _log('Baixa faturamento', 'FAT#' + fats[idx].num + ' marcado como pago');
+}
+
+function fatGerarBoleto(id) {
+  var fats = getFaturamentos();
+  var f    = fats.find(function(x){ return x.id === id; });
+  if (!f) return;
+
+  // Linha digitável visual (formato FEBRABAN — sem banco real)
+  var banco   = '000';
+  var moeda   = '9';
+  var vencFmt = f.vencimento ? f.vencimento.replace(/-/g,'') : '00000000';
+  var valorFmt = String(Math.round(f.valor * 100)).padStart(10, '0');
+  var nosso   = f.nossoNum || '00000001';
+  var campo1  = banco + moeda + '.' + nosso.substring(0,5) + ' ';
+  var campo2  = nosso.substring(5) + '000000' + '.' + '000000 ';
+  var campo3  = '000000000' + '.' + '000000 ';
+  var digito  = '1';
+  var fatorVenc = '0000';
+  var linhaDigitavel = campo1 + campo2 + campo3 + digito + ' ' + fatorVenc + valorFmt;
+
+  var dtVenc = f.vencimento ? new Date(f.vencimento+'T12:00:00').toLocaleDateString('pt-BR') : '—';
+  var dtEmit = new Date(f.dataCriacao).toLocaleDateString('pt-BR');
+  var itensHtml = (f.itens || []).map(function(it, i) {
+    return '<tr style="border-bottom:1px solid #e5e7eb;">' +
+      '<td style="padding:4px 8px;">' + (i+1) + '</td>' +
+      '<td style="padding:4px 8px;">' + it.prod + '</td>' +
+      '<td style="padding:4px 8px;text-align:center;">' + it.qtd + '</td>' +
+      '<td style="padding:4px 8px;text-align:right;">R$ ' + it.preco.toFixed(2).replace('.',',') + '</td>' +
+      '<td style="padding:4px 8px;text-align:right;font-weight:700;">R$ ' + it.sub.toFixed(2).replace('.',',') + '</td>' +
+    '</tr>';
+  }).join('');
+
+  var html = '<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8">' +
+    '<title>Boleto FAT#' + f.num + '</title>' +
+    '<style>body{font-family:Arial,sans-serif;font-size:12px;color:#111;margin:0;padding:20px;}' +
+    '.blt{max-width:750px;margin:0 auto;border:1px solid #ccc;}' +
+    '.blt-header{background:#0D3B2E;color:#fff;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;}' +
+    '.blt-header h1{font-size:14px;margin:0;font-weight:700;}' +
+    '.blt-section{padding:10px 16px;border-bottom:1px solid #ddd;}' +
+    '.blt-row{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:6px;}' +
+    '.blt-field{flex:1;min-width:120px;}' +
+    '.blt-label{font-size:10px;color:#666;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px;}' +
+    '.blt-value{font-size:13px;font-weight:600;}' +
+    '.blt-linha{background:#f5f5f5;padding:12px 16px;font-family:monospace;font-size:13px;letter-spacing:1px;word-break:break-all;border-bottom:1px solid #ddd;}' +
+    '.blt-barras{height:60px;background:repeating-linear-gradient(90deg,#000 0,#000 2px,#fff 2px,#fff 4px);margin:12px 16px;}' +
+    '.blt-instrucoes{padding:10px 16px;font-size:11px;color:#555;border-bottom:1px solid #ddd;}' +
+    '.blt-aviso{background:#fff3cd;padding:8px 16px;font-size:11px;color:#856404;text-align:center;}' +
+    'table{width:100%;border-collapse:collapse;}th{background:#f5f5f5;padding:4px 8px;text-align:left;font-size:11px;}' +
+    '@media print{.no-print{display:none!important;}}' +
+    '</style></head><body>' +
+    '<div class="no-print" style="text-align:center;margin-bottom:16px;">' +
+    '<button onclick="window.print()" style="background:#0D3B2E;color:#fff;border:none;padding:10px 24px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;">🖨 Imprimir / Salvar PDF</button>' +
+    '</div>' +
+    '<div class="blt">' +
+    '<div class="blt-header"><h1>🐾 Delivet Pet · Boleto de Cobrança</h1>' +
+    '<div style="text-align:right;font-size:11px;">FAT#' + f.num + '<br>Nosso Nº: ' + f.nossoNum + '</div></div>' +
+    '<div class="blt-section"><div class="blt-row">' +
+    '<div class="blt-field"><div class="blt-label">Cedente</div><div class="blt-value">Delivet Pet</div></div>' +
+    '<div class="blt-field"><div class="blt-label">Emissão</div><div class="blt-value">' + dtEmit + '</div></div>' +
+    '<div class="blt-field"><div class="blt-label">Vencimento</div><div class="blt-value" style="color:#c0392b;font-size:15px;">' + dtVenc + '</div></div>' +
+    '<div class="blt-field"><div class="blt-label">Valor</div><div class="blt-value" style="color:#0D3B2E;font-size:15px;">R$ ' + f.valor.toFixed(2).replace('.',',') + '</div></div>' +
+    '</div></div>' +
+    '<div class="blt-section"><div class="blt-row">' +
+    '<div class="blt-field"><div class="blt-label">Sacado (Cliente)</div><div class="blt-value">' + f.cliente + (f.cnpj ? ' · ' + f.cnpj : '') + '</div></div>' +
+    '<div class="blt-field"><div class="blt-label">Referente a</div><div class="blt-value">Pedido PV#' + f.pvNum + '</div></div>' +
+    '</div></div>' +
+    (f.juros || f.multa ? '<div class="blt-instrucoes">Juros de ' + f.juros + '% a.m. após o vencimento · Multa de ' + f.multa + '% · ' + (f.obs || '') + '</div>' : '') +
+    '<div class="blt-section"><table><thead><tr><th>#</th><th>Produto</th><th>Qtd</th><th>Preço Unit.</th><th>Subtotal</th></tr></thead><tbody>' + itensHtml + '</tbody></table></div>' +
+    '<div class="blt-linha">Linha Digitável: ' + linhaDigitavel + '</div>' +
+    '<div class="blt-barras"></div>' +
+    '<div class="blt-aviso">⚠️ Este boleto é um documento de cobrança interno · Válido somente após integração bancária · Delivet Pet</div>' +
+    '</div></body></html>';
+
+  var w = window.open('', '_blank');
+  if (w) { w.document.write(html); w.document.close(); }
 }
 </script>
 
@@ -13364,6 +13846,307 @@ window.addEventListener('load',()=>{
 
 </div>
 </div>
+
+<!-- ══ ABA: PEDIDOS DE VENDA ══ -->
+<div class="tab-pane" id="tab-pedidos-venda">
+<div class="main" style="padding-bottom:32px;">
+
+  <div class="step-label" style="margin-top:8px;">
+    <div class="step-num">🛒</div>
+    <div class="step-title">Pedidos de Venda <span class="step-sub">— força de vendas</span></div>
+  </div>
+
+  <!-- Novo Pedido -->
+  <div class="card" style="margin-bottom:16px;">
+    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--blue);margin-bottom:14px;padding-bottom:8px;border-bottom:2px solid var(--blue-lt);">
+      ➕ Novo Pedido de Venda
+    </div>
+
+    <div class="g2" style="margin-bottom:12px;">
+      <div class="field">
+        <label class="mod-label">Cliente *</label>
+        <input type="text" id="pvCliente" class="inp" placeholder="Nome do cliente / empresa" maxlength="100">
+      </div>
+      <div class="field">
+        <label class="mod-label">CNPJ / CPF</label>
+        <input type="text" id="pvCnpj" class="inp" placeholder="00.000.000/0000-00" maxlength="20">
+      </div>
+    </div>
+
+    <div class="g2" style="margin-bottom:12px;">
+      <div class="field">
+        <label class="mod-label">Condição de Pagamento *</label>
+        <select id="pvCondicao" class="inp">
+          <option value="À vista">À vista</option>
+          <option value="30 dias">30 dias</option>
+          <option value="30/60 dias">30/60 dias</option>
+          <option value="30/60/90 dias">30/60/90 dias</option>
+          <option value="Boleto 30 dias">Boleto 30 dias</option>
+          <option value="PIX">PIX</option>
+          <option value="Cartão">Cartão</option>
+        </select>
+      </div>
+      <div class="field">
+        <label class="mod-label">Vencimento previsto</label>
+        <input type="date" id="pvVencimento" class="inp">
+      </div>
+    </div>
+
+    <!-- Itens do pedido -->
+    <div style="font-size:11px;font-weight:700;color:var(--blue);margin-bottom:8px;text-transform:uppercase;letter-spacing:.8px;">
+      📦 Itens do Pedido
+    </div>
+    <div style="overflow-x:auto;margin-bottom:10px;">
+      <table style="width:100%;border-collapse:collapse;font-size:12px;">
+        <thead>
+          <tr style="background:var(--bg2);">
+            <th style="padding:7px 8px;text-align:left;font-weight:700;color:var(--text-3);">Produto / Descrição</th>
+            <th style="padding:7px 8px;text-align:center;font-weight:700;color:var(--text-3);width:60px;">Qtd</th>
+            <th style="padding:7px 8px;text-align:right;font-weight:700;color:var(--text-3);width:100px;">Preço Unit.</th>
+            <th style="padding:7px 8px;text-align:center;font-weight:700;color:var(--text-3);width:70px;">Desc %</th>
+            <th style="padding:7px 8px;text-align:right;font-weight:700;color:var(--text-3);width:90px;">Subtotal</th>
+            <th style="width:36px;"></th>
+          </tr>
+        </thead>
+        <tbody id="pvItensTbody"></tbody>
+      </table>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
+      <button class="mod-btn" onclick="pvNovoItem()">+ Adicionar Item</button>
+      <div style="font-size:16px;font-weight:800;color:var(--green);">
+        Total: <span id="pvTotal">R$ 0,00</span>
+      </div>
+    </div>
+
+    <div class="field" style="margin-bottom:14px;">
+      <label class="mod-label">Observações</label>
+      <textarea id="pvObs" class="inp" rows="2" placeholder="Instruções de entrega, observações..." style="resize:vertical;"></textarea>
+    </div>
+
+    <button class="mod-btn primary" onclick="pvSalvarPedido()" style="width:100%;padding:12px;font-size:13px;font-weight:800;">
+      💾 Salvar Pedido de Venda
+    </button>
+  </div>
+
+  <!-- Lista de Pedidos -->
+  <div class="card">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--blue);">
+        📋 Meus Pedidos
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        <button class="mod-btn primary" onclick="pvRenderLista('todos')" style="font-size:10px;padding:4px 10px;">Todos</button>
+        <button class="mod-btn" onclick="pvRenderLista('aberto')" style="font-size:10px;padding:4px 10px;">Em aberto</button>
+        <button class="mod-btn" onclick="pvRenderLista('analise')" style="font-size:10px;padding:4px 10px;">Em análise</button>
+        <button class="mod-btn" onclick="pvRenderLista('aprovado')" style="font-size:10px;padding:4px 10px;">Aprovado</button>
+        <button class="mod-btn" onclick="pvRenderLista('faturado')" style="font-size:10px;padding:4px 10px;">Faturado</button>
+      </div>
+    </div>
+    <div style="overflow-x:auto;">
+      <table style="width:100%;border-collapse:collapse;font-size:11px;">
+        <thead>
+          <tr style="background:var(--bg2);">
+            <th style="padding:7px 8px;text-align:left;">Nº</th>
+            <th style="padding:7px 8px;text-align:left;">Cliente</th>
+            <th style="padding:7px 8px;text-align:left;">Vendedora</th>
+            <th style="padding:7px 8px;text-align:left;">Data</th>
+            <th style="padding:7px 8px;text-align:left;">Total</th>
+            <th style="padding:7px 8px;text-align:left;">Condição</th>
+            <th style="padding:7px 8px;text-align:left;">Status</th>
+            <th style="padding:7px 8px;text-align:left;">Ações</th>
+          </tr>
+        </thead>
+        <tbody id="pvListaTbody">
+          <tr><td colspan="8" class="mod-empty">Carregando…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- Modal: Ver Pedido -->
+<div id="pvModalVer" style="display:none;position:fixed;inset:0;z-index:999;background:rgba(0,0,0,0.5);
+  backdrop-filter:blur(3px);align-items:center;justify-content:center;padding:16px;">
+  <div style="background:var(--card,#fff);border-radius:16px;max-width:600px;width:100%;
+    max-height:88vh;overflow-y:auto;box-shadow:0 16px 48px rgba(0,0,0,0.25);">
+    <div style="background:linear-gradient(135deg,#0D3B2E,#155C44);padding:16px 20px;border-radius:16px 16px 0 0;
+      display:flex;justify-content:space-between;align-items:center;">
+      <div>
+        <div style="font-size:10px;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:1px;">Pedido de Venda</div>
+        <div style="font-size:17px;font-weight:800;color:#fff;" id="pvModalNumero">PV#0</div>
+      </div>
+      <button onclick="document.getElementById('pvModalVer').style.display='none'"
+        style="background:rgba(255,255,255,0.15);border:none;color:#fff;border-radius:8px;padding:6px 12px;cursor:pointer;font-size:18px;">✕</button>
+    </div>
+    <div style="padding:16px 20px;">
+      <div class="g2" style="margin-bottom:12px;">
+        <div><div style="font-size:10px;color:var(--text-4);text-transform:uppercase;font-weight:700;">Cliente</div>
+          <div style="font-weight:700;" id="pvModalCliente"></div></div>
+        <div><div style="font-size:10px;color:var(--text-4);text-transform:uppercase;font-weight:700;">Vendedora</div>
+          <div id="pvModalVend"></div></div>
+        <div><div style="font-size:10px;color:var(--text-4);text-transform:uppercase;font-weight:700;">Data</div>
+          <div id="pvModalData"></div></div>
+        <div><div style="font-size:10px;color:var(--text-4);text-transform:uppercase;font-weight:700;">Condição</div>
+          <div id="pvModalCond"></div></div>
+        <div><div style="font-size:10px;color:var(--text-4);text-transform:uppercase;font-weight:700;">Vencimento</div>
+          <div id="pvModalVenc"></div></div>
+        <div><div style="font-size:10px;color:var(--text-4);text-transform:uppercase;font-weight:700;">Observações</div>
+          <div id="pvModalObs"></div></div>
+      </div>
+      <div style="font-size:11px;font-weight:700;color:var(--blue);margin-bottom:8px;text-transform:uppercase;">Itens</div>
+      <div style="overflow-x:auto;margin-bottom:14px;">
+        <table style="width:100%;border-collapse:collapse;font-size:11px;">
+          <thead><tr style="background:var(--bg2);">
+            <th style="padding:5px 8px;">#</th><th style="padding:5px 8px;">Produto</th>
+            <th style="padding:5px 8px;text-align:center;">Qtd</th>
+            <th style="padding:5px 8px;text-align:right;">Preço</th>
+            <th style="padding:5px 8px;text-align:right;">Desc</th>
+            <th style="padding:5px 8px;text-align:right;">Subtotal</th>
+          </tr></thead>
+          <tbody id="pvModalItens"></tbody>
+        </table>
+      </div>
+      <div style="text-align:right;font-size:18px;font-weight:800;color:var(--green);margin-bottom:14px;">
+        Total: <span id="pvModalTotal"></span>
+      </div>
+      <div style="font-size:11px;font-weight:700;color:var(--text-3);margin-bottom:6px;text-transform:uppercase;">Histórico</div>
+      <div id="pvModalHist"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ ABA: FATURAMENTO ══ -->
+<div class="tab-pane" id="tab-faturamento">
+<div class="main" style="padding-bottom:32px;">
+
+  <div class="step-label" style="margin-top:8px;">
+    <div class="step-num">💰</div>
+    <div class="step-title">Faturamento <span class="step-sub">— pedidos aprovados</span></div>
+  </div>
+
+  <!-- Fila de pedidos aprovados -->
+  <div class="card" style="margin-bottom:16px;">
+    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--green);
+      margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid var(--green-lt);">
+      ✅ Pedidos Aprovados — Aguardando Faturamento
+    </div>
+    <div style="overflow-x:auto;">
+      <table style="width:100%;border-collapse:collapse;font-size:11px;">
+        <thead>
+          <tr style="background:var(--bg2);">
+            <th style="padding:7px 8px;">Nº Pedido</th>
+            <th style="padding:7px 8px;">Cliente</th>
+            <th style="padding:7px 8px;">Vendedora</th>
+            <th style="padding:7px 8px;">Data</th>
+            <th style="padding:7px 8px;">Valor</th>
+            <th style="padding:7px 8px;">Ação</th>
+          </tr>
+        </thead>
+        <tbody id="fatFilaTbody">
+          <tr><td colspan="6" class="mod-empty">Carregando…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Títulos gerados -->
+  <div class="card">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--blue);">
+        🧾 Títulos Gerados
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        <button class="mod-btn primary" onclick="fatRenderLista('todos')" style="font-size:10px;padding:4px 10px;">Todos</button>
+        <button class="mod-btn" onclick="fatRenderLista('aberto')" style="font-size:10px;padding:4px 10px;">Em aberto</button>
+        <button class="mod-btn" onclick="fatRenderLista('pago')" style="font-size:10px;padding:4px 10px;">Pagos</button>
+        <button class="mod-btn" onclick="fatRenderLista('vencido')" style="font-size:10px;padding:4px 10px;">Vencidos</button>
+      </div>
+    </div>
+    <div style="overflow-x:auto;">
+      <table style="width:100%;border-collapse:collapse;font-size:11px;">
+        <thead>
+          <tr style="background:var(--bg2);">
+            <th style="padding:7px 8px;">FAT#</th>
+            <th style="padding:7px 8px;">PV#</th>
+            <th style="padding:7px 8px;">Cliente</th>
+            <th style="padding:7px 8px;">Vencimento</th>
+            <th style="padding:7px 8px;">Valor</th>
+            <th style="padding:7px 8px;">Status</th>
+            <th style="padding:7px 8px;">Ações</th>
+          </tr>
+        </thead>
+        <tbody id="fatListaTbody">
+          <tr><td colspan="7" class="mod-empty">Carregando…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- Modal: Faturar pedido -->
+<div id="fatModal" style="display:none;position:fixed;inset:0;z-index:999;background:rgba(0,0,0,0.5);
+  backdrop-filter:blur(3px);align-items:center;justify-content:center;padding:16px;">
+  <div style="background:var(--card,#fff);border-radius:16px;max-width:460px;width:100%;
+    box-shadow:0 16px 48px rgba(0,0,0,0.25);">
+    <div style="background:linear-gradient(135deg,#0D3B2E,#155C44);padding:16px 20px;border-radius:16px 16px 0 0;
+      display:flex;justify-content:space-between;align-items:center;">
+      <div>
+        <div style="font-size:10px;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:1px;">Gerar Faturamento</div>
+        <div style="font-size:16px;font-weight:800;color:#fff;">
+          <span id="fatPvNum">PV#0</span> · <span id="fatCliente">—</span>
+        </div>
+        <div style="font-size:13px;color:rgba(255,255,255,0.8);margin-top:2px;font-weight:700;" id="fatValor"></div>
+      </div>
+      <button onclick="document.getElementById('fatModal').style.display='none'"
+        style="background:rgba(255,255,255,0.15);border:none;color:#fff;border-radius:8px;padding:6px 12px;cursor:pointer;font-size:18px;">✕</button>
+    </div>
+    <div style="padding:16px 20px;">
+      <input type="hidden" id="fatPvId">
+
+      <div class="g2" style="margin-bottom:12px;">
+        <div class="field">
+          <label class="mod-label">Valor a Cobrar (R$) *</label>
+          <input type="number" id="fatValorCob" class="inp" step="0.01" min="0" placeholder="0,00">
+        </div>
+        <div class="field">
+          <label class="mod-label">Vencimento *</label>
+          <input type="date" id="fatVencimento" class="inp">
+        </div>
+      </div>
+
+      <div class="g2" style="margin-bottom:12px;">
+        <div class="field">
+          <label class="mod-label">Juros (% a.m.)</label>
+          <input type="number" id="fatJuros" class="inp" value="0" min="0" step="0.01">
+        </div>
+        <div class="field">
+          <label class="mod-label">Multa (%)</label>
+          <input type="number" id="fatMulta" class="inp" value="0" min="0" step="0.01">
+        </div>
+      </div>
+
+      <div class="field" style="margin-bottom:12px;">
+        <label class="mod-label">Desconto para antecipação (R$)</label>
+        <input type="number" id="fatDesconto" class="inp" value="0" min="0" step="0.01">
+      </div>
+
+      <div class="field" style="margin-bottom:16px;">
+        <label class="mod-label">Instruções / Observações</label>
+        <textarea id="fatObs2" class="inp" rows="2" placeholder="Instruções para o boleto..." style="resize:vertical;"></textarea>
+      </div>
+
+      <button onclick="fatConfirmar()" class="mod-btn primary"
+        style="width:100%;padding:13px;font-size:13px;font-weight:800;">
+        💰 Gerar Título e Boleto
+      </button>
+    </div>
+  </div>
+</div>
+
 
 <!-- ============================================================
      HTML >> ABA: PAINEL ADM
