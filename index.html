@@ -2723,8 +2723,8 @@ td .mod-btn, td button {
       <span style="display:none;" id="confLabel">Confidencial</span>
       <span style="font-size:9px;opacity:0.7;">v2.1</span>
     </div>
-    <button id="btnToggleTema" onclick="toggleTema()" title="Alternar tema" style="background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.18);border-radius:10px;color:#fff;cursor:pointer;padding:6px 10px;font-size:16px;margin-right:6px;"></button>
-    <button id="btnSair" onclick="confirmarSaida()" title="Sair"
+    <button id="btnToggleTema" onclick="toggleTema()" title="Alternar tema" aria-label="Alternar tema" style="background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.18);border-radius:10px;color:#fff;cursor:pointer;padding:6px 10px;font-size:16px;margin-right:6px;"></button>
+    <button id="btnSair" onclick="confirmarSaida()" title="Sair" aria-label="Sair"
       style="background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.25);color:rgba(255,255,255,0.9);border-radius:8px;padding:7px 13px;cursor:pointer;font-family:'Inter',sans-serif;font-weight:600;font-size:11px;letter-spacing:0.3px;transition:all .2s;white-space:nowrap;display:flex;align-items:center;gap:5px;"
       onmouseover="this.style.background='rgba(220,38,38,0.55)';this.style.borderColor='rgba(252,165,165,0.5)'"
       onmouseout="if(!this.dataset.confirmando){this.style.background='rgba(255,255,255,0.12)';this.style.borderColor='rgba(255,255,255,0.25)'}">
@@ -9940,7 +9940,7 @@ function pvRenderLista(filtro) {
   lista = lista.slice().reverse();
 
   if (!lista.length) {
-    tbody.innerHTML = '<tr><td colspan="8" class="mod-empty">Nenhum pedido encontrado.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="8"><div style="display:flex;flex-direction:column;align-items:center;padding:32px 16px;text-align:center;gap:6px;"><div style="width:44px;height:44px;border-radius:12px;background:rgba(13,59,46,0.08);display:flex;align-items:center;justify-content:center;margin-bottom:4px;"><svg width="22" height="22" fill="none" stroke="#0D3B2E" stroke-width="1.6" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg></div><div style="font-size:14px;font-weight:700;color:var(--text);">Sem pedidos</div><div style="font-size:12px;color:var(--text-3);">Nenhum pedido no período selecionado.</div></div></td></tr>';
     return;
   }
 
@@ -10046,7 +10046,7 @@ function fatRenderFila() {
   if (!tbody) return;
   var lista = getPedidosVenda().filter(function(p){ return p.status === 'aprovado'; });
   if (!lista.length) {
-    tbody.innerHTML = '<tr><td colspan="6" class="mod-empty">Nenhum pedido aprovado aguardando faturamento.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="6"><div style="display:flex;flex-direction:column;align-items:center;padding:32px 16px;text-align:center;gap:6px;"><div style="width:44px;height:44px;border-radius:12px;background:rgba(13,59,46,0.08);display:flex;align-items:center;justify-content:center;margin-bottom:4px;"><svg width="22" height="22" fill="none" stroke="#0D3B2E" stroke-width="1.6" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div><div style="font-size:14px;font-weight:700;color:var(--text);">Fila vazia</div><div style="font-size:12px;color:var(--text-3);">Pedidos aprovados aparecerão aqui.</div></div></td></tr>';
     return;
   }
   tbody.innerHTML = lista.map(function(p) {
@@ -10824,6 +10824,33 @@ function canhotoConfirmar() {
 
 // Ver foto do canhoto
 function canhotoVerFoto(entId) {
+  var entregas = getEntregas();
+  var e = entregas.find(function(x){ return x.id === entId; });
+  if (!e || !e.canhoto) { _toast('Nenhum canhoto registrado.', 'info'); return; }
+  var c = e.canhoto;
+
+  var modal = document.createElement('div');
+  modal.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.92);' +
+    'display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;';
+  modal.onclick = function(){ document.body.removeChild(modal); };
+
+  var info = '<div style="color:#fff;text-align:center;margin-bottom:12px;font-family:Inter,sans-serif;">' +
+    '<div style="font-size:14px;font-weight:700;">Canhoto — Pedido #' + (e.num||'') + '</div>' +
+    '<div style="font-size:12px;opacity:0.7;margin-top:4px;">Recebedor: ' + c.assinante +
+    (c.nf ? ' · NF: ' + c.nf : '') + '</div>' +
+    '<div style="font-size:11px;opacity:0.5;margin-top:2px;">' + new Date(c.ts).toLocaleString('pt-BR') +
+    ' · ' + (c.operador || '') + '</div></div>';
+
+  var img = c.foto
+    ? '<img src="' + c.foto + '" style="max-width:100%;max-height:60vh;border-radius:12px;object-fit:contain;">'
+    : '<div style="color:rgba(255,255,255,0.5);font-size:13px;padding:40px;">Foto não registrada</div>';
+
+  modal.innerHTML = info + img +
+    '<div style="color:rgba(255,255,255,0.4);font-size:11px;margin-top:12px;">Toque para fechar</div>';
+  document.body.appendChild(modal);
+}
+  renderDashFV();
+</script>anhotoVerFoto(entId) {
   var entregas = getEntregas();
   var e = entregas.find(function(x){ return x.id === entId; });
   if (!e || !e.canhoto) { _toast('Nenhum canhoto registrado.', 'info'); return; }
@@ -13322,7 +13349,7 @@ window.addEventListener('load',()=>{
 
     <!-- Regime tributário -->
     <div class="field" style="margin-bottom:14px;">
-      <label class="mod-label">Regime Tributário</label>
+      <label class="mod-label" for="notaRegime">Regime Tributário</label>
       <select id="notaRegime" class="inp" onchange="calcViabilidadeNota()">
         <option value="0">MEI — isento</option>
         <option value="0.045" selected>Simples Nacional — Faixa 1 (4,5%)</option>
@@ -13335,19 +13362,19 @@ window.addEventListener('load',()=>{
 
     <div class="g2" style="margin-bottom:14px;">
       <div class="field">
-        <label class="mod-label">Valor Total da Nota (R$)</label>
+        <label class="mod-label" for="notaValor">Valor Total da Nota (R$)</label>
         <input type="number" id="notaValor" class="inp" placeholder="Ex: 5.000,00"
           min="0" step="0.01" oninput="calcViabilidadeNota()">
       </div>
       <div class="field">
-        <label class="mod-label">Margem Desejada (%)</label>
+        <label class="mod-label" for="notaMargem">Margem Desejada (%)</label>
         <input type="number" id="notaMargem" class="inp" placeholder="Ex: 30"
           min="0" max="100" step="0.1" oninput="calcViabilidadeNota()">
       </div>
     </div>
 
     <div class="field" style="margin-bottom:14px;">
-      <label class="mod-label">Custo Total dos Produtos (R$)</label>
+      <label class="mod-label" for="notaCusto">Custo Total dos Produtos (R$)</label>
       <input type="number" id="notaCusto" class="inp" placeholder="Ex: 3.000,00"
         min="0" step="0.01" oninput="calcViabilidadeNota()">
     </div>
@@ -13445,11 +13472,11 @@ window.addEventListener('load',()=>{
     </div>
     <div class="g2" style="margin-bottom:14px;">
       <div class="field">
-        <label class="mod-label">Colaborador</label>
+        <label class="mod-label" for="pontoColaborador">Colaborador <span style="color:var(--red);font-size:11px;">*</span></label>
         <input type="text" id="pontoColaborador" class="inp" placeholder="Nome do colaborador" maxlength="60">
       </div>
       <div class="field">
-        <label class="mod-label">Tipo de Registro</label>
+        <label class="mod-label" for="pontoTipo">Tipo de Registro</label>
         <select id="pontoTipo" class="inp">
           <option value="entrada">⬆️ Entrada</option>
           <option value="saida_almoco">Saída Almoço</option>
@@ -13460,16 +13487,16 @@ window.addEventListener('load',()=>{
     </div>
     <div class="g2" style="margin-bottom:14px;">
       <div class="field">
-        <label class="mod-label">Data</label>
+        <label class="mod-label" for="pontoData">Data</label>
         <input type="date" id="pontoData" class="inp">
       </div>
       <div class="field">
-        <label class="mod-label">Horario</label>
+        <label class="mod-label" for="pontoHorario">Horario</label>
         <input type="time" id="pontoHorario" class="inp">
       </div>
     </div>
     <div class="field" style="margin-bottom:14px;">
-      <label class="mod-label">Observacao (opcional)</label>
+      <label class="mod-label" for="pontoObs">Observacao (opcional)</label>
       <input type="text" id="pontoObs" class="inp" placeholder="Ex: home office, atestado..." maxlength="120">
     </div>
     <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
@@ -15007,15 +15034,15 @@ window.addEventListener('load',()=>{
     <div style="padding:18px 20px;">
       <input type="hidden" id="emailFatId">
       <div class="field" style="margin-bottom:12px;">
-        <label class="mod-label">Para (e-mail do cliente) *</label>
+        <label class="mod-label" for="emailPara">Para (e-mail do cliente) *</label>
         <input type="email" id="emailPara" class="inp" placeholder="cliente@email.com">
       </div>
       <div class="field" style="margin-bottom:12px;">
-        <label class="mod-label">Assunto</label>
+        <label class="mod-label" for="emailAssunto">Assunto</label>
         <input type="text" id="emailAssunto" class="inp">
       </div>
       <div class="field" style="margin-bottom:16px;">
-        <label class="mod-label">Mensagem</label>
+        <label class="mod-label" for="emailCorpo">Mensagem</label>
         <textarea id="emailCorpo" class="inp" rows="6" style="resize:vertical;font-size:12px;"></textarea>
       </div>
       <div style="background:rgba(13,59,46,0.06);border:1px solid rgba(13,59,46,0.15);
@@ -15071,13 +15098,13 @@ window.addEventListener('load',()=>{
 
       <!-- Número da NF -->
       <div class="field" style="margin-bottom:12px;">
-        <label class="mod-label">Número da Nota Fiscal</label>
+        <label class="mod-label" for="canhotoNF">Número da Nota Fiscal</label>
         <input type="text" id="canhotoNF" class="inp" placeholder="Ex: 000123" maxlength="20">
       </div>
 
       <!-- Nome de quem assinou -->
       <div class="field" style="margin-bottom:16px;">
-        <label class="mod-label">Nome de quem assinou o canhoto *</label>
+        <label class="mod-label" for="canhotoAssinante">Nome de quem assinou o canhoto *</label>
         <input type="text" id="canhotoAssinante" class="inp"
           placeholder="Nome completo do recebedor" maxlength="80">
       </div>
@@ -15121,18 +15148,18 @@ window.addEventListener('load',()=>{
 
     <div class="g2" style="margin-bottom:12px;">
       <div class="field">
-        <label class="mod-label">Cliente *</label>
+        <label class="mod-label" for="pvCliente">Cliente *</label>
         <input type="text" id="pvCliente" class="inp" placeholder="Nome do cliente / empresa" maxlength="100">
       </div>
       <div class="field">
-        <label class="mod-label">CNPJ / CPF</label>
+        <label class="mod-label" for="pvCnpj">CNPJ / CPF</label>
         <input type="text" id="pvCnpj" class="inp" placeholder="00.000.000/0000-00" maxlength="20">
       </div>
     </div>
 
     <div class="g2" style="margin-bottom:12px;">
       <div class="field">
-        <label class="mod-label">Condição de Pagamento *</label>
+        <label class="mod-label" for="pvCondicao">Condição de Pagamento *</label>
         <select id="pvCondicao" class="inp">
           <option value="À vista">À vista</option>
           <option value="30 dias">30 dias</option>
@@ -15144,7 +15171,7 @@ window.addEventListener('load',()=>{
         </select>
       </div>
       <div class="field">
-        <label class="mod-label">Vencimento previsto</label>
+        <label class="mod-label" for="pvVencimento">Vencimento previsto</label>
         <input type="date" id="pvVencimento" class="inp">
       </div>
     </div>
@@ -15176,7 +15203,7 @@ window.addEventListener('load',()=>{
     </div>
 
     <div class="field" style="margin-bottom:14px;">
-      <label class="mod-label">Observações</label>
+      <label class="mod-label" for="pvObs">Observações</label>
       <textarea id="pvObs" class="inp" rows="2" placeholder="Instruções de entrega, observações..." style="resize:vertical;"></textarea>
     </div>
 
@@ -15214,7 +15241,16 @@ window.addEventListener('load',()=>{
           </tr>
         </thead>
         <tbody id="pvListaTbody">
-          <tr><td colspan="8" class="mod-empty">Carregando…</td></tr>
+          <tr><td colspan='8'><div style="display:flex;flex-direction:column;align-items:center;
+      justify-content:center;padding:32px 16px;text-align:center;gap:8px;">
+      <div style="width:48px;height:48px;border-radius:14px;background:rgba(13,59,46,0.08);
+        display:flex;align-items:center;justify-content:center;margin-bottom:4px;">
+        <svg width="22" height="22" fill="none" stroke="#0D3B2E" stroke-width="1.6" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+      </div>
+      <div style="font-size:14px;font-weight:700;color:var(--text);">Sem pedidos</div>
+      <div style="font-size:12px;color:var(--text-3);max-width:220px;line-height:1.5;">Os pedidos de venda aparecerão aqui após serem criados.</div>
+      
+    </div></td></tr>
         </tbody>
       </table>
     </div>
@@ -15369,33 +15405,33 @@ window.addEventListener('load',()=>{
 
       <div class="g2" style="margin-bottom:12px;">
         <div class="field">
-          <label class="mod-label">Valor a Cobrar (R$) *</label>
+          <label class="mod-label" for="fatValorCob">Valor a Cobrar (R$) *</label>
           <input type="number" id="fatValorCob" class="inp" step="0.01" min="0" placeholder="0,00">
         </div>
         <div class="field">
-          <label class="mod-label">Vencimento *</label>
+          <label class="mod-label" for="fatVencimento">Vencimento *</label>
           <input type="date" id="fatVencimento" class="inp">
         </div>
       </div>
 
       <div class="g2" style="margin-bottom:12px;">
         <div class="field">
-          <label class="mod-label">Juros (% a.m.)</label>
+          <label class="mod-label" for="fatJuros">Juros (% a.m.)</label>
           <input type="number" id="fatJuros" class="inp" value="0" min="0" step="0.01">
         </div>
         <div class="field">
-          <label class="mod-label">Multa (%)</label>
+          <label class="mod-label" for="fatMulta">Multa (%)</label>
           <input type="number" id="fatMulta" class="inp" value="0" min="0" step="0.01">
         </div>
       </div>
 
       <div class="field" style="margin-bottom:12px;">
-        <label class="mod-label">Desconto para antecipação (R$)</label>
+        <label class="mod-label" for="fatDesconto">Desconto para antecipação (R$)</label>
         <input type="number" id="fatDesconto" class="inp" value="0" min="0" step="0.01">
       </div>
 
       <div class="field" style="margin-bottom:16px;">
-        <label class="mod-label">Instruções / Observações</label>
+        <label class="mod-label" for="fatObs2">Instruções / Observações</label>
         <textarea id="fatObs2" class="inp" rows="2" placeholder="Instruções para o boleto..." style="resize:vertical;"></textarea>
       </div>
 
@@ -16161,19 +16197,19 @@ window.addEventListener('load',()=>{
     </div>
     <div class="mod-form-grid">
       <div class="mod-form-span">
-        <label class="mod-label">Nome do produto</label>
+        <label class="mod-label" for="prodNome">Nome do produto <span style="color:var(--red);font-size:11px;">*</span></label>
         <input class="mod-input" type="text" id="prodNome" placeholder="Ex: Produto A — 1kg">
       </div>
       <div>
-        <label class="mod-label">Quantidade inicial</label>
+        <label class="mod-label" for="prodQtd">Quantidade inicial</label>
         <input class="mod-input" type="number" id="prodQtd" placeholder="0" min="0">
       </div>
       <div>
-        <label class="mod-label">Estoque mínimo</label>
+        <label class="mod-label" for="prodMin">Estoque mínimo</label>
         <input class="mod-input" type="number" id="prodMin" placeholder="5" min="0">
       </div>
       <div class="mod-form-span">
-        <label class="mod-label">Custo médio (R$)</label>
+        <label class="mod-label" for="prodCusto">Custo médio (R$)</label>
         <input class="mod-input" type="number" id="prodCusto" placeholder="0,00" min="0" step="0.01">
       </div>
     </div>
@@ -16193,23 +16229,23 @@ window.addEventListener('load',()=>{
       <button class="mod-modal-close" onclick="fecharMovModal()">✕</button>
     </div>
     <div class="mod-field">
-      <label class="mod-label">Produto</label>
+      <label class="mod-label" for="movProduto">Produto</label>
       <select class="mod-input" id="movProduto"></select>
     </div>
     <div class="mod-form-grid">
       <div>
-        <label class="mod-label">Tipo</label>
+        <label class="mod-label" for="movTipo">Tipo</label>
         <select class="mod-input" id="movTipo">
           <option value="entrada"> Entrada</option>
           <option value="saida"> Saída</option>
         </select>
       </div>
       <div>
-        <label class="mod-label">Quantidade</label>
+        <label class="mod-label" for="movQtd">Quantidade</label>
         <input class="mod-input" type="number" id="movQtd" placeholder="0" min="1">
       </div>
       <div class="mod-form-span">
-        <label class="mod-label">Motivo (opcional)</label>
+        <label class="mod-label" for="movMotivo">Motivo (opcional)</label>
         <input class="mod-input" type="text" id="movMotivo" placeholder="Ex: Compra, Venda, Perda...">
       </div>
     </div>
@@ -16686,18 +16722,18 @@ window.addEventListener('load',()=>{
       <button class="mod-modal-close" onclick="fecharEntregaModal()">✕</button>
     </div>
     <div class="mod-field">
-      <label class="mod-label">Tutor / Responsável</label>
+      <label class="mod-label" for="entTutor">Tutor / Responsável <span style="color:var(--red);font-size:11px;">*</span></label>
       <input class="mod-input" type="text" id="entTutor" maxlength="80" placeholder="Ex: Maria Silva">
     </div>
     <!-- Campos Pet -->
     <div class="mod-field" style="padding:0;margin-bottom:0;">
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;padding:8px 0;">
         <div>
-          <label class="mod-label"> Animal</label>
+          <label class="mod-label" for="entAnimalNome"> Animal</label>
           <input class="mod-input" type="text" id="entAnimalNome" placeholder="Rex, Mimi..." maxlength="40">
         </div>
         <div>
-          <label class="mod-label"> Espécie</label>
+          <label class="mod-label" for="entAnimalEspecie"> Espécie</label>
           <select class="mod-input" id="entAnimalEspecie">
             <option value="">— Espécie —</option>
             <option value="Cão"> Cão</option>
@@ -16709,30 +16745,30 @@ window.addEventListener('load',()=>{
           </select>
         </div>
         <div>
-          <label class="mod-label">️ Raça</label>
+          <label class="mod-label" for="entAnimalRaca">️ Raça</label>
           <input class="mod-input" type="text" id="entAnimalRaca" placeholder="Labrador..." maxlength="40">
         </div>
       </div>
     </div>
     <div class="mod-field">
-      <label class="mod-label">Descrição do Pedido Vet</label>
+      <label class="mod-label" for="entDescricao">Descrição do Pedido Vet</label>
       <input class="mod-input" type="text" id="entDescricao" maxlength="120" placeholder="Ex: Pedido #001 — 3 itens">
     </div>
     <div class="mod-field">
-      <label class="mod-label">Número da Nota Fiscal</label>
+      <label class="mod-label" for="entNF">Número da Nota Fiscal</label>
       <input class="mod-input" type="text" id="entNF" maxlength="20" placeholder="Ex: 000123">
     </div>
     <div class="mod-form-grid">
       <div>
-        <label class="mod-label">Data do pedido</label>
+        <label class="mod-label" for="entData">Data do pedido</label>
         <input class="mod-input" type="date" id="entData">
       </div>
       <div>
-        <label class="mod-label">Valor (R$)</label>
+        <label class="mod-label" for="entValor">Valor (R$)</label>
         <input class="mod-input" type="number" id="entValor" placeholder="0,00" min="0" step="0.01">
       </div>
       <div>
-        <label class="mod-label">Status</label>
+        <label class="mod-label" for="entStatus">Status</label>
         <select class="mod-input" id="entStatus">
           <option value="pendente">⏳ Pendente</option>
           <option value="saiu"> Saiu para entrega</option>
@@ -16760,11 +16796,11 @@ window.addEventListener('load',()=>{
     
     <div class="mod-form-grid" style="margin-top:4px;">
       <div>
-        <label class="mod-label">Peso do pedido (kg)</label>
+        <label class="mod-label" for="entPeso">Peso do pedido (kg)</label>
         <input class="mod-input" type="number" id="entPeso" placeholder="Ex: 2.5" min="0" step="0.1" oninput="calcularFreteEntrega()">
       </div>
       <div>
-        <label class="mod-label">Distância (km)</label>
+        <label class="mod-label" for="entDistancia">Distância (km)</label>
         <input class="mod-input" type="number" id="entDistancia" placeholder="Ex: 50" min="0" step="1" oninput="calcularFreteEntrega()">
       </div>
     </div>
@@ -16802,41 +16838,41 @@ window.addEventListener('load',()=>{
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
       <div class="field">
-        <label class="mod-label"> Médico Veterinário</label>
+        <label class="mod-label" for="recVeterinario"> Médico Veterinário</label>
         <input type="text" id="recVeterinario" class="inp" placeholder="Dr. Nome Sobrenome" maxlength="60">
       </div>
       <div class="field">
-        <label class="mod-label"> CRMV</label>
+        <label class="mod-label" for="recCRMV"> CRMV</label>
         <input type="text" id="recCRMV" class="inp" placeholder="CRMV-SP 00000" maxlength="20">
       </div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
       <div class="field">
-        <label class="mod-label"> Paciente (animal)</label>
+        <label class="mod-label" for="recPaciente"> Paciente (animal)</label>
         <input type="text" id="recPaciente" class="inp" placeholder="Nome do animal" maxlength="40">
       </div>
       <div class="field">
-        <label class="mod-label"> Espécie / Raça</label>
+        <label class="mod-label" for="recEspecie"> Espécie / Raça</label>
         <input type="text" id="recEspecie" class="inp" placeholder="Ex: Cão — Labrador" maxlength="60">
       </div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
       <div class="field">
-        <label class="mod-label">Tutor / Responsável</label>
+        <label class="mod-label" for="recTutor">Tutor / Responsável</label>
         <input type="text" id="recTutor" class="inp" placeholder="Nome do responsável" maxlength="60">
       </div>
       <div class="field">
-        <label class="mod-label">Data da Prescrição</label>
+        <label class="mod-label" for="recData">Data da Prescrição</label>
         <input type="date" id="recData" class="inp">
       </div>
     </div>
     <div class="field" style="margin-bottom:12px;">
-      <label class="mod-label"> Medicamentos Prescritos</label>
+      <label class="mod-label" for="recMedicamentos"> Medicamentos Prescritos</label>
       <textarea id="recMedicamentos" class="inp" rows="4" style="resize:vertical;padding:10px 12px;"
         placeholder="Ex: Amoxicilina 500mg — 1 comprimido a cada 12h por 7 dias&#10;Prednisolona 20mg — conforme orientação"></textarea>
     </div>
     <div class="field" style="margin-bottom:16px;">
-      <label class="mod-label">Observações</label>
+      <label class="mod-label" for="recObsVet">Observações</label>
       <input type="text" id="recObsVet" class="inp" placeholder="Orientações adicionais, retorno, cuidados..." maxlength="200">
     </div>
     <div style="display:flex;gap:10px;flex-wrap:wrap;">
@@ -16988,7 +17024,7 @@ window.addEventListener('load',()=>{
 <!-- ══ AGENTE IA ══ -->
 
 <!-- ══ CHAT INTERNO ══ -->
-<button id="chatBtn" onclick="toggleChat()" title="Chat Interno">
+<button id="chatBtn" onclick="toggleChat()" title="Chat Interno" aria-label="Chat Interno">
   <div class="fab-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.95)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
   <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
   <line x1="8" y1="10" x2="8" y2="10" stroke-width="2.5"/>
@@ -17060,7 +17096,7 @@ window.addEventListener('load',()=>{
   <img id="chatLightboxImg" src="" alt="Imagem" onclick="event.stopPropagation()">
 </div>
 
-<button id="agentBtn" onclick="toggleAgente()" title="Assistente IA">
+<button id="agentBtn" onclick="toggleAgente()" title="Assistente IA" aria-label="Assistente IA">
   <div class="fab-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.95)" stroke-width="1.8" stroke-linecap="round">
   <circle cx="12" cy="5" r="2"/>
   <circle cx="5" cy="17" r="2"/>
