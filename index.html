@@ -1434,14 +1434,15 @@ transition: background .15s; }
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 16px;
-  height: 16px;
-  opacity: 0.6;
+  width: 15px;
+  height: 15px;
+  opacity: 0.55;
   flex-shrink: 0;
-  transition: opacity .15s;
+  transition: opacity .2s;
+  color: var(--text-3);
 }
-.nav-sub.active .nav-sub-icon,
-.nav-sub:hover .nav-sub-icon { opacity: 1; }
+.nav-sub.active .nav-sub-icon { opacity: 1; color: var(--blue); }
+.nav-sub:hover .nav-sub-icon  { opacity: 0.85; }
 
 .nav-sub-badge { position:absolute; top:6px; right:4px;
   background:var(--red); color:#fff; font-size:8px;
@@ -2618,7 +2619,7 @@ transition: background .15s; }
         <span class="nav-sub-icon"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 16 16"><rect x="1" y="1" width="6" height="6" rx="1"/><rect x="9" y="1" width="6" height="6" rx="1"/><rect x="1" y="9" width="6" height="6" rx="1"/><rect x="9" y="9" width="6" height="6" rx="1"/></svg></span>Dashboard
       </button>
       <button class="nav-sub" id="tabPrecBtn" style="display:none;" onclick="switchTab('precificacao')">
-        <span class="nav-sub-icon"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 16 16"><path d="M2 8l6-6 6 6-6 6z"/><path d="M8 5v6M5.5 7.5h5"/></svg></span>Precificação
+        <span class="nav-sub-icon"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 16 16"><path d="M2 2h6l6 6-6 6-6-6V2z"/><circle cx="6" cy="6" r="1.2" fill="currentColor" stroke="none"/></svg></span>Precificação
       </button>
       <button class="nav-sub" id="tabNfUploadBtn" style="display:none;" onclick="switchTab('nf-upload')">
         <span class="nav-sub-icon"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 16 16"><rect x="2" y="1" width="10" height="14" rx="1"/><path d="M5 5h6M5 8h6M5 11h4"/></svg></span>Nota Fiscal
@@ -10250,7 +10251,7 @@ var _FAT_STATUS = {
 
   <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; margin-top:8px; margin-bottom:4px;">
     <div class="step-label" style="margin:0;">
-      <div class="step-num">DB</div>
+      <div class="step-num">PR</div>
       <div class="step-title">Precificação da Nota Fiscal <span class="step-sub">— calculado pela IA</span></div>
     </div>
     <button id="btnEmailNF" onclick="emailNotaFiscal()"
@@ -16233,11 +16234,11 @@ window.addEventListener('load',()=>{
 
 <!-- ══ CHAT INTERNO ══ -->
 <button id="chatBtn" onclick="toggleChat()" title="Chat Interno">
-  <div class="fab-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <path d="M12 3C7.03 3 3 6.58 3 11c0 1.98.78 3.78 2.08 5.18L4 21l5.18-1.38C10.36 20.17 11.17 20.4 12 20.4c4.97 0 9-3.58 9-8s-4.03-8.4-9-8.4z" fill="rgba(255,255,255,0.9)"/>
-  <circle cx="8.5" cy="11" r="1.2" fill="#0D3B2E"/>
-  <circle cx="12" cy="11" r="1.2" fill="#0D3B2E"/>
-  <circle cx="15.5" cy="11" r="1.2" fill="#0D3B2E"/>
+  <div class="fab-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.95)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
+  <line x1="8" y1="10" x2="8" y2="10" stroke-width="2.5"/>
+  <line x1="12" y1="10" x2="12" y2="10" stroke-width="2.5"/>
+  <line x1="16" y1="10" x2="16" y2="10" stroke-width="2.5"/>
 </svg></div>
   <span class="fab-label">Chat</span>
   <div id="chatBadge"></div>
@@ -16305,11 +16306,16 @@ window.addEventListener('load',()=>{
 </div>
 
 <button id="agentBtn" onclick="toggleAgente()" title="Assistente IA">
-  <div class="fab-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <circle cx="12" cy="12" r="3" fill="rgba(255,255,255,0.95)"/>
-  <path d="M12 2L13.5 8.5L20 7L15.5 12L20 17L13.5 15.5L12 22L10.5 15.5L4 17L8.5 12L4 7L10.5 8.5L12 2Z" fill="rgba(255,255,255,0.92)" stroke="rgba(255,255,255,0.3)" stroke-width="0.5"/>
+  <div class="fab-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.95)" stroke-width="1.8" stroke-linecap="round">
+  <circle cx="12" cy="5" r="2"/>
+  <circle cx="5" cy="17" r="2"/>
+  <circle cx="19" cy="17" r="2"/>
+  <line x1="12" y1="7" x2="7" y2="15"/>
+  <line x1="12" y1="7" x2="17" y2="15"/>
+  <line x1="7" y1="17" x2="17" y2="17"/>
+  <circle cx="12" cy="12" r="1.2" fill="rgba(255,255,255,0.95)" stroke="none"/>
 </svg></div>
-  <span class="fab-label">IA</span>
+  <span class="fab-label">Agente</span>
 </button>
 
 <div id="agentPanel">
