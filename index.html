@@ -1421,13 +1421,7 @@ transition: background .15s; }
 #navSubs::-webkit-scrollbar { display: none; }
 
 /* Divs internos dos grupos (subsFinanceiro, subsConfig etc.) */
-#navSubs > div {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  padding: 0;
-  min-width: 0;
-}
+
 
 .nav-sub {
   position: relative;
@@ -2779,7 +2773,7 @@ td .mod-btn, td button {
   <!-- LINHA 2: Subitens do grupo ativo -->
   <div id="navSubs">
     <!-- Subitens grupo Financeiro -->
-    <div id="subsFinanceiro" style="display:flex;align-items:center;gap:4px;">
+    <div id="subsFinanceiro" style="display:contents;">
       <button class="nav-sub" id="tabDashBtn" style="display:none;" onclick="switchTab('dashboard')">
         <span class="nav-sub-icon"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 16 16"><rect x="1" y="1" width="6" height="6" rx="1"/><rect x="9" y="1" width="6" height="6" rx="1"/><rect x="1" y="9" width="6" height="6" rx="1"/><rect x="9" y="9" width="6" height="6" rx="1"/></svg></span>Dashboard
       </button>
@@ -9293,7 +9287,7 @@ function ativarGrupo(grupo, semMudarAba) {
   // Mostrar/ocultar subitens
   ['Financeiro','Operacoes','Medicamentos','Comercial','Rh','Config'].forEach(function(g) {
     var el = document.getElementById('subs' + g);
-    if (el) el.style.display = (g.toLowerCase() === grupo) ? 'flex' : 'none';
+    if (el) el.style.display = (g.toLowerCase() === grupo) ? 'contents' : 'none';
   });
 
   // Se não for para manter a aba atual, navegar para a primeira aba visível do grupo
