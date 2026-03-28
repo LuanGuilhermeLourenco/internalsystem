@@ -9582,22 +9582,23 @@ function fatRenderLista(filtro) {
   var lista = getFaturamentos();
   if (filtro && filtro !== 'todos') lista = lista.filter(function(f){ return f.status === filtro; });
   lista = lista.slice().reverse();
-
   if (!lista.length) {
-    tbody.innerHTML = '<tr><td colspan="7" class="mod-empty">Nenhum faturamento registrado.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="8" class="mod-empty">Nenhum faturamento registrado.</td></tr>';
     return;
   }
-
-  var STATUS_FAT = {
-    aberto:    { cor:'#2563EB', label:'Em aberto' },
-    pago:      { cor:'#059669', label:'Pago' },
-    vencido:   { cor:'#dc2626', label:'Vencido' },
-    cancelado: { cor:'#6b7280', label:'Cancelado' },
-  };
-
   tbody.innerHTML = lista.map(function(f) {
-    var cfg = STATUS_FAT[f.status] || STATUS_FAT.aberto;
+    var cfg    = _FAT_STATUS[f.status] || _FAT_STATUS.aberto;
+    var nfeCfg = f.statusNFe === 'emitida'
+      ? { cor:'#059669', label:'NF-e ✅' }
+      : { cor:'#d97706', label:'NF-e ⏳' };
     var dtVenc = f.vencimento ? new Date(f.vencimento+'T12:00:00').toLocaleDateString('pt-BR') : '—';
+    var acoes  =
+      '<button class="mod-btn" style="font-size:10px;padding:3px 8px;" onclick="fatGerarBoleto(\'' + f.id + '\')">🖨 Boleto</button> ' +
+      '<button class="mod-btn" style="font-size:10px;padding:3px 8px;" onclick="nfeImprimirDANFE(\'' + f.id + '\')">📄 DANFE</button> ' +
+      '<button class="mod-btn" style="font-size:10px;padding:3px 8px;" onclick="nfeDownloadXML(\'' + f.id + '\')">⬇ XML</button> ' +
+      (f.statusNFe !== 'emitida' ? '<button class="mod-btn" style="font-size:10px;padding:3px 8px;" onclick="nfeEmitir(\'' + f.id + '\')">🧾 NF-e</button> ' : '') +
+      '<button class="mod-btn" style="font-size:10px;padding:3px 8px;" onclick="fatAbrirModalEmail(\'' + f.id + '\')">📧 Enviar</button> ' +
+      (f.status === 'aberto' || f.status === 'enviado' ? '<button class="mod-btn primary" style="font-size:10px;padding:3px 8px;" onclick="fatMarcarPago(\'' + f.id + '\')">✅ Pago</button>' : '');
     return '<tr>' +
       '<td style="font-weight:700;color:var(--green);">FAT#' + f.num + '</td>' +
       '<td style="font-size:11px;color:var(--blue);">PV#' + f.pvNum + '</td>' +
@@ -9605,14 +9606,11 @@ function fatRenderLista(filtro) {
       '<td>' + dtVenc + '</td>' +
       '<td style="font-weight:700;">R$ ' + f.valor.toFixed(2).replace('.',',') + '</td>' +
       '<td><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:6px;color:' + cfg.cor + ';">' + cfg.label + '</span></td>' +
-      '<td style="display:flex;gap:4px;flex-wrap:wrap;">' +
-        '<button class="mod-btn" style="font-size:10px;padding:3px 8px;" onclick="fatGerarBoleto(\'' + f.id + '\')">🖨 Boleto</button>' +
-        (f.status === 'aberto' ? '<button class="mod-btn primary" style="font-size:10px;padding:3px 8px;" onclick="fatMarcarPago(\'' + f.id + '\')">✅ Pago</button>' : '') +
-      '</td>' +
+      '<td><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:6px;color:' + nfeCfg.cor + ';">' + nfeCfg.label + '</span></td>' +
+      '<td style="display:flex;gap:4px;flex-wrap:wrap;">' + acoes + '</td>' +
     '</tr>';
   }).join('');
 }
-
 function fatMarcarPago(id) {
   var fats = getFaturamentos();
   var idx  = fats.findIndex(function(f){ return f.id === id; });
@@ -9698,6 +9696,444 @@ function fatGerarBoleto(id) {
   var w = window.open('', '_blank');
   if (w) { w.document.write(html); w.document.close(); }
 }
+
+// ════════════════════════════════════════════════════════
+// NF-e — XML + DANFE + E-MAIL + BAIXA
+// ════════════════════════════════════════════════════════
+
+// ── Dados do emitente (configuráveis na aba ADM) ────────
+function _emitente() {
+  var cfg = {};
+  try { cfg = JSON.parse(localStorage.getItem('gl_emitente') || '{}'); } catch(e){}
+  return {
+    razao:  cfg.razao  || 'Delivet Pet',
+    fantasia:cfg.fantasia||'Delivet Pet',
+    cnpj:   cfg.cnpj   || '00.000.000/0001-00',
+    ie:     cfg.ie     || '000000000',
+    crt:    cfg.crt    || '1', // 1=Simples, 2=Simples Excesso, 3=Normal
+    logradouro: cfg.logradouro || '',
+    numero: cfg.numero || 'S/N',
+    bairro: cfg.bairro || '',
+    municipio: cfg.municipio || '',
+    uf:     cfg.uf     || 'SP',
+    cep:    cfg.cep    || '00000-000',
+    fone:   cfg.fone   || '',
+    email:  cfg.email  || '',
+  };
+}
+
+// ── Chave de 44 dígitos (simulada — real exige backend) ─
+function _gerarChaveNFe(num, serie, cnpj, dtEmissao) {
+  var cUF  = '35'; // SP
+  var aamm = dtEmissao.replace(/-/g,'').substring(0,6);
+  var cnpjLimpo = (cnpj||'').replace(/\D/g,'').padStart(14,'0');
+  var mod  = '55';
+  var serieStr = String(serie).padStart(3,'0');
+  var nNF  = String(num).padStart(9,'0');
+  var tpEmis = '1';
+  var cNF  = String(Math.floor(Math.random()*99999999)).padStart(8,'0');
+  var chave = cUF + aamm + cnpjLimpo + mod + serieStr + nNF + tpEmis + cNF;
+  // Dígito verificador módulo 11
+  var pesos = [2,3,4,5,6,7,8,9,2,3,4,5,6,7,8,9,2,3,4,5,6,7,8,9,2,3,4,5,6,7,8,9,2,3,4,5,6,7,8,9,2,3,4];
+  var soma  = 0;
+  for (var i=0; i<43; i++) soma += parseInt(chave[i]) * pesos[i];
+  var resto = soma % 11;
+  var cDV   = (resto < 2) ? 0 : (11 - resto);
+  return chave + cDV;
+}
+
+// ── Gerar XML NF-e NT 2024.001 ──────────────────────────
+function nfeGerarXML(fat) {
+  var emit   = _emitente();
+  var dtEmis = fat.dataCriacao ? fat.dataCriacao.substring(0,10) : new Date().toISOString().substring(0,10);
+  var dtEmisISO = dtEmis + 'T' + (fat.dataCriacao||'').substring(11,19) || dtEmis + 'T12:00:00';
+  var serie  = fat.serie  || 1;
+  var nNF    = fat.num;
+  var chave  = _gerarChaveNFe(nNF, serie, emit.cnpj, dtEmis);
+  var cNF    = chave.substring(35,43);
+
+  var itensXML = (fat.itens||[]).map(function(it, i) {
+    var nItem = i + 1;
+    var vProd = (it.sub||0).toFixed(2);
+    var vDesc = ((it.preco * it.qtd) - it.sub).toFixed(2);
+    return [
+      '<det nItem="' + nItem + '">',
+      '<prod>',
+        '<cProd>' + String(nItem).padStart(4,'0') + '</cProd>',
+        '<cEAN>SEM GTIN</cEAN>',
+        '<xProd>' + (it.prod||'').substring(0,120) + '</xProd>',
+        '<NCM>22021000</NCM>',
+        '<CFOP>5102</CFOP>',
+        '<uCom>UN</uCom>',
+        '<qCom>' + (it.qtd||1).toFixed(4) + '</qCom>',
+        '<vUnCom>' + (it.preco||0).toFixed(10) + '</vUnCom>',
+        '<vProd>' + vProd + '</vProd>',
+        '<cEANTrib>SEM GTIN</cEANTrib>',
+        '<uTrib>UN</uTrib>',
+        '<qTrib>' + (it.qtd||1).toFixed(4) + '</qTrib>',
+        '<vUnTrib>' + (it.preco||0).toFixed(10) + '</vUnTrib>',
+        (parseFloat(vDesc)>0 ? '<vDesc>' + vDesc + '</vDesc>' : ''),
+        '<indTot>1</indTot>',
+      '</prod>',
+      '<imposto>',
+        '<ICMS><ICMSSN102><orig>0</orig><CSOSN>102</CSOSN></ICMSSN102></ICMS>',
+        '<PIS><PISAliq><CST>01</CST><vBC>0.00</vBC><pPIS>0.0000</pPIS><vPIS>0.00</vPIS></PISAliq></PIS>',
+        '<COFINS><COFINSAliq><CST>01</CST><vBC>0.00</vBC><pCOFINS>0.0000</pCOFINS><vCOFINS>0.00</vCOFINS></COFINSAliq></COFINS>',
+      '</imposto>',
+      '</det>'
+    ].join('\n');
+  }).join('\n');
+
+  var vNF    = (fat.valor||0).toFixed(2);
+  var vProd  = (fat.itens||[]).reduce(function(s,it){ return s + (it.preco * it.qtd); }, 0).toFixed(2);
+  var vDesc  = (parseFloat(vProd) - parseFloat(vNF)).toFixed(2);
+  var vDesc2 = Math.max(0, parseFloat(vDesc)).toFixed(2);
+
+  var xml = [
+    '<?xml version="1.0" encoding="UTF-8"?>',
+    '<nfeProc xmlns="http://www.portalfiscal.inf.br/nfe" versao="4.00">',
+    '<NFe xmlns="http://www.portalfiscal.inf.br/nfe">',
+    '<infNFe Id="NFe' + chave + '" versao="4.00">',
+    '<ide>',
+      '<cUF>35</cUF>',
+      '<cNF>' + cNF + '</cNF>',
+      '<natOp>VENDA DE MERCADORIA</natOp>',
+      '<mod>55</mod>',
+      '<serie>' + serie + '</serie>',
+      '<nNF>' + nNF + '</nNF>',
+      '<dhEmi>' + dtEmisISO + '-03:00</dhEmi>',
+      '<tpNF>1</tpNF>',
+      '<idDest>1</idDest>',
+      '<cMunFG>3550308</cMunFG>',
+      '<tpImp>1</tpImp>',
+      '<tpEmis>1</tpEmis>',
+      '<cDV>' + chave.slice(-1) + '</cDV>',
+      '<tpAmb>2</tpAmb>',
+      '<finNFe>1</finNFe>',
+      '<indFinal>1</indFinal>',
+      '<indPres>1</indPres>',
+      '<procEmi>0</procEmi>',
+      '<verProc>Delivet v2.1</verProc>',
+    '</ide>',
+    '<emit>',
+      '<CNPJ>' + emit.cnpj.replace(/\D/g,'') + '</CNPJ>',
+      '<xNome>' + emit.razao + '</xNome>',
+      '<xFant>' + emit.fantasia + '</xFant>',
+      '<enderEmit>',
+        '<xLgr>' + emit.logradouro + '</xLgr>',
+        '<nro>' + emit.numero + '</nro>',
+        '<xBairro>' + emit.bairro + '</xBairro>',
+        '<cMun>3550308</cMun>',
+        '<xMun>' + emit.municipio + '</xMun>',
+        '<UF>' + emit.uf + '</UF>',
+        '<CEP>' + emit.cep.replace(/\D/g,'') + '</CEP>',
+        '<cPais>1058</cPais>',
+        '<xPais>Brasil</xPais>',
+        '<fone>' + emit.fone.replace(/\D/g,'') + '</fone>',
+      '</enderEmit>',
+      '<IE>' + emit.ie + '</IE>',
+      '<CRT>' + emit.crt + '</CRT>',
+    '</emit>',
+    '<dest>',
+      '<CPF>' + (fat.cnpj||'').replace(/\D/g,'').padStart(11,'0').substring(0,11) + '</CPF>',
+      '<xNome>' + (fat.cliente||'NÃO IDENTIFICADO') + '</xNome>',
+      '<indIEDest>9</indIEDest>',
+      '<email>' + (fat.emailCliente||'') + '</email>',
+    '</dest>',
+    itensXML,
+    '<total>',
+      '<ICMSTot>',
+        '<vBC>0.00</vBC><vICMS>0.00</vICMS><vICMSDeson>0.00</vICMSDeson>',
+        '<vFCP>0.00</vFCP><vBCST>0.00</vBCST><vST>0.00</vST>',
+        '<vFCPST>0.00</vFCPST><vFCPSTRet>0.00</vFCPSTRet>',
+        '<vProd>' + vProd + '</vProd>',
+        '<vFrete>0.00</vFrete><vSeg>0.00</vSeg>',
+        '<vDesc>' + vDesc2 + '</vDesc>',
+        '<vII>0.00</vII><vIPI>0.00</vIPI><vIPIDevol>0.00</vIPIDevol>',
+        '<vPIS>0.00</vPIS><vCOFINS>0.00</vCOFINS><vOutro>0.00</vOutro>',
+        '<vNF>' + vNF + '</vNF>',
+      '</ICMSTot>',
+    '</total>',
+    '<transp><modFrete>9</modFrete></transp>',
+    '<cobr>',
+      '<fat>',
+        '<nFat>' + String(fat.nossoNum||fat.num).padStart(8,'0') + '</nFat>',
+        '<vOrig>' + vNF + '</vOrig>',
+        '<vDesc>0.00</vDesc>',
+        '<vLiq>' + vNF + '</vLiq>',
+      '</fat>',
+      '<dup>',
+        '<nDup>001</nDup>',
+        '<dVenc>' + (fat.vencimento||dtEmis) + '</dVenc>',
+        '<vDup>' + vNF + '</vDup>',
+      '</dup>',
+    '</cobr>',
+    '<pag><detPag><tPag>15</tPag><vPag>' + vNF + '</vPag></detPag></pag>',
+    '<infAdic><infCpl>Pedido Delivet PV#' + (fat.pvNum||0) + ' | Nosso Num: ' + (fat.nossoNum||'') + ' | ' + (fat.obs||'') + ' | [INTEGRAR SEFAZ: transmitir XML assinado com certificado A1 para webservice estadual NT2024.001]</infCpl></infAdic>',
+    '</infNFe>',
+    '<!-- ASSINATURA DIGITAL: backend deve assinar este XML com certificado A1 antes de transmitir -->',
+    '<!-- TRANSMISSÃO: POST https://nfe.fazenda.sp.gov.br/ws/nfeautorizacao4.asmx (produção) -->',
+    '<!-- HOMOLOGAÇÃO: POST https://homologacao.nfe.fazenda.sp.gov.br/ws/nfeautorizacao4.asmx -->',
+    '</NFe>',
+    '</nfeProc>'
+  ].join('\n');
+
+  return { xml: xml, chave: chave };
+}
+
+// ── Baixar XML ───────────────────────────────────────────
+function nfeDownloadXML(fatId) {
+  var fats = getFaturamentos();
+  var fat  = fats.find(function(f){ return f.id === fatId; });
+  if (!fat) return;
+  var resultado = nfeGerarXML(fat);
+  fat.chaveNFe = fat.chaveNFe || resultado.chave;
+  salvarFaturamentos(fats);
+  var blob = new Blob([resultado.xml], { type: 'application/xml' });
+  var a    = document.createElement('a');
+  a.href   = URL.createObjectURL(blob);
+  a.download = 'NFe_' + resultado.chave + '.xml';
+  a.click();
+  URL.revokeObjectURL(a.href);
+  _log('XML NF-e gerado', 'FAT#' + fat.num + ' — chave: ' + resultado.chave);
+}
+
+// ── Emitir NF-e (visual) ─────────────────────────────────
+function nfeEmitir(fatId) {
+  var fats = getFaturamentos();
+  var idx  = fats.findIndex(function(f){ return f.id === fatId; });
+  if (idx === -1) return;
+  var fat  = fats[idx];
+  var resultado = nfeGerarXML(fat);
+  fats[idx].statusNFe  = 'emitida';
+  fats[idx].chaveNFe   = resultado.chave;
+  fats[idx].xmlNFe     = resultado.xml;
+  fats[idx].dataEmissao = new Date().toISOString();
+  salvarFaturamentos(fats);
+  fatRenderLista();
+  _log('NF-e emitida', 'FAT#' + fat.num + ' — chave: ' + resultado.chave);
+  alert('✅ NF-e FAT#' + fat.num + ' emitida!\nChave: ' + resultado.chave + '\n\n⚠️ Esta é uma emissão visual. Para transmissão SEFAZ, assine o XML com certificado A1 e envie ao webservice estadual.');
+}
+
+// ── DANFE ────────────────────────────────────────────────
+function nfeImprimirDANFE(fatId) {
+  var fats = getFaturamentos();
+  var fat  = fats.find(function(f){ return f.id === fatId; });
+  if (!fat) return;
+
+  var emit   = _emitente();
+  var chave  = fat.chaveNFe || _gerarChaveNFe(fat.num, fat.serie||1, emit.cnpj, (fat.dataCriacao||'').substring(0,10));
+  var dtEmis = fat.dataCriacao ? new Date(fat.dataCriacao).toLocaleDateString('pt-BR') : '—';
+  var dtVenc = fat.vencimento ? new Date(fat.vencimento+'T12:00:00').toLocaleDateString('pt-BR') : '—';
+
+  var chaveFmt = chave.replace(/(\d{4})/g,'$1 ').trim();
+
+  var itensRows = (fat.itens||[]).map(function(it,i) {
+    return '<tr>' +
+      '<td>' + String(i+1).padStart(3,'0') + '</td>' +
+      '<td>' + (it.prod||'') + '</td>' +
+      '<td style="text-align:center;">UN</td>' +
+      '<td style="text-align:center;">' + (it.qtd||0) + '</td>' +
+      '<td style="text-align:right;">R$ ' + (it.preco||0).toFixed(2).replace('.',',') + '</td>' +
+      '<td style="text-align:center;">' + (it.desc||0) + '%</td>' +
+      '<td style="text-align:right;font-weight:700;">R$ ' + (it.sub||0).toFixed(2).replace('.',',') + '</td>' +
+    '</tr>';
+  }).join('');
+
+  var html = '<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8">' +
+    '<title>DANFE — NF-e ' + fat.num + '</title>' +
+    '<style>' +
+    'body{font-family:Arial,sans-serif;font-size:11px;color:#000;margin:0;padding:12px;}' +
+    '.danfe{max-width:780px;margin:0 auto;border:2px solid #000;}' +
+    '.d-header{display:grid;grid-template-columns:200px 1fr 160px;border-bottom:2px solid #000;}' +
+    '.d-logo{padding:10px;border-right:1px solid #000;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;color:#0D3B2E;}' +
+    '.d-danfe{padding:8px;border-right:1px solid #000;text-align:center;}' +
+    '.d-danfe h2{font-size:14px;font-weight:900;margin:0 0 4px;}' +
+    '.d-num{padding:8px;font-size:10px;}' +
+    '.d-chave{background:#f5f5f5;padding:6px 10px;border-bottom:1px solid #000;font-family:monospace;font-size:9px;word-break:break-all;}' +
+    '.d-bar{height:40px;background:repeating-linear-gradient(90deg,#000 0,#000 1.5px,#fff 1.5px,#fff 3px);margin:6px 10px;border:1px solid #000;}' +
+    '.d-section{border-bottom:1px solid #000;padding:6px 10px;}' +
+    '.d-section-title{font-size:9px;font-weight:700;text-transform:uppercase;color:#555;margin-bottom:4px;border-bottom:1px solid #ddd;padding-bottom:2px;}' +
+    '.d-grid{display:grid;gap:6px;}' +
+    '.d-field{font-size:10px;}' +
+    '.d-field label{display:block;font-size:8px;color:#666;text-transform:uppercase;margin-bottom:1px;}' +
+    'table{width:100%;border-collapse:collapse;font-size:10px;}' +
+    'thead th{background:#e5e5e5;padding:4px 6px;border:1px solid #ccc;font-size:9px;text-align:left;}' +
+    'tbody td{padding:3px 6px;border:1px solid #ddd;}' +
+    '.d-totais{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding:6px 10px;border-bottom:1px solid #000;background:#f9f9f9;}' +
+    '.d-total-item{text-align:center;}' +
+    '.d-total-item label{display:block;font-size:8px;color:#666;text-transform:uppercase;}' +
+    '.d-total-item span{font-size:13px;font-weight:900;color:#0D3B2E;}' +
+    '.d-fisco{background:#000;color:#fff;padding:4px 10px;font-size:9px;font-weight:700;text-align:center;}' +
+    '.d-aviso{background:#fff3cd;padding:6px 10px;font-size:10px;color:#856404;text-align:center;border-top:2px dashed #f0a500;}' +
+    '.no-print{text-align:center;margin-bottom:12px;}' +
+    '@media print{.no-print{display:none!important;}}' +
+    '</style></head><body>' +
+
+    '<div class="no-print">' +
+    '<button onclick="window.print()" style="background:#0D3B2E;color:#fff;border:none;padding:10px 24px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;margin-right:8px;">🖨 Imprimir / Salvar PDF</button>' +
+    '</div>' +
+
+    '<div class="danfe">' +
+
+    // Header
+    '<div class="d-header">' +
+    '<div class="d-logo">🐾 DELIVET PET</div>' +
+    '<div class="d-danfe">' +
+    '<h2>DANFE</h2>' +
+    '<div style="font-size:10px;">Documento Auxiliar da Nota Fiscal Eletrônica</div>' +
+    '<div style="font-size:10px;margin-top:4px;">Entrada <input type="checkbox"> &nbsp; Saída <input type="checkbox" checked></div>' +
+    '<div style="font-size:11px;font-weight:700;margin-top:4px;">Nº de Série: ' + (fat.serie||1) + '</div>' +
+    '</div>' +
+    '<div class="d-num">' +
+    '<div style="font-size:9px;color:#555;">NF-e Nº</div>' +
+    '<div style="font-size:16px;font-weight:900;">' + String(fat.num).padStart(9,'0') + '</div>' +
+    '<div style="font-size:9px;color:#555;margin-top:6px;">Folha</div>' +
+    '<div style="font-size:12px;font-weight:700;">1 / 1</div>' +
+    '</div>' +
+    '</div>' +
+
+    // Chave de acesso
+    '<div class="d-chave">' +
+    '<div style="font-size:8px;color:#555;margin-bottom:2px;">CHAVE DE ACESSO — Consulte em http://www.nfe.fazenda.gov.br/portal</div>' +
+    '<div style="letter-spacing:1px;">' + chaveFmt + '</div>' +
+    '</div>' +
+
+    // Código de barras
+    '<div class="d-bar"></div>' +
+
+    // Natureza da operação
+    '<div class="d-section">' +
+    '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">' +
+    '<div class="d-field"><label>Natureza da Operação</label>VENDA DE MERCADORIA</div>' +
+    '<div class="d-field"><label>Protocolo de Autorização</label>' +
+    (fat.statusNFe === 'emitida' ? '⚠️ Aguardando transmissão SEFAZ' : '— Não transmitida —') + '</div>' +
+    '<div class="d-field"><label>Data / Hora de Emissão</label>' + dtEmis + '</div>' +
+    '</div></div>' +
+
+    // Emitente
+    '<div class="d-section"><div class="d-section-title">Emitente</div>' +
+    '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">' +
+    '<div class="d-field"><label>Razão Social</label>' + emit.razao + '</div>' +
+    '<div class="d-field"><label>CNPJ</label>' + emit.cnpj + '</div>' +
+    '<div class="d-field"><label>Inscrição Estadual</label>' + emit.ie + '</div>' +
+    '<div class="d-field"><label>Endereço</label>' + emit.logradouro + ', ' + emit.numero + '</div>' +
+    '<div class="d-field"><label>Município / UF</label>' + emit.municipio + ' / ' + emit.uf + '</div>' +
+    '<div class="d-field"><label>CEP</label>' + emit.cep + '</div>' +
+    '</div></div>' +
+
+    // Destinatário
+    '<div class="d-section"><div class="d-section-title">Destinatário / Remetente</div>' +
+    '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">' +
+    '<div class="d-field"><label>Nome / Razão Social</label>' + (fat.cliente||'—') + '</div>' +
+    '<div class="d-field"><label>CNPJ / CPF</label>' + (fat.cnpj||'—') + '</div>' +
+    '<div class="d-field"><label>Data de Vencimento</label>' + dtVenc + '</div>' +
+    '</div></div>' +
+
+    // Itens
+    '<div class="d-section"><div class="d-section-title">Dados dos Produtos / Serviços</div>' +
+    '<table><thead><tr>' +
+    '<th>#</th><th>Descrição do Produto</th><th>UN</th><th>Qtd</th><th>Vl. Unit.</th><th>Desc.</th><th>Vl. Total</th>' +
+    '</tr></thead><tbody>' + itensRows + '</tbody></table></div>' +
+
+    // Totais
+    '<div class="d-totais">' +
+    '<div class="d-total-item"><label>Valor dos Produtos</label><span>R$ ' + (fat.itens||[]).reduce(function(s,it){return s+(it.preco*it.qtd);},0).toFixed(2).replace('.',',') + '</span></div>' +
+    '<div class="d-total-item"><label>Descontos</label><span>R$ ' + Math.max(0,(fat.itens||[]).reduce(function(s,it){return s+(it.preco*it.qtd);},0)-fat.valor).toFixed(2).replace('.',',') + '</span></div>' +
+    '<div class="d-total-item"><label>Valor do Frete</label><span>R$ 0,00</span></div>' +
+    '<div class="d-total-item"><label>VALOR TOTAL NF-e</label><span style="font-size:16px;">R$ ' + (fat.valor||0).toFixed(2).replace('.',',') + '</span></div>' +
+    '</div>' +
+
+    // Dados adicionais
+    '<div class="d-section"><div class="d-section-title">Informações Complementares</div>' +
+    '<div style="font-size:10px;">Pedido: PV#' + (fat.pvNum||0) + ' | Nosso Número: ' + (fat.nossoNum||'') + ' | ' + (fat.obs||'') + '</div>' +
+    '<div style="font-size:9px;color:#555;margin-top:4px;">Regime: Simples Nacional · Documento emitido por ME/EPP optante pelo Simples Nacional · Não gera direito a crédito de ICMS.</div>' +
+    '</div>' +
+
+    '<div class="d-fisco">USO EXCLUSIVO DO FISCO</div>' +
+    '<div class="d-aviso">⚠️ DANFE sem valor fiscal até transmissão e autorização pela SEFAZ · ' +
+    'Integração pendente: assinar XML com certificado digital A1 e transmitir ao webservice estadual</div>' +
+    '</div></body></html>';
+
+  var w = window.open('', '_blank');
+  if (w) { w.document.write(html); w.document.close(); }
+}
+
+// ── Modal de envio por e-mail ─────────────────────────────
+function fatAbrirModalEmail(fatId) {
+  var fats = getFaturamentos();
+  var fat  = fats.find(function(f){ return f.id === fatId; });
+  if (!fat) return;
+
+  document.getElementById('emailFatId').value       = fatId;
+  document.getElementById('emailPara').value         = fat.emailCliente || '';
+  document.getElementById('emailAssunto').value      = 'Delivet Pet — Boleto e NF-e Nº ' + fat.num + ' | ' + fat.cliente;
+  document.getElementById('emailCorpo').value        =
+    'Prezado(a) ' + fat.cliente + ',\n\n' +
+    'Segue em anexo o boleto bancário e a Nota Fiscal Eletrônica referente ao seu pedido.\n\n' +
+    '📋 Pedido: PV#' + fat.pvNum + '\n' +
+    '💰 Valor: R$ ' + (fat.valor||0).toFixed(2).replace('.',',') + '\n' +
+    '📅 Vencimento: ' + (fat.vencimento ? new Date(fat.vencimento+'T12:00:00').toLocaleDateString('pt-BR') : '—') + '\n\n' +
+    'Em caso de dúvidas, entre em contato.\n\n' +
+    'Atenciosamente,\nDelivet Pet';
+  document.getElementById('modalEmailFat').style.display = 'flex';
+}
+
+function fatEnviarEmail() {
+  var fatId   = document.getElementById('emailFatId').value;
+  var para    = document.getElementById('emailPara').value.trim();
+  var assunto = document.getElementById('emailAssunto').value.trim();
+  var corpo   = document.getElementById('emailCorpo').value.trim();
+  var apiKey  = localStorage.getItem('gl_sendgrid_key') || '';
+
+  if (!para)    { alert('Informe o e-mail do destinatário.'); return; }
+  if (!assunto) { alert('Informe o assunto.'); return; }
+
+  if (!apiKey) {
+    // Sem API key — abrir mailto como fallback
+    var mailto = 'mailto:' + para +
+      '?subject=' + encodeURIComponent(assunto) +
+      '&body='    + encodeURIComponent(corpo);
+    window.open(mailto, '_blank');
+    alert('⚠️ Chave SendGrid não configurada.\nAbrindo cliente de e-mail local como alternativa.\n\nPara envio automático, configure a chave SendGrid na aba Configurações.');
+    document.getElementById('modalEmailFat').style.display = 'none';
+    return;
+  }
+
+  // [INTEGRAR SENDGRID] — quando tiver API key
+  // POST https://api.sendgrid.com/v3/mail/send
+  // Authorization: Bearer {apiKey}
+  // Corpo: { to:[{email:para}], from:{email:emit.email}, subject:assunto, content:[{type:'text/plain',value:corpo}] }
+  var fats = getFaturamentos();
+  var idx  = fats.findIndex(function(f){ return f.id === fatId; });
+  if (idx !== -1) {
+    fats[idx].status       = 'enviado';
+    fats[idx].emailCliente = para;
+    fats[idx].dataEnvio    = new Date().toISOString();
+    salvarFaturamentos(fats);
+    fatRenderLista();
+  }
+  document.getElementById('modalEmailFat').style.display = 'none';
+  alert('✅ E-mail registrado como enviado.\n[INTEGRAR SENDGRID para envio real]');
+  _log('E-mail faturamento', 'FAT#' + fats[idx].num + ' → ' + para);
+}
+
+// ── Baixa automática simulada ─────────────────────────────
+function fatBaixaAutomatica() {
+  // [INTEGRAR BANCO] — quando tiver API de retorno bancário
+  // Ler arquivo CNAB de retorno ou webhook do banco
+  // Para cada título liquidado, chamar fatMarcarPago(id)
+  alert('⚠️ Baixa automática requer integração bancária (CNAB retorno ou webhook).\nUse "✅ Marcar Pago" manualmente até a integração estar ativa.');
+}
+
+// ── Atualizar fatRenderLista com novos status ─────────────
+var _FAT_STATUS = {
+  aberto:   { cor:'#2563EB', label:'Em aberto' },
+  enviado:  { cor:'#7c3aed', label:'Enviado' },
+  pago:     { cor:'#059669', label:'Pago' },
+  vencido:  { cor:'#dc2626', label:'Vencido' },
+  cancelado:{ cor:'#6b7280', label:'Cancelado' },
+};
 </script>
 
 </div>
@@ -13838,6 +14274,46 @@ window.addEventListener('load',()=>{
   </div>
 </div>
 
+
+<!-- ══ MODAL: Enviar por E-mail ══ -->
+<div id="modalEmailFat" style="display:none;position:fixed;inset:0;z-index:9998;
+  background:rgba(0,0,0,0.55);backdrop-filter:blur(4px);
+  align-items:center;justify-content:center;padding:16px;">
+  <div style="background:var(--card,#fff);border-radius:16px;max-width:480px;width:100%;
+    box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+    <div style="background:linear-gradient(135deg,#0D3B2E,#155C44);padding:16px 20px;
+      border-radius:16px 16px 0 0;display:flex;justify-content:space-between;align-items:center;">
+      <div style="font-size:16px;font-weight:800;color:#fff;">📧 Enviar para Cliente</div>
+      <button onclick="document.getElementById('modalEmailFat').style.display='none'"
+        style="background:rgba(255,255,255,0.15);border:none;color:#fff;border-radius:8px;
+          padding:6px 12px;cursor:pointer;font-size:18px;">✕</button>
+    </div>
+    <div style="padding:18px 20px;">
+      <input type="hidden" id="emailFatId">
+      <div class="field" style="margin-bottom:12px;">
+        <label class="mod-label">Para (e-mail do cliente) *</label>
+        <input type="email" id="emailPara" class="inp" placeholder="cliente@email.com">
+      </div>
+      <div class="field" style="margin-bottom:12px;">
+        <label class="mod-label">Assunto</label>
+        <input type="text" id="emailAssunto" class="inp">
+      </div>
+      <div class="field" style="margin-bottom:16px;">
+        <label class="mod-label">Mensagem</label>
+        <textarea id="emailCorpo" class="inp" rows="6" style="resize:vertical;font-size:12px;"></textarea>
+      </div>
+      <div style="background:rgba(13,59,46,0.06);border:1px solid rgba(13,59,46,0.15);
+        border-radius:10px;padding:10px 14px;margin-bottom:16px;font-size:11px;color:var(--text-3);">
+        📎 <strong>Anexos:</strong> Boleto (PDF) + DANFE (PDF) + XML NF-e serão gerados ao enviar.<br>
+        <span style="color:#d97706;">⚠️ Chave SendGrid: configure em Configurações → Integrações para envio automático. Sem chave, abrirá cliente de e-mail local.</span>
+      </div>
+      <button onclick="fatEnviarEmail()" class="mod-btn primary"
+        style="width:100%;padding:13px;font-size:13px;font-weight:800;">
+        📧 Enviar para Cliente
+      </button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
 ">
@@ -14028,9 +14504,11 @@ window.addEventListener('load',()=>{
 
   <!-- Fila de pedidos aprovados -->
   <div class="card" style="margin-bottom:16px;">
-    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--green);
-      margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid var(--green-lt);">
-      ✅ Pedidos Aprovados — Aguardando Faturamento
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--green);">✅ Pedidos Aprovados — Aguardando Faturamento</div>
+    <button class="mod-btn" style="font-size:10px;padding:4px 10px;" onclick="fatBaixaAutomatica()">🔄 Baixa Automática</button>
+    </div>
+    <div style="display:none;">
     </div>
     <div style="overflow-x:auto;">
       <table style="width:100%;border-collapse:collapse;font-size:11px;">
@@ -14074,6 +14552,7 @@ window.addEventListener('load',()=>{
             <th style="padding:7px 8px;">Vencimento</th>
             <th style="padding:7px 8px;">Valor</th>
             <th style="padding:7px 8px;">Status</th>
+            <th style="padding:7px 8px;">NF-e</th>
             <th style="padding:7px 8px;">Ações</th>
           </tr>
         </thead>
