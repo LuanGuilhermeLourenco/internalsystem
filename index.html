@@ -2868,6 +2868,61 @@ td .mod-btn, td button {
 
   </div>
 
+
+  <!-- ── Relatório Financeiro ── -->
+  <div class="card" style="margin-bottom:14px;">
+    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--green);margin-bottom:14px;">Relatório Financeiro</div>
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;">
+      <div style="background:var(--green-lt);border-radius:12px;padding:12px 14px;">
+        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--green);margin-bottom:4px;">Total vendido</div>
+        <div style="font-size:20px;font-weight:800;color:var(--green);font-family:'JetBrains Mono',monospace;" id="rfTotalVendido">R$ —</div>
+        <div style="font-size:10px;color:var(--green);opacity:.7;margin-top:2px;" id="rfTotalVendidoSub">— títulos</div>
+      </div>
+      <div style="background:var(--blue-lt);border-radius:12px;padding:12px 14px;">
+        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--blue);margin-bottom:4px;">Total recebido</div>
+        <div style="font-size:20px;font-weight:800;color:var(--blue);font-family:'JetBrains Mono',monospace;" id="rfTotalRecebido">R$ —</div>
+        <div style="font-size:10px;color:var(--blue);opacity:.7;margin-top:2px;" id="rfTotalRecebidoSub">— pagos</div>
+      </div>
+      <div style="background:rgba(245,158,11,0.08);border-radius:12px;padding:12px 14px;">
+        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#d97706;margin-bottom:4px;">A receber</div>
+        <div style="font-size:20px;font-weight:800;color:#d97706;font-family:'JetBrains Mono',monospace;" id="rfAReceber">R$ —</div>
+        <div style="font-size:10px;color:#d97706;opacity:.7;margin-top:2px;" id="rfAReceberSub">— em aberto</div>
+      </div>
+      <div style="background:rgba(220,38,38,0.07);border-radius:12px;padding:12px 14px;">
+        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#dc2626;margin-bottom:4px;">Em atraso</div>
+        <div style="font-size:20px;font-weight:800;color:#dc2626;font-family:'JetBrains Mono',monospace;" id="rfEmAtraso">R$ —</div>
+        <div style="font-size:10px;color:#dc2626;opacity:.7;margin-top:2px;" id="rfEmAtrasoSub">— vencidos</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Relatório Comercial ── -->
+  <div class="card" style="margin-bottom:14px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#7c3aed;">Relatório Comercial</div>
+      <div style="display:flex;gap:4px;">
+        <button id="rcPillMes" onclick="rcPeriodo('mes')" style="font-size:10px;font-weight:700;padding:3px 9px;border-radius:6px;cursor:pointer;border:1px solid #7c3aed;background:rgba(124,58,237,0.08);color:#7c3aed;">Mês</button>
+        <button id="rcPillSemana" onclick="rcPeriodo('semana')" style="font-size:10px;font-weight:700;padding:3px 9px;border-radius:6px;cursor:pointer;border:1px solid var(--border);background:var(--bg);color:var(--text-3);">Semana</button>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:14px;">
+      <div style="background:rgba(124,58,237,0.08);border-radius:12px;padding:12px 14px;">
+        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#7c3aed;margin-bottom:4px;" id="rcPeriodoLabel">Total vendido — Mês</div>
+        <div style="font-size:20px;font-weight:800;color:#7c3aed;font-family:'JetBrains Mono',monospace;" id="rcTotalPeriodo">R$ —</div>
+        <div style="font-size:10px;color:#7c3aed;opacity:.7;margin-top:2px;" id="rcTotalPeriodoSub">— pedidos</div>
+      </div>
+      <div style="background:rgba(220,38,38,0.07);border-radius:12px;padding:12px 14px;">
+        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#dc2626;margin-bottom:4px;">Em atraso</div>
+        <div style="font-size:20px;font-weight:800;color:#dc2626;font-family:'JetBrains Mono',monospace;" id="rcEmAtraso">0</div>
+        <div style="font-size:10px;color:#dc2626;opacity:.7;margin-top:2px;" id="rcEmAtrasoSub">aprovados sem faturamento</div>
+      </div>
+    </div>
+    <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text-3);margin-bottom:8px;" id="rcRankingLabel">Top Vendedoras — Mês</div>
+    <div id="rcRanking">
+      <div style="color:var(--text-4);font-size:12px;text-align:center;padding:8px 0;">Nenhum pedido ainda.</div>
+    </div>
+  </div>
+
   <!-- ── Metas do mês ── -->
   <div class="card" style="margin-bottom:14px;" id="dashMetasCard">
     <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--blue);margin-bottom:12px;">Metas do mês</div>
@@ -5648,6 +5703,109 @@ function renderDashboard() {
 // ════════════════════════════════════════════════════════
 
 var _dashFVPeriodo = 'mes';
+
+
+// ════════════════════════════════════════════════════════
+// DASHBOARD — Relatório Financeiro
+// ════════════════════════════════════════════════════════
+function renderRelFinanceiro() {
+  var fats = getFaturamentos();
+  var hoje = new Date().toISOString().substring(0,10);
+  var fmt  = function(v){ return 'R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}); };
+  var el   = function(id){ return document.getElementById(id); };
+
+  var totalVendido  = fats.reduce(function(s,f){ return s+(f.valor||0); },0);
+  var pagos         = fats.filter(function(f){ return f.status==='pago'; });
+  var totalRecebido = pagos.reduce(function(s,f){ return s+(f.valor||0); },0);
+  var emAberto      = fats.filter(function(f){ return f.status==='aberto'||f.status==='enviado'; });
+  var aReceber      = emAberto.reduce(function(s,f){ return s+(f.valor||0); },0);
+  var atrasados     = emAberto.filter(function(f){ return f.vencimento && f.vencimento<hoje; });
+  var emAtraso      = atrasados.reduce(function(s,f){ return s+(f.valor||0); },0);
+
+  if (el('rfTotalVendido'))    el('rfTotalVendido').textContent    = fmt(totalVendido);
+  if (el('rfTotalVendidoSub')) el('rfTotalVendidoSub').textContent = fats.length+(fats.length===1?' título':' títulos');
+  if (el('rfTotalRecebido'))   el('rfTotalRecebido').textContent   = fmt(totalRecebido);
+  if (el('rfTotalRecebidoSub'))el('rfTotalRecebidoSub').textContent= pagos.length+' pagos';
+  if (el('rfAReceber'))        el('rfAReceber').textContent        = fmt(aReceber);
+  if (el('rfAReceberSub'))     el('rfAReceberSub').textContent     = emAberto.length+' em aberto';
+  if (el('rfEmAtraso'))        el('rfEmAtraso').textContent        = fmt(emAtraso);
+  if (el('rfEmAtrasoSub'))     el('rfEmAtrasoSub').textContent     = atrasados.length+(atrasados.length===1?' vencido':' vencidos');
+  if (el('rfEmAtraso') && emAtraso>0) el('rfEmAtraso').style.animation='alertaPulse 2s ease infinite';
+}
+
+// ════════════════════════════════════════════════════════
+// DASHBOARD — Relatório Comercial
+// ════════════════════════════════════════════════════════
+var _rcPeriodo = 'mes';
+
+function rcPeriodo(periodo) {
+  _rcPeriodo = periodo;
+  var el = function(id){ return document.getElementById(id); };
+  var ativo   = 'font-size:10px;font-weight:700;padding:3px 9px;border-radius:6px;cursor:pointer;border:1px solid #7c3aed;background:rgba(124,58,237,0.08);color:#7c3aed;';
+  var inativo = 'font-size:10px;font-weight:700;padding:3px 9px;border-radius:6px;cursor:pointer;border:1px solid var(--border);background:var(--bg);color:var(--text-3);';
+  if (el('rcPillMes'))    el('rcPillMes').style.cssText    = periodo==='mes'    ? ativo : inativo;
+  if (el('rcPillSemana')) el('rcPillSemana').style.cssText = periodo==='semana' ? ativo : inativo;
+  if (el('rcPeriodoLabel')) el('rcPeriodoLabel').textContent = 'Total vendido — '+(periodo==='mes'?'Mês':'Semana');
+  if (el('rcRankingLabel')) el('rcRankingLabel').textContent = 'Top Vendedoras — '+(periodo==='mes'?'Mês':'Semana');
+  renderRelComercial();
+}
+
+function renderRelComercial() {
+  var el  = function(id){ return document.getElementById(id); };
+  var fmt = function(v){ return 'R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}); };
+  var pedidos = getPedidosVenda();
+  var isAdm   = sessaoAtual && (sessaoAtual.tipo==='adm'||sessaoAtual.tipo==='financeiro');
+  if (!isAdm && sessaoAtual) pedidos = pedidos.filter(function(p){ return p.loginVend===sessaoAtual.login; });
+
+  var ativos = pedidos.filter(function(p){ return p.status!=='cancelado'; });
+  var agora  = new Date();
+  var inicioMes  = new Date(agora.getFullYear(),agora.getMonth(),1).toISOString().substring(0,10);
+  var dow        = agora.getDay();
+  var seg        = new Date(agora.getTime()-((dow===0?6:dow-1)*86400000)).toISOString().substring(0,10);
+  var inicio     = _rcPeriodo==='mes' ? inicioMes : seg;
+
+  var periodo    = ativos.filter(function(p){ return p.dataCriacao&&p.dataCriacao.substring(0,10)>=inicio; });
+  var totalPer   = periodo.reduce(function(s,p){ return s+(p.total||0); },0);
+
+  var tresDias   = new Date(agora.getTime()-3*86400000).toISOString().substring(0,10);
+  var emAtraso   = ativos.filter(function(p){ return p.status==='aprovado'&&p.dataStatus&&p.dataStatus.substring(0,10)<=tresDias; });
+
+  if (el('rcTotalPeriodo'))    el('rcTotalPeriodo').textContent    = fmt(totalPer);
+  if (el('rcTotalPeriodoSub')) el('rcTotalPeriodoSub').textContent = periodo.length+(periodo.length===1?' pedido':' pedidos');
+  if (el('rcEmAtraso'))        el('rcEmAtraso').textContent        = emAtraso.length;
+  if (el('rcEmAtrasoSub'))     el('rcEmAtrasoSub').textContent     = emAtraso.length===0 ? 'todos em dia' : emAtraso.length+(emAtraso.length===1?' aprovado sem faturar':' aprovados sem faturar');
+
+  var rankDiv = el('rcRanking');
+  if (!rankDiv) return;
+  if (periodo.length===0) { rankDiv.innerHTML='<div style="color:var(--text-4);font-size:12px;text-align:center;padding:8px 0;">Nenhum pedido no período.</div>'; return; }
+
+  var pv = {};
+  periodo.forEach(function(p){ var n=p.vendedora||'—'; if(!pv[n])pv[n]={nome:n,total:0,qtd:0}; pv[n].total+=(p.total||0); pv[n].qtd+=1; });
+  var rank   = Object.values(pv).sort(function(a,b){ return b.total-a.total; });
+  var melhor = rank[0].total||1;
+  var cores  = ['#7c3aed','#2563EB','#059669'];
+
+  rankDiv.innerHTML = rank.map(function(v,i){
+    var pct=Math.round((v.total/melhor)*100);
+    var cor=i<3?cores[i]:'#64748b';
+    var med=i<3?(i+1)+'°':(i+1)+'°';
+    return '<div style="display:flex;flex-direction:column;gap:4px;margin-bottom:8px;">'+
+      '<div style="display:flex;align-items:center;justify-content:space-between;">'+
+        '<div style="display:flex;align-items:center;gap:8px;">'+
+          '<span style="font-size:11px;font-weight:800;min-width:22px;text-align:center;color:'+cor+'">'+med+'</span>'+
+          '<span style="font-size:13px;font-weight:600;color:var(--text)">'+v.nome+'</span>'+
+        '</div>'+
+        '<div style="text-align:right;">'+
+          '<div style="font-size:12px;font-weight:800;color:'+cor+'">'+fmt(v.total)+'</div>'+
+          '<div style="font-size:10px;color:var(--text-3)">'+v.qtd+(v.qtd===1?' pedido':' pedidos')+'</div>'+
+        '</div>'+
+      '</div>'+
+      '<div style="height:4px;background:var(--border);border-radius:2px;overflow:hidden;">'+
+        '<div style="height:100%;width:'+pct+'%;background:'+cor+';border-radius:2px;transition:width .6s cubic-bezier(.16,1,.3,1)"></div>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+}
 
 function dashFVPeriodo(periodo) {
   _dashFVPeriodo = periodo;
