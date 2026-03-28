@@ -1405,42 +1405,74 @@ transition: background .15s; }
   padding:0 4px; gap:6px; flex-shrink:0; }
 
 /* Linha 2 — subitens limpos com dot + underline */
-#navSubs { display:flex; align-items:stretch;
-  background:#fff; border-bottom:1.5px solid var(--border);
-  overflow-x:auto; -webkit-overflow-scrolling:touch;
-  white-space:nowrap; scrollbar-width:none; padding:0 8px; }
-#navSubs::-webkit-scrollbar { display:none; }
+/* ── Sub-abas — pill moderno ── */
+#navSubs {
+  display: flex;
+  align-items: center;
+  background: var(--bg, #f0f4f0);
+  border-bottom: 1px solid var(--border);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  white-space: nowrap;
+  scrollbar-width: none;
+  padding: 6px 12px;
+  gap: 4px;
+}
+#navSubs::-webkit-scrollbar { display: none; }
 
-.nav-sub { position:relative; display:flex; align-items:center;
-  gap:7px; padding:0 16px; height:42px; border:none;
-  background:none; color:var(--text-3);
-  font-family:'Inter',sans-serif; font-size:12px;
-  font-weight:500; cursor:pointer; white-space:nowrap;
-  border-bottom:2px solid transparent;
-  transition:color .15s, background .15s, border-color .15s;
-  flex-shrink:0; }
-.nav-sub:hover { color:var(--blue); background:var(--blue-lt); }
-.nav-sub.ativo { color:var(--blue); border-bottom:2px solid var(--blue);
-  font-weight:700; background:var(--blue-lt); }
+.nav-sub {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 14px;
+  height: 32px;
+  border: 1.5px solid transparent;
+  border-radius: 20px;
+  background: transparent;
+  color: var(--text-3);
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: color .18s, background .18s, border-color .18s, box-shadow .18s;
+  -webkit-tap-highlight-color: transparent;
+}
+.nav-sub:hover {
+  color: var(--text);
+  background: rgba(255,255,255,0.7);
+  border-color: var(--border);
+}
+.nav-sub.ativo {
+  color: #fff;
+  background: #0D3B2E;
+  border-color: #0D3B2E;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(13,59,46,0.25);
+}
+[data-tema="dark"] .nav-sub.ativo {
+  background: #155C44;
+  border-color: #155C44;
+  box-shadow: 0 2px 8px rgba(21,92,68,0.4);
+}
+/* Sem dot — pill já comunica ativo */
+.nav-sub::before { display: none; }
 
-/* Dot indicator no item ativo */
-.nav-sub::before { content:''; width:6px; height:6px; border-radius:50%;
-  background:var(--blue); opacity:0; flex-shrink:0;
-  transition:opacity .15s; }
-.nav-sub.ativo::before { opacity:1; }
-
-/* Remove icone emoji dos subitens */
+/* Ícone na sub-aba */
 .nav-sub-icon {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 15px;
-  height: 15px;
-  opacity: 0.55;
+  width: 14px;
+  height: 14px;
+  opacity: 0.6;
   flex-shrink: 0;
-  transition: opacity .2s;
-  color: var(--text-3);
+  transition: opacity .18s;
 }
+.nav-sub.ativo .nav-sub-icon { opacity: 1; filter: brightness(2); }
+.nav-sub:hover .nav-sub-icon  { opacity: 0.85; }
 .nav-sub.active .nav-sub-icon { opacity: 1; color: var(--blue); }
 .nav-sub:hover .nav-sub-icon  { opacity: 0.85; }
 
