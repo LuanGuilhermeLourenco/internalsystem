@@ -3931,27 +3931,27 @@ function aplicarPermissoes(perms) {
     if (vis) algumaPrecVis = true;
   });
   var btnPrec = document.getElementById('tabPrecBtn');
-  if (btnPrec) btnPrec.style.display = algumaPrecVis ? 'flex' : 'none';
+  if (btnPrec) btnPrec.style.display = algumaPrecVis ? 'inline-flex' : 'none';
 
   // --- Pedidos de Venda ---
   var pvVis = isAdm ? true : (p['comercial'] === true);
   var btnPv = document.getElementById('tabPedidosVendaBtn');
-  if (btnPv) btnPv.style.display = pvVis ? 'flex' : 'none';
+  if (btnPv) btnPv.style.display = pvVis ? 'inline-flex' : 'none';
 
   // --- Faturamento ---
   var fatVis = isAdm ? true : (p['notafiscal'] === true);
   var btnFat = document.getElementById('tabFaturamentoBtn');
-  if (btnFat) btnFat.style.display = fatVis ? 'flex' : 'none';
+  if (btnFat) btnFat.style.display = fatVis ? 'inline-flex' : 'none';
 
   // --- Mercado ---
   var mercVis = isAdm ? true : (p['notafiscal'] === true);
   var btnMerc = document.getElementById('tabMercadoBtn');
-  if (btnMerc) btnMerc.style.display = mercVis ? 'flex' : 'none';
+  if (btnMerc) btnMerc.style.display = mercVis ? 'inline-flex' : 'none';
 
   // --- Nota Fiscal ---
   var nfVis = isAdm ? true : (p['notafiscal'] === true);
   var btnNf = document.getElementById('tabNfUploadBtn');
-  if (btnNf) btnNf.style.display = nfVis ? 'flex' : 'none';
+  if (btnNf) btnNf.style.display = nfVis ? 'inline-flex' : 'none';
   if (!nfVis) {
     var nfPane = document.getElementById('tab-nf-upload');
     if (nfPane && nfPane.classList.contains('active')) switchTab('precificacao');
@@ -3960,7 +3960,7 @@ function aplicarPermissoes(perms) {
   // --- Estoque ---
   var estVis = isAdm ? true : (p['estoque'] === true);
   var btnEst = document.getElementById('tabEstoqueBtn');
-  if (btnEst) btnEst.style.display = estVis ? 'flex' : 'none';
+  if (btnEst) btnEst.style.display = estVis ? 'inline-flex' : 'none';
   if (!estVis) {
     var estPane = document.getElementById('tab-estoque');
     if (estPane && estPane.classList.contains('active')) switchTab('precificacao');
@@ -3969,7 +3969,7 @@ function aplicarPermissoes(perms) {
   // --- Entregas ---
   var entVis = isAdm ? true : (p['entregas'] === true);
   var btnEnt = document.getElementById('tabEntregasBtn');
-  if (btnEnt) btnEnt.style.display = entVis ? 'flex' : 'none';
+  if (btnEnt) btnEnt.style.display = entVis ? 'inline-flex' : 'none';
   if (!entVis) {
     var entPane = document.getElementById('tab-entregas');
     if (entPane && entPane.classList.contains('active')) switchTab('precificacao');
@@ -3978,7 +3978,7 @@ function aplicarPermissoes(perms) {
   // --- Reposição de Cargas ---
   var repVis = isAdm ? true : (p['reposicao'] === true);
   var btnRep = document.getElementById('tabReposicaoBtn');
-  if (btnRep) btnRep.style.display = repVis ? 'flex' : 'none';
+  if (btnRep) btnRep.style.display = repVis ? 'inline-flex' : 'none';
   if (!repVis) {
     var repPane = document.getElementById('tab-reposicao');
     if (repPane && repPane.classList.contains('active')) switchTab('precificacao');
@@ -3987,7 +3987,7 @@ function aplicarPermissoes(perms) {
   // --- Frete ---
   var freteVis = isAdm ? true : (p['frete'] === true);
   var btnFr = document.getElementById('tabFreteBtn');
-  if (btnFr) btnFr.style.display = freteVis ? 'flex' : 'none';
+  if (btnFr) btnFr.style.display = freteVis ? 'inline-flex' : 'none';
   if (!freteVis) {
     var frPane = document.getElementById('tab-frete');
     if (frPane && frPane.classList.contains('active')) switchTab('precificacao');
@@ -3996,7 +3996,7 @@ function aplicarPermissoes(perms) {
   // --- Laboratorio ---
   var labVis = isAdm ? true : (p['laboratorio'] === true);
   var btnLab = document.getElementById('tabLabBtn');
-  if (btnLab) btnLab.style.display = labVis ? 'flex' : 'none';
+  if (btnLab) btnLab.style.display = labVis ? 'inline-flex' : 'none';
   if (!labVis) {
     var labPane = document.getElementById('tab-laboratorio');
     if (labPane && labPane.classList.contains('active')) switchTab('precificacao');
@@ -4005,9 +4005,9 @@ function aplicarPermissoes(perms) {
   // --- Dashboard + Financeiro ---
   var finVis = isAdm ? true : (p['financeiro'] === true);
   var btnFin = document.getElementById('tabFinanceiroBtn');
-  if (btnFin) btnFin.style.display = finVis ? 'flex' : 'none';
+  if (btnFin) btnFin.style.display = finVis ? 'inline-flex' : 'none';
   var btnDash = document.getElementById('tabDashBtn');
-  if (btnDash) btnDash.style.display = finVis ? 'flex' : 'none';
+  if (btnDash) btnDash.style.display = finVis ? 'inline-flex' : 'none';
   if (!finVis) {
     var finPane = document.getElementById('tab-financeiro');
     if (finPane && finPane.classList.contains('active')) switchTab('perfil');
@@ -4029,11 +4029,11 @@ function aplicarPermissoes(perms) {
   var grpComBtn = document.getElementById('grpComercial');
   if (grpComBtn) grpComBtn.style.display = '';
   var tabComBtn = document.getElementById('tabComercialBtn');
-  if (tabComBtn) tabComBtn.style.display = 'flex';
+  if (tabComBtn) tabComBtn.style.display = 'inline-flex';
   var grpRhBtn = document.getElementById('grpRh');
   if (grpRhBtn) grpRhBtn.style.display = (isAdm || p.rh) ? '' : 'none';
   var tabRhBtn = document.getElementById('tabRhBtn');
-  if (tabRhBtn) tabRhBtn.style.display = (isAdm || p.rh) ? 'flex' : 'none';
+  if (tabRhBtn) tabRhBtn.style.display = (isAdm || p.rh) ? 'inline-flex' : 'none';
   if (!isAdm) {
     var _grupoAtualBtn = document.getElementById('grp' + _grupoAtivo.charAt(0).toUpperCase() + _grupoAtivo.slice(1));
     if (_grupoAtualBtn && _grupoAtualBtn.style.display === 'none') {
