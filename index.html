@@ -5642,6 +5642,114 @@ function renderDashboard() {
 // ═══════════════════════════════════════════════════
 // FEATURE 5: CALCULADORA DE FRETE NO PEDIDO
 // ═══════════════════════════════════════════════════
+
+// ════════════════════════════════════════════════════════
+// DASHBOARD — Força de Vendas
+// ════════════════════════════════════════════════════════
+
+var _dashFVPeriodo = 'mes';
+
+function dashFVPeriodo(periodo) {
+  _dashFVPeriodo = periodo;
+  var btnMes    = document.getElementById('fvPillMes');
+  var btnSemana = document.getElementById('fvPillSemana');
+  var labelP    = document.getElementById('fvPeriodoLabel');
+  var labelR    = document.getElementById('fvRankingLabel');
+  var ativo   = 'font-size:10px;font-weight:700;padding:3px 9px;border-radius:6px;cursor:pointer;border:1px solid var(--green);background:var(--green-lt);color:var(--green);';
+  var inativo = 'font-size:10px;font-weight:700;padding:3px 9px;border-radius:6px;cursor:pointer;border:1px solid var(--border);background:var(--bg);color:var(--text-3);';
+  if (btnMes)    btnMes.style.cssText    = periodo==='mes'    ? ativo : inativo;
+  if (btnSemana) btnSemana.style.cssText = periodo==='semana' ? ativo : inativo;
+  if (labelP) labelP.textContent = periodo === 'mes' ? 'Vendido no mês' : 'Vendido na semana';
+  if (labelR) labelR.textContent = 'Top Vendedoras — ' + (periodo === 'mes' ? 'Mês' : 'Semana');
+  renderDashFV();
+}
+
+function renderDashFV() {
+  var card = document.getElementById('dashFVCard');
+  if (!card) return;
+
+  var pedidos = getPedidosVenda();
+  var isAdm = sessaoAtual && (sessaoAtual.tipo === 'adm' || sessaoAtual.tipo === 'financeiro');
+  if (!isAdm && sessaoAtual) {
+    pedidos = pedidos.filter(function(p){ return p.loginVend === sessaoAtual.login; });
+  }
+  var ativos = pedidos.filter(function(p){ return p.status !== 'cancelado'; });
+
+  var agora = new Date();
+  var hoje  = agora.toISOString().substring(0,10);
+  var inicioMes = new Date(agora.getFullYear(), agora.getMonth(), 1).toISOString().substring(0,10);
+  var dow = agora.getDay();
+  var diasParaSeg = (dow === 0) ? 6 : dow - 1;
+  var inicioSemana = new Date(agora.getTime() - diasParaSeg * 86400000).toISOString().substring(0,10);
+  var inicioPeriodo = _dashFVPeriodo === 'mes' ? inicioMes : inicioSemana;
+
+  var pedidosHoje = ativos.filter(function(p){ return p.dataCriacao && p.dataCriacao.substring(0,10) === hoje; });
+  var totalHoje   = pedidosHoje.reduce(function(s,p){ return s+(p.total||0); }, 0);
+
+  var pedidosPeriodo = ativos.filter(function(p){ return p.dataCriacao && p.dataCriacao.substring(0,10) >= inicioPeriodo; });
+  var totalPeriodo   = pedidosPeriodo.reduce(function(s,p){ return s+(p.total||0); }, 0);
+  var ticketMedio    = pedidosPeriodo.length > 0 ? totalPeriodo / pedidosPeriodo.length : 0;
+  var aprovados      = pedidos.filter(function(p){ return p.status === 'aprovado'; });
+
+  var fmt = function(v){ return 'R$ ' + v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}); };
+  var el  = function(id){ return document.getElementById(id); };
+
+  if (el('fvHojeVal'))    el('fvHojeVal').textContent    = fmt(totalHoje);
+  if (el('fvHojeSub'))    el('fvHojeSub').textContent    = pedidosHoje.length + (pedidosHoje.length===1?' pedido':' pedidos');
+  if (el('fvPeriodoVal')) el('fvPeriodoVal').textContent = fmt(totalPeriodo);
+  if (el('fvPeriodoSub')) el('fvPeriodoSub').textContent = pedidosPeriodo.length + (pedidosPeriodo.length===1?' pedido':' pedidos');
+  if (el('fvTicketVal'))  el('fvTicketVal').textContent  = fmt(ticketMedio);
+  if (el('fvTicketSub'))  el('fvTicketSub').textContent  = pedidosPeriodo.length + ' no período';
+  if (el('fvAprovVal'))   el('fvAprovVal').textContent   = aprovados.length;
+
+  // Ranking
+  var rankDiv = el('fvRanking');
+  if (!rankDiv) return;
+
+  if (pedidosPeriodo.length === 0) {
+    rankDiv.innerHTML = '<div style="color:var(--text-4);font-size:12px;text-align:center;padding:8px 0;">Nenhum pedido no período.</div>';
+    card.style.display = 'block';
+    return;
+  }
+
+  var por_vend = {};
+  pedidosPeriodo.forEach(function(p) {
+    var nome = p.vendedora || 'Sem nome';
+    if (!por_vend[nome]) por_vend[nome] = { nome:nome, total:0, qtd:0 };
+    por_vend[nome].total += (p.total||0);
+    por_vend[nome].qtd   += 1;
+  });
+
+  var ranking = Object.values(por_vend).sort(function(a,b){ return b.total-a.total; });
+  var melhor  = ranking[0].total || 1;
+  var medalhas = ['1°','2°','3°'];
+  var cores    = ['#059669','#2563EB','#7c3aed'];
+
+  rankDiv.innerHTML = ranking.map(function(v,i) {
+    var pct     = Math.round((v.total/melhor)*100);
+    var medalha = i < 3 ? medalhas[i] : (i+1)+'°';
+    var cor     = i < 3 ? cores[i] : '#64748b';
+    var barCor  = i===0 ? '#059669' : i===1 ? '#2563EB' : '#7c3aed';
+    return '<div style="display:flex;flex-direction:column;gap:4px;">' +
+      '<div style="display:flex;align-items:center;justify-content:space-between;">' +
+        '<div style="display:flex;align-items:center;gap:8px;">' +
+          '<span style="font-size:11px;font-weight:800;min-width:24px;text-align:center;color:'+cor+'">'+medalha+'</span>'+
+          '<span style="font-size:13px;font-weight:600;color:var(--text)">'+v.nome+'</span>'+
+        '</div>'+
+        '<div style="text-align:right;">'+
+          '<div style="font-size:12px;font-weight:800;color:'+cor+'">R$ '+v.total.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})+'</div>'+
+          '<div style="font-size:10px;color:var(--text-3)">'+v.qtd+(v.qtd===1?' pedido':' pedidos')+'</div>'+
+        '</div>'+
+      '</div>'+
+      '<div style="height:4px;background:var(--border);border-radius:2px;overflow:hidden;">'+
+        '<div style="height:100%;width:'+pct+'%;background:'+barCor+';border-radius:2px;transition:width .6s cubic-bezier(.16,1,.3,1)"></div>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+
+  card.style.display = 'block';
+}
+
 function calcularFreteEntrega() {
   var peso = parseFloat((document.getElementById('entPeso')||{}).value) || 0;
   var dist = parseFloat((document.getElementById('entDistancia')||{}).value) || 0;
@@ -10559,6 +10667,7 @@ function canhotoVerFoto(entId) {
     '<div style="color:rgba(255,255,255,0.4);font-size:11px;margin-top:12px;">Toque para fechar</div>';
   document.body.appendChild(modal);
 }
+  renderDashFV();
 </script>
 
 </div>
