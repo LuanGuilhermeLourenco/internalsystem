@@ -2375,6 +2375,100 @@ td .mod-btn, td button {
   from { opacity:0; transform:translateY(-4px); }
   to   { opacity:1; transform:translateY(0); }
 }
+
+/* ── 1. Cards escalonados na entrada de aba ── */
+@keyframes cardSlideIn {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.tab-pane.active .card {
+  animation: cardSlideIn .28s cubic-bezier(.16,1,.3,1) both;
+}
+.tab-pane.active .card:nth-child(1)  { animation-delay: .03s; }
+.tab-pane.active .card:nth-child(2)  { animation-delay: .07s; }
+.tab-pane.active .card:nth-child(3)  { animation-delay: .11s; }
+.tab-pane.active .card:nth-child(4)  { animation-delay: .15s; }
+.tab-pane.active .card:nth-child(5)  { animation-delay: .19s; }
+.tab-pane.active .card:nth-child(n+6){ animation-delay: .22s; }
+
+/* ── 2. inp:focus — transição suave ── */
+.inp {
+  transition: border-color .18s ease, box-shadow .18s ease, background .18s ease;
+}
+.inp:focus {
+  outline: none;
+  border-color: var(--blue) !important;
+  box-shadow: 0 0 0 3px rgba(37,99,235,0.12) !important;
+  background: #fff !important;
+}
+[data-tema="dark"] .inp:focus {
+  box-shadow: 0 0 0 3px rgba(37,99,235,0.2) !important;
+}
+
+/* ── 3. mod-btn hover — resposta tátil ── */
+.mod-btn {
+  transition: transform .14s cubic-bezier(.34,1.56,.64,1),
+              box-shadow .14s ease,
+              background .14s ease,
+              color .14s ease;
+  will-change: transform;
+}
+.mod-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+}
+.mod-btn:active {
+  transform: translateY(0) scale(0.97);
+  box-shadow: none;
+  transition-duration: .08s;
+}
+.mod-btn.primary:hover {
+  box-shadow: 0 4px 16px rgba(13,59,46,0.25);
+}
+.mod-btn.danger:hover {
+  box-shadow: 0 4px 12px rgba(220,38,38,0.2);
+}
+
+/* ── 4. Linhas de tabela — fadeIn escalonado ── */
+@keyframes rowFadeIn {
+  from { opacity: 0; transform: translateX(-6px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+.mod-table-wrap tbody tr,
+#pvListaTbody tr,
+#fatFilaTbody tr,
+#fatListaTbody tr,
+#pontoTbody tr,
+#estoqueBody tr,
+#entregasBody tr {
+  animation: rowFadeIn .18s ease both;
+}
+.mod-table-wrap tbody tr:nth-child(1),  #pvListaTbody tr:nth-child(1),
+#fatFilaTbody tr:nth-child(1),  #fatListaTbody tr:nth-child(1),
+#pontoTbody tr:nth-child(1),  #estoqueBody tr:nth-child(1) { animation-delay: .02s; }
+.mod-table-wrap tbody tr:nth-child(2),  #pvListaTbody tr:nth-child(2),
+#fatFilaTbody tr:nth-child(2),  #fatListaTbody tr:nth-child(2),
+#pontoTbody tr:nth-child(2),  #estoqueBody tr:nth-child(2) { animation-delay: .05s; }
+.mod-table-wrap tbody tr:nth-child(3),  #pvListaTbody tr:nth-child(3),
+#fatFilaTbody tr:nth-child(3),  #fatListaTbody tr:nth-child(3),
+#pontoTbody tr:nth-child(3),  #estoqueBody tr:nth-child(3) { animation-delay: .08s; }
+.mod-table-wrap tbody tr:nth-child(4),  #pvListaTbody tr:nth-child(4),
+#fatFilaTbody tr:nth-child(4),  #fatListaTbody tr:nth-child(4),
+#pontoTbody tr:nth-child(4),  #estoqueBody tr:nth-child(4) { animation-delay: .11s; }
+.mod-table-wrap tbody tr:nth-child(n+5) { animation-delay: .13s; }
+
+/* ── 5. Toast — animação de entrada ── */
+@keyframes toastIn {
+  from { opacity: 0; transform: translateX(-50%) translateY(20px) scale(0.95); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0)    scale(1);    }
+}
+@keyframes toastOut {
+  from { opacity: 1; transform: translateX(-50%) translateY(0)    scale(1);    }
+  to   { opacity: 0; transform: translateX(-50%) translateY(8px)  scale(0.97); }
+}
+#_toastGlobal {
+  animation: toastIn .22s cubic-bezier(.16,1,.3,1) both;
+}
 </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
@@ -3474,16 +3568,15 @@ function _toast(msg, tipo) {
     'pointer-events:none;white-space:pre-line;';
 
   clearTimeout(_toastTimer);
-  // Animar entrada
+  // Resetar e re-animar
+  el.style.animation = 'none';
   requestAnimationFrame(function() {
-    el.style.opacity = '1';
-    el.style.transform = 'translateX(-50%) translateY(0)';
+    el.style.animation = 'toastIn .22s cubic-bezier(.16,1,.3,1) both';
   });
   // Auto-fechar — mais tempo para textos longos
   var duration = msg.length > 60 ? 4000 : 2800;
   _toastTimer = setTimeout(function() {
-    el.style.opacity = '0';
-    el.style.transform = 'translateX(-50%) translateY(8px)';
+    el.style.animation = 'toastOut .2s ease forwards';
   }, duration);
 }
 
