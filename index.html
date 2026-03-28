@@ -9313,7 +9313,7 @@ function pvSalvarPedido() {
 
   if (!itens.length) { alert('Nenhum item válido.'); return; }
 
-  var sess = _getSessao();
+  var sess = sessaoAtual;
   var pedido = {
     id:        _pvId(),
     num:       0,
@@ -9358,7 +9358,7 @@ function pvLimparForm() {
 function pvRenderLista(filtro) {
   var tbody = document.getElementById('pvListaTbody');
   if (!tbody) return;
-  var sess = _getSessao();
+  var sess = sessaoAtual;
   var isAdm = sess && (sess.tipo === 'adm' || sess.tipo === 'financeiro');
   var lista = getPedidosVenda();
 
@@ -9419,7 +9419,7 @@ function pvMudarStatus(id, novoStatus) {
   var lista = getPedidosVenda();
   var idx   = lista.findIndex(function(p){ return p.id === id; });
   if (idx === -1) return;
-  var sess  = _getSessao();
+  var sess  = sessaoAtual;
   var old   = lista[idx].status;
   lista[idx].status = novoStatus;
   lista[idx].dataStatus = new Date().toISOString();
@@ -9528,7 +9528,7 @@ function fatConfirmar() {
   if (!venc)  { alert('Informe a data de vencimento.'); return; }
   if (!valor) { alert('Informe o valor a cobrar.'); return; }
 
-  var sess = _getSessao();
+  var sess = sessaoAtual;
   var fats = getFaturamentos();
   var maxNum = fats.reduce(function(m,f){ return f.num > m ? f.num : m; }, 0);
 
