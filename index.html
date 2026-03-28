@@ -6544,6 +6544,10 @@ function marcarLido(canal) {
 
 // ── Toggle ────────────────────────────────────────────────────
 function toggleChat() {
+  // Fechar Agente se estiver aberto
+  if (!_chatAberto && typeof _agentAberto !== 'undefined' && _agentAberto) {
+    toggleAgente();
+  }
   _chatAberto = !_chatAberto;
   var panel = document.getElementById('chatPanel');
   if (!panel) return;
@@ -11997,6 +12001,10 @@ function _agentMostrarBtn(mostrar) {
 }
 
 function toggleAgente() {
+  // Fechar Chat se estiver aberto
+  if (!_agentAberto && typeof _chatAberto !== 'undefined' && _chatAberto) {
+    toggleChat();
+  }
   _agentAberto = !_agentAberto;
   var panel = document.getElementById('agentPanel');
   if (_agentAberto) {
