@@ -15172,6 +15172,85 @@ window.addEventListener('load',()=>{
     </div>
   </div>
 </div>
+
+<!-- ══ MODAL: Credenciais ADM ══ -->
+<div id="modalCredAdm" style="display:none;position:fixed;inset:0;z-index:9998;
+  background:rgba(0,0,0,0.55);backdrop-filter:blur(4px);
+  align-items:center;justify-content:center;padding:16px;">
+  <div style="background:var(--card,#fff);border-radius:16px;max-width:400px;width:100%;
+    box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+    <div style="background:linear-gradient(135deg,#0D3B2E,#155C44);padding:16px 20px;
+      border-radius:16px 16px 0 0;display:flex;justify-content:space-between;align-items:center;">
+      <div style="font-size:16px;font-weight:800;color:#fff;">Alterar Credenciais ADM</div>
+      <button onclick="fecharModalCredAdm()"
+        style="background:rgba(255,255,255,0.15);border:none;color:#fff;
+          border-radius:8px;padding:6px 12px;cursor:pointer;font-size:18px;">✕</button>
+    </div>
+    <div style="padding:18px 20px;">
+      <div id="credAdmErr" style="display:none;background:rgba(220,38,38,0.08);
+        border:1px solid rgba(220,38,38,0.3);border-radius:10px;padding:10px 14px;
+        font-size:12px;color:#dc2626;margin-bottom:14px;"></div>
+      <div class="field" style="margin-bottom:12px;">
+        <label class="mod-label" for="newAdmLogin">Novo Login ADM</label>
+        <input type="text" id="newAdmLogin" class="inp" maxlength="30" placeholder="Ex: ADMdelivet">
+      </div>
+      <div class="field" style="margin-bottom:12px;">
+        <label class="mod-label" for="newAdmSenha">Nova Senha</label>
+        <input type="password" id="newAdmSenha" class="inp" maxlength="50" placeholder="Mínimo 8 caracteres">
+      </div>
+      <div class="field" style="margin-bottom:16px;">
+        <label class="mod-label" for="newAdmSenha2">Confirmar Senha</label>
+        <input type="password" id="newAdmSenha2" class="inp" maxlength="50" placeholder="Repita a senha">
+      </div>
+      <button onclick="salvarCredAdm()" class="mod-btn primary"
+        style="width:100%;padding:13px;font-size:13px;font-weight:800;">
+        Salvar Credenciais
+      </button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══ MODAL: Editar Usuário ══ -->
+<div id="modalEditUser" style="display:none;position:fixed;inset:0;z-index:9998;
+  background:rgba(0,0,0,0.55);backdrop-filter:blur(4px);
+  align-items:center;justify-content:center;padding:16px;">
+  <div style="background:var(--card,#fff);border-radius:16px;max-width:420px;width:100%;
+    box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+    <div style="background:linear-gradient(135deg,#0D3B2E,#155C44);padding:16px 20px;
+      border-radius:16px 16px 0 0;display:flex;justify-content:space-between;align-items:center;">
+      <div style="font-size:16px;font-weight:800;color:#fff;">Editar Usuário</div>
+      <button onclick="fecharModalEditUser()"
+        style="background:rgba(255,255,255,0.15);border:none;color:#fff;
+          border-radius:8px;padding:6px 12px;cursor:pointer;font-size:18px;">✕</button>
+    </div>
+    <div style="padding:18px 20px;">
+      <input type="hidden" id="editUserLogin">
+      <div id="editUserErr" style="display:none;background:rgba(220,38,38,0.08);
+        border:1px solid rgba(220,38,38,0.3);border-radius:10px;padding:10px 14px;
+        font-size:12px;color:#dc2626;margin-bottom:14px;"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+        <div>
+          <label class="mod-label" for="editUserNome">Nome completo <span style="color:var(--red);font-size:11px;">*</span></label>
+          <input type="text" id="editUserNome" class="inp" maxlength="60" placeholder="Ex: Ana Silva">
+        </div>
+        <div>
+          <label class="mod-label" for="editUserEmail">E-mail <span style="color:var(--red);font-size:11px;">*</span></label>
+          <input type="email" id="editUserEmail" class="inp" maxlength="80" placeholder="ana@empresa.com">
+        </div>
+      </div>
+      <div class="field" style="margin-bottom:16px;">
+        <label class="mod-label" for="editUserSenha">Nova Senha (deixe vazio para manter)</label>
+        <input type="password" id="editUserSenha" class="inp" maxlength="50" placeholder="Mínimo 6 caracteres">
+      </div>
+      <button onclick="salvarEditUser()" class="mod-btn primary"
+        style="width:100%;padding:13px;font-size:13px;font-weight:800;">
+        Salvar Alterações
+      </button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
 ">
