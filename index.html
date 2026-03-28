@@ -3831,10 +3831,10 @@ function entrarNoSistema() {
   document.getElementById('headerNome').textContent = sessaoAtual.nome;
 
   // Abas sempre visíveis
-  document.getElementById('tabPerfilBtn').style.display = 'flex';
-  var navWrapper = document.getElementById('navWrapper'); if (navWrapper) navWrapper.style.display = 'flex';
-  var buscaWrap = document.getElementById('navBusca'); if (buscaWrap) buscaWrap.style.display = 'flex';
-  var avisosBtn = document.getElementById('tabAvisosBtn'); if (avisosBtn) avisosBtn.style.display = 'flex';
+  document.getElementById('tabPerfilBtn').style.display = 'inline-flex';
+  var navWrapper = document.getElementById('navWrapper'); if (navWrapper) navWrapper.style.display = 'inline-flex';
+  var buscaWrap = document.getElementById('navBusca'); if (buscaWrap) buscaWrap.style.display = 'inline-flex';
+  var avisosBtn = document.getElementById('tabAvisosBtn'); if (avisosBtn) avisosBtn.style.display = 'inline-flex';
   _agentMostrarBtn(true);
   _chatMostrarBtn(true);
   setTimeout(contarNaoLidos, 500);
@@ -3843,9 +3843,9 @@ function entrarNoSistema() {
   document.getElementById('headerNome').style.display = '';
 
   if (sessaoAtual.tipo === 'adm') {
-    document.getElementById('tabAdmBtn').style.display = 'flex';
-    document.getElementById('tabComercialBtn').style.display = 'flex';
-    document.getElementById('tabRhBtn').style.display = 'flex';
+    document.getElementById('tabAdmBtn').style.display = 'inline-flex';
+    document.getElementById('tabComercialBtn').style.display = 'inline-flex';
+    document.getElementById('tabRhBtn').style.display = 'inline-flex';
     renderAdmLista();
     aplicarPermissoes(null);
     var bRelat = document.getElementById('btnRelatorioGeral'); if (bRelat) bRelat.style.display = '';
@@ -3856,7 +3856,7 @@ function entrarNoSistema() {
     const u = usuarios.find(u => u.login === sessaoAtual.login);
     aplicarPermissoes(u ? (u.permissoes || {}) : {});
     var bRelatU = document.getElementById('btnRelatorioGeral'); if (bRelatU) bRelatU.style.display = 'none';
-    var bFinU = document.getElementById('tabFinanceiroBtn'); if (bFinU) bFinU.style.display = 'flex';
+    var bFinU = document.getElementById('tabFinanceiroBtn'); if (bFinU) bFinU.style.display = 'inline-flex';
     var bCredU  = document.getElementById('btnCredAdmPerfil');  if (bCredU)  bCredU.style.display  = 'none';
   }
 
@@ -3892,7 +3892,7 @@ function entrarNoSistema() {
   setTimeout(atualizarFirebaseStatusBadge, 300);
   // Busca global
   var bg = document.getElementById('buscaGlobalWrap');
-  if (bg) bg.style.display = 'flex';
+  if (bg) bg.style.display = 'inline-flex';
   // Timeout — carregar valor salvo
   var tsMin = getTimeoutMin();
   var tsEl = document.getElementById('timeoutSelect');
