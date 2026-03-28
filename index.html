@@ -140,11 +140,13 @@ color: rgba(255,255,255,0.6); white-space: nowrap; letter-spacing: 0.1px; }
 .sair-label { display: inline; }
 .step-label { display: flex; align-items: center; gap: 10px;
 margin-bottom: 14px; margin-top: 28px; }
-.step-num { width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0;
-background: var(--blue); color: #fff;
-font-family: 'Inter', sans-serif; font-weight: 700; font-size: 12px;
-display: flex; align-items: center; justify-content: center;
-box-shadow: 0 2px 8px rgba(37,99,235,0.30); }
+.step-num {
+  width: 32px; height: 32px; border-radius: 8px; flex-shrink: 0;
+  background: #0D3B2E; color: #fff;
+  font-family: 'Inter', sans-serif; font-weight: 700; font-size: 11px;
+  display: flex; align-items: center; justify-content: center;
+  letter-spacing: 0.3px;
+}
 .step-title { font-family: 'Inter', sans-serif; font-weight: 700; font-size: 15px;
 color: var(--text); letter-spacing: -0.2px; }
 .step-sub { font-size: 12px; color: var(--text-3); font-weight: 400; margin-left: 4px; }
@@ -500,7 +502,11 @@ transition: border-color .2s, box-shadow .2s; }
 .metrica-card.verde { border-color: rgba(5,150,105,0.25);  background: #F0FBF6; }
 .metrica-card.vermelho { border-color: rgba(220,38,38,0.2);   background: #FFF4F4; }
 .metrica-card.laranja { border-color: rgba(217,119,6,0.25);  background: #FFFBF0; }
-.metrica-icon { font-size: 20px; margin-bottom: 8px; }
+..metrica-icon {
+  font-size: 10px; font-weight: 800; letter-spacing: 0.5px;
+  color: var(--text-4); text-transform: uppercase;
+  margin-bottom: 4px; line-height: 1;
+}
 .metrica-label { font-family: 'Inter', sans-serif; font-weight: 500; font-size: 11px;
 color: var(--text-3); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
 .metrica-val { font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 26px;
@@ -1056,7 +1062,11 @@ background: rgba(255,255,255,0.10); }
 .dash-orange { background: linear-gradient(135deg, #D97706, #B45309); color: #fff; }
 .dash-green { background: linear-gradient(135deg, #059669, #047857); color: #fff; }
 .dash-purple { background: linear-gradient(135deg, #7C3AED, #6D28D9); color: #fff; }
-.dash-icon { font-size: 24px; margin-bottom: 8px; }
+..dash-icon {
+  font-size: 10px; font-weight: 800; letter-spacing: 0.5px;
+  color: var(--text-4); text-transform: uppercase;
+  margin-bottom: 4px; line-height: 1;
+}
 .dash-val { font-family: 'JetBrains Mono', monospace; font-size: 22px; font-weight: 700; line-height: 1.1; }
 .dash-lbl { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; opacity: 0.85; }
 .dash-sub { font-size: 11px; opacity: 0.65; margin-top: 2px; }
@@ -1379,7 +1389,16 @@ transition: background .15s; }
 .nav-grupo:hover { color:#fff; background:rgba(255,255,255,0.12); }
 .nav-grupo.ativo { color:#fff; background:rgba(255,255,255,0.2);
   box-shadow:inset 0 0 0 1px rgba(255,255,255,0.25); }
-.nav-grupo-icon { font-size:13px; }
+..nav-grupo-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  opacity: 0.75;
+  flex-shrink: 0;
+}
+.nav-grupo.ativo .nav-grupo-icon { opacity: 1; }
 
 /* Busca no mesmo nivel dos grupos */
 #navBusca { margin-left:auto; display:flex; align-items:center;
@@ -1411,7 +1430,18 @@ transition: background .15s; }
 .nav-sub.ativo::before { opacity:1; }
 
 /* Remove icone emoji dos subitens */
-.nav-sub-icon { display:none; }
+.nav-sub-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  opacity: 0.6;
+  flex-shrink: 0;
+  transition: opacity .15s;
+}
+.nav-sub.active .nav-sub-icon,
+.nav-sub:hover .nav-sub-icon { opacity: 1; }
 
 .nav-sub-badge { position:absolute; top:6px; right:4px;
   background:var(--red); color:#fff; font-size:8px;
@@ -2550,19 +2580,19 @@ transition: background .15s; }
   <!-- LINHA 1: Grupos -->
   <div id="navGrupos">
     <button class="nav-grupo ativo" id="grpFinanceiro" onclick="ativarGrupo('financeiro')">
-      <span class="nav-grupo-icon">$</span> Financeiro
+      <span class="nav-grupo-icon"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 16 16"><rect x="1" y="4" width="14" height="9" rx="1.5"/><path d="M1 7h14M5 7v6M11 7v6"/></svg></span> Financeiro
     </button>
     <button class="nav-grupo" id="grpOperacoes" onclick="ativarGrupo('operacoes')">
-      <span class="nav-grupo-icon">↑↓</span> Operações
+      <span class="nav-grupo-icon"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 16 16"><rect x="1" y="4" width="9" height="8" rx="1"/><path d="M10 6h2l2 3v3h-4V6z"/><circle cx="4" cy="13" r="1.5"/><circle cx="12" cy="13" r="1.5"/></svg></span> Operações
     </button>
     <button class="nav-grupo" id="grpMedicamentos" onclick="ativarGrupo('medicamentos')">
       <span class="nav-grupo-icon"></span> Medicamentos
     </button>
     <button class="nav-grupo" id="grpComercial" onclick="ativarGrupo('comercial')">
-      <span class="nav-grupo-icon">↗</span> Comercial
+      <span class="nav-grupo-icon"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 16 16"><path d="M2 12l4-5 3 3 5-7"/></svg></span> Comercial
     </button>
     <button class="nav-grupo" id="grpRh" onclick="ativarGrupo('rh')">
-      <span class="nav-grupo-icon">RH</span> RH
+      <span class="nav-grupo-icon"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 16 16"><circle cx="6" cy="5" r="3"/><path d="M1 14a5 5 0 0110 0"/><circle cx="13" cy="5" r="2"/><path d="M13 10a4 4 0 013 3.8"/></svg></span> RH
     </button>
     <button class="nav-grupo" id="grpConfig" onclick="ativarGrupo('config')">
       <span class="nav-grupo-icon">⚙️</span> Configurações
@@ -2864,7 +2894,7 @@ transition: background .15s; }
         <div class="dash-sub" id="finReceitaSub" style="color:rgba(255,255,255,0.65);"></div>
       </div>
       <div class="dash-card" style="background:linear-gradient(135deg,#7f1d1d,#dc2626);cursor:default;">
-        <div class="dash-icon" style="font-size:12px;font-weight:800;color:var(--red);">−$</div>
+        <div class="dash-icon">DESP</div>
         <div class="dash-val" id="finTotalDespesa" style="color:#fff;">R$ 0</div>
         <div class="dash-lbl" style="color:rgba(255,255,255,0.8);">Total Despesas</div>
         <div class="dash-sub" id="finDespesaSub" style="color:rgba(255,255,255,0.65);"></div>
@@ -3165,7 +3195,7 @@ transition: background .15s; }
       </div>
 
       <div class="price-card" id="pcBoleto" style="background:var(--green-lt); border-color:var(--green);">
-        <div class="pc-icon" style="font-size:10px;font-weight:700;">BOL</div>
+        <div class="pc-icon" style="font-size:10px;font-weight:700;color:var(--text-3);">BOL</div>
         <div class="pc-method">Boleto</div>
         <div class="pc-price" id="val-boleto">—</div>
         <div class="pc-sub" id="sub-boleto">—</div>
@@ -15465,7 +15495,7 @@ window.addEventListener('load',()=>{
     </div>
     <div class="metricas-grid">
       <div class="metrica-card destaque">
-        <div class="metrica-icon" style="font-size:11px;font-weight:700;color:var(--text-3);">Vol</div>
+        <div class="metrica-icon">VOL</div>
         <div class="metrica-label">Volume de Pedidos</div>
         <div class="metrica-val azul" id="mVol">0</div>
         <div class="metrica-sub" id="mVolSub">no período</div>
@@ -15493,7 +15523,7 @@ window.addEventListener('load',()=>{
       </div>
       
       <div class="metrica-card" style="grid-column:1/-1;">
-        <div class="metrica-icon" style="font-size:11px;font-weight:700;color:var(--text-3);">R$</div>
+        <div class="metrica-icon">R$</div>
         <div class="metrica-val" id="mFaturado" style="color:var(--green);">R$ 0,00</div>
         <div class="metrica-lbl">Faturado (entregas entregues)</div>
         <div class="metrica-sub" id="mFaturadoSub">no período selecionado</div>
