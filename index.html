@@ -11339,7 +11339,8 @@ function estExportarExcel() {
     {key:'alerta',label:'Alerta'},
   ], 'Estoque_' + new Date().toISOString().substring(0,10));
 }
-</script>anhotoVerFoto(entId) {
+
+function canhotoVerFoto(entId) {
   var entregas = getEntregas();
   var e = entregas.find(function(x){ return x.id === entId; });
   if (!e || !e.canhoto) { _toast('Nenhum canhoto registrado.', 'info'); return; }
