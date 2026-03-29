@@ -3760,6 +3760,49 @@ var ADM_EXTRA = []; // Apenas ADMeuguilouren tem acesso ADM
 var _toastTimer = null;
 
 // ── P4: Validação inline ─────────────────────────────────
+// ════════════════════════════════════════════════════════
+// COUNTER ANIMADO — métricas do dashboard
+// ════════════════════════════════════════════════════════
+function _countUp(el, targetStr, duration) {
+  if (!el) return;
+  // Extrair número do string (ex: "R$ 1.234,50" → 1234.50)
+  var isCurrency = targetStr.includes('R$');
+  var numStr = targetStr.replace(/[R$\s.]/g, '').replace(',', '.');
+  var target = parseFloat(numStr);
+  if (isNaN(target) || target === 0) { el.textContent = targetStr; return; }
+
+  var start    = 0;
+  var startTs  = null;
+  var dur      = duration || 600;
+
+  function step(ts) {
+    if (!startTs) startTs = ts;
+    var progress = Math.min((ts - startTs) / dur, 1);
+    // ease-out cubic
+    var eased = 1 - Math.pow(1 - progress, 3);
+    var current = start + (target - start) * eased;
+
+    if (isCurrency) {
+      el.textContent = 'R$ ' + current.toLocaleString('pt-BR', {
+        minimumFractionDigits: 2, maximumFractionDigits: 2
+      });
+    } else {
+      el.textContent = Math.round(current).toLocaleString('pt-BR');
+    }
+
+    if (progress < 1) requestAnimationFrame(step);
+    else el.textContent = targetStr; // garantir valor exato no final
+  }
+  requestAnimationFrame(step);
+}
+
+// Versão para setar textContent com animação
+function _setMetrica(id, value) {
+  var el = document.getElementById(id);
+  if (!el) return;
+  _countUp(el, value, 650);
+}
+
 function _validarCampo(id, regra, msgErro) {
   var el = document.getElementById(id);
   if (!el) return true;
@@ -5824,7 +5867,7 @@ function renderDashboard() {
   var valorEstoque = prods.reduce(function(s,p){ return s+(parseFloat(p.quantidade)||0)*(parseFloat(p.custo)||0); }, 0);
   var alertas = prods.filter(function(p){ return (parseInt(p.minimo)||0) > 0 && (parseInt(p.quantidade)||0) < (parseInt(p.minimo)||0); });
   var el = document.getElementById('dashEstoqueVal');
-  if (el) el.textContent = 'R$ ' + valorEstoque.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2});
+  if (el) _countUp(el, 'R$ ' + valorEstoque.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2}), 700);
   var sub = document.getElementById('dashEstoqueSub');
   if (sub) sub.textContent = prods.length + ' produto' + (prods.length!==1?'s':'');
   var av = document.getElementById('dashAlertaVal');
@@ -5936,13 +5979,13 @@ function renderRelFinanceiro() {
   var atrasados     = emAberto.filter(function(f){ return f.vencimento && f.vencimento<hoje; });
   var emAtraso      = atrasados.reduce(function(s,f){ return s+(f.valor||0); },0);
 
-  if (el('rfTotalVendido'))    el('rfTotalVendido').textContent    = fmt(totalVendido);
+  if (el('rfTotalVendido'))    _countUp(el('rfTotalVendido'), fmt(totalVendido), 700);
   if (el('rfTotalVendidoSub')) el('rfTotalVendidoSub').textContent = fats.length+(fats.length===1?' título':' títulos');
-  if (el('rfTotalRecebido'))   el('rfTotalRecebido').textContent   = fmt(totalRecebido);
+  if (el('rfTotalRecebido'))   _countUp(el('rfTotalRecebido'), fmt(totalRecebido), 700);
   if (el('rfTotalRecebidoSub'))el('rfTotalRecebidoSub').textContent= pagos.length+' pagos';
-  if (el('rfAReceber'))        el('rfAReceber').textContent        = fmt(aReceber);
+  if (el('rfAReceber'))        _countUp(el('rfAReceber'), fmt(aReceber), 700);
   if (el('rfAReceberSub'))     el('rfAReceberSub').textContent     = emAberto.length+' em aberto';
-  if (el('rfEmAtraso'))        el('rfEmAtraso').textContent        = fmt(emAtraso);
+  if (el('rfEmAtraso'))        _countUp(el('rfEmAtraso'), fmt(emAtraso), 700);
   if (el('rfEmAtrasoSub'))     el('rfEmAtrasoSub').textContent     = atrasados.length+(atrasados.length===1?' vencido':' vencidos');
   if (el('rfEmAtraso') && emAtraso>0) el('rfEmAtraso').style.animation='alertaPulse 2s ease infinite';
 }
@@ -5984,7 +6027,7 @@ function renderRelComercial() {
   var tresDias   = new Date(agora.getTime()-3*86400000).toISOString().substring(0,10);
   var emAtraso   = ativos.filter(function(p){ return p.status==='aprovado'&&p.dataStatus&&p.dataStatus.substring(0,10)<=tresDias; });
 
-  if (el('rcTotalPeriodo'))    el('rcTotalPeriodo').textContent    = fmt(totalPer);
+  if (el('rcTotalPeriodo'))    _countUp(el('rcTotalPeriodo'), fmt(totalPer), 700);
   if (el('rcTotalPeriodoSub')) el('rcTotalPeriodoSub').textContent = periodo.length+(periodo.length===1?' pedido':' pedidos');
   if (el('rcEmAtraso'))        el('rcEmAtraso').textContent        = emAtraso.length;
   if (el('rcEmAtrasoSub'))     el('rcEmAtrasoSub').textContent     = emAtraso.length===0 ? 'todos em dia' : emAtraso.length+(emAtraso.length===1?' aprovado sem faturar':' aprovados sem faturar');
@@ -6294,7 +6337,7 @@ function importarBackup() {
 
         // Validar versão
         var versaoBackup = parseFloat(backup.versao || '0');
-        var versaoAtual  = 2.0;
+        var versaoAtual  = 2.1;
         var avisos = [];
         if (versaoBackup < versaoAtual) {
           avisos.push('⚠️ Backup gerado em versão anterior (' + backup.versao + ').');
@@ -10053,6 +10096,11 @@ function pvSalvarPedido() {
   var cond    = (document.getElementById('pvCondicao') || {}).value || '';
   var obs     = (document.getElementById('pvObs') || {}).value || '';
   var venc    = (document.getElementById('pvVencimento') || {}).value || '';
+  var pvCEP  = ((document.getElementById('pvCEP')||{}).value||'').trim();
+  var pvEnd  = ((document.getElementById('pvLogradouro')||{}).value||'').trim();
+  var pvBairro = ((document.getElementById('pvBairro')||{}).value||'').trim();
+  var pvCidade = ((document.getElementById('pvCidade')||{}).value||'').trim();
+  var pvUF   = ((document.getElementById('pvUF')||{}).value||'').trim();
 
   if (!cliente.trim()) { _toast('Informe o nome do cliente.', 'erro'); return; }
 
@@ -10086,6 +10134,7 @@ function pvSalvarPedido() {
     total:     total,
     vendedora: sess ? sess.nome : '—',
     loginVend: sess ? sess.login : '—',
+    endereco: pvCEP ? { cep: pvCEP, logradouro: pvEnd, bairro: pvBairro, cidade: pvCidade, uf: pvUF } : null,
     status:    'aberto',
     dataCriacao: new Date().toISOString(),
     dataStatus:  new Date().toISOString(),
@@ -10129,6 +10178,23 @@ function pvRenderLista(filtro) {
   // Vendedora vê apenas os próprios
   if (!isAdm) {
     lista = lista.filter(function(p){ return p.loginVend === sess.login; });
+  } else {
+    // ADM pode filtrar por vendedora
+    var selVend = document.getElementById('pvFiltroVendedora');
+    var filtroVend = selVend ? selVend.value : '';
+    if (filtroVend) {
+      lista = lista.filter(function(p){ return p.vendedora === filtroVend; });
+    }
+    // Popular select com vendedoras únicas
+    if (selVend && selVend.options.length <= 1) {
+      var todas = getPedidosVenda();
+      var vendedoras = [...new Set(todas.map(function(p){ return p.vendedora; }).filter(Boolean))].sort();
+      vendedoras.forEach(function(v) {
+        var opt = document.createElement('option');
+        opt.value = v; opt.textContent = v;
+        selVend.appendChild(opt);
+      });
+    }
   }
   // Ordenar mais recente primeiro
   lista = lista.slice().reverse();
@@ -11044,6 +11110,234 @@ function canhotoVerFoto(entId) {
   document.body.appendChild(modal);
 }
   renderDashFV();
+
+// ════════════════════════════════════════════════════════
+// MÁSCARAS DE INPUT
+// ════════════════════════════════════════════════════════
+function _maskCNPJ(v) {
+  v = v.replace(/\D/g, '').substring(0, 14);
+  if (v.length <= 2)  return v;
+  if (v.length <= 5)  return v.slice(0,2)+'.'+v.slice(2);
+  if (v.length <= 8)  return v.slice(0,2)+'.'+v.slice(2,5)+'.'+v.slice(5);
+  if (v.length <= 12) return v.slice(0,2)+'.'+v.slice(2,5)+'.'+v.slice(5,8)+'/'+v.slice(8);
+  return v.slice(0,2)+'.'+v.slice(2,5)+'.'+v.slice(5,8)+'/'+v.slice(8,12)+'-'+v.slice(12);
+}
+function _maskCPF(v) {
+  v = v.replace(/\D/g, '').substring(0, 11);
+  if (v.length <= 3)  return v;
+  if (v.length <= 6)  return v.slice(0,3)+'.'+v.slice(3);
+  if (v.length <= 9)  return v.slice(0,3)+'.'+v.slice(3,6)+'.'+v.slice(6);
+  return v.slice(0,3)+'.'+v.slice(3,6)+'.'+v.slice(6,9)+'-'+v.slice(9);
+}
+function _maskCNPJouCPF(v) {
+  var d = v.replace(/\D/g, '');
+  return d.length <= 11 ? _maskCPF(d) : _maskCNPJ(d);
+}
+function _maskCEP(v) {
+  v = v.replace(/\D/g, '').substring(0, 8);
+  if (v.length <= 5) return v;
+  return v.slice(0,5)+'-'+v.slice(5);
+}
+function _maskTel(v) {
+  v = v.replace(/\D/g, '').substring(0, 11);
+  if (v.length <= 2)  return '('+v;
+  if (v.length <= 6)  return '('+v.slice(0,2)+') '+v.slice(2);
+  if (v.length <= 10) return '('+v.slice(0,2)+') '+v.slice(2,6)+'-'+v.slice(6);
+  return '('+v.slice(0,2)+') '+v.slice(2,7)+'-'+v.slice(7);
+}
+function _applyMask(el, maskFn) {
+  if (!el) return;
+  el.addEventListener('input', function() {
+    var pos = el.selectionStart;
+    var oldLen = el.value.length;
+    el.value = maskFn(el.value);
+    // Ajustar cursor
+    var diff = el.value.length - oldLen;
+    el.setSelectionRange(pos + diff, pos + diff);
+  });
+}
+// Inicializar máscaras nos campos existentes
+function _initMasks() {
+  var masks = [
+    ['pvCnpj',    _maskCNPJouCPF],
+    ['fatCnpj',   _maskCNPJouCPF],
+    ['prodCEP',   _maskCEP],
+    ['cepCliente',_maskCEP],
+  ];
+  masks.forEach(function(m) {
+    var el = document.getElementById(m[0]);
+    if (el) _applyMask(el, m[1]);
+  });
+  // Aplicar em todos os inputs com placeholder de CNPJ/CEP
+  document.querySelectorAll('input[placeholder*="000.000"]').forEach(function(el) {
+    _applyMask(el, _maskCNPJouCPF);
+  });
+  document.querySelectorAll('input[placeholder*="00.000.000"]').forEach(function(el) {
+    _applyMask(el, _maskCNPJouCPF);
+  });
+  document.querySelectorAll('input[placeholder*="00000-000"]').forEach(function(el) {
+    _applyMask(el, _maskCEP);
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function(){ setTimeout(_initMasks, 500); });
+
+// ════════════════════════════════════════════════════════
+// CEP → ENDEREÇO (ViaCEP — API pública, sem autenticação)
+// ════════════════════════════════════════════════════════
+async function _buscarCEP(cep, callback) {
+  var cepLimpo = cep.replace(/\D/g, '');
+  if (cepLimpo.length !== 8) return;
+  try {
+    var r = await fetch('https://viacep.com.br/ws/' + cepLimpo + '/json/');
+    var d = await r.json();
+    if (d.erro) { _toast('CEP não encontrado.', 'aviso'); return; }
+    callback(d);
+  } catch(e) {
+    _toast('Erro ao buscar CEP. Verifique sua conexão.', 'erro');
+  }
+}
+
+// Para campos de entrega — preencher endereço do tutor
+function _cepEntrega(cepValue) {
+  _buscarCEP(cepValue, function(d) {
+    var logEl = document.getElementById('entLogradouro');
+    var baiEl = document.getElementById('entBairro');
+    var cidEl = document.getElementById('entCidade');
+    var ufEl  = document.getElementById('entUF');
+    if (logEl) logEl.value = d.logradouro || '';
+    if (baiEl) baiEl.value = d.bairro     || '';
+    if (cidEl) cidEl.value = d.localidade || '';
+    if (ufEl)  ufEl.value  = d.uf         || '';
+    _toast('Endereço preenchido via CEP.', 'ok');
+  });
+}
+
+// Para campos de pedido de venda
+function _cepPedido(cepValue) {
+  _buscarCEP(cepValue, function(d) {
+    var logEl = document.getElementById('pvLogradouro');
+    var baiEl = document.getElementById('pvBairro');
+    var cidEl = document.getElementById('pvCidade');
+    var ufEl  = document.getElementById('pvUF');
+    if (logEl) logEl.value = d.logradouro || '';
+    if (baiEl) baiEl.value = d.bairro     || '';
+    if (cidEl) cidEl.value = d.localidade || '';
+    if (ufEl)  ufEl.value  = d.uf         || '';
+    _toast('Endereço preenchido.', 'ok');
+  });
+}
+
+// ════════════════════════════════════════════════════════
+// EXPORTAÇÃO — Excel (SheetJS) e PDF (impressão)
+// ════════════════════════════════════════════════════════
+
+// ── Excel genérico ────────────────────────────────────
+function _exportarExcel(dados, colunas, nomeArq) {
+  if (!dados || !dados.length) { _toast('Nenhum dado para exportar.', 'aviso'); return; }
+  try {
+    var header = colunas.map(function(c){ return c.label; });
+    var rows   = dados.map(function(row) {
+      return colunas.map(function(c){ return row[c.key] || ''; });
+    });
+    var wb = XLSX.utils.book_new();
+    var ws = XLSX.utils.aoa_to_sheet([header].concat(rows));
+    // Largura das colunas
+    ws['!cols'] = colunas.map(function(){ return { wch: 20 }; });
+    XLSX.utils.book_append_sheet(wb, ws, 'Dados');
+    XLSX.writeFile(wb, nomeArq + '.xlsx');
+    _toast('Exportado com sucesso.', 'ok');
+  } catch(e) {
+    _toast('Erro ao exportar: ' + e.message, 'erro');
+  }
+}
+
+// ── Exportar Pedidos de Venda ─────────────────────────
+function pvExportarExcel() {
+  var lista = getPedidosVenda();
+  var dados = lista.map(function(p) {
+    return {
+      num:       'PV#' + p.num,
+      cliente:   p.cliente || '',
+      vendedora: p.vendedora || '',
+      data:      p.dataCriacao ? p.dataCriacao.substring(0,10) : '',
+      total:     p.total ? p.total.toFixed(2).replace('.',',') : '0,00',
+      condicao:  p.condicao || '',
+      status:    p.status || '',
+    };
+  });
+  _exportarExcel(dados, [
+    {key:'num',label:'Pedido'},{key:'cliente',label:'Cliente'},
+    {key:'vendedora',label:'Vendedora'},{key:'data',label:'Data'},
+    {key:'total',label:'Total (R$)'},{key:'condicao',label:'Condição'},
+    {key:'status',label:'Status'},
+  ], 'Pedidos_Venda_' + new Date().toISOString().substring(0,10));
+}
+
+// ── Exportar Faturamentos ─────────────────────────────
+function fatExportarExcel() {
+  var lista = getFaturamentos();
+  var dados = lista.map(function(f) {
+    return {
+      fat:      'FAT#' + f.num,
+      pv:       'PV#'  + f.pvNum,
+      cliente:  f.cliente || '',
+      venc:     f.vencimento || '',
+      valor:    f.valor ? f.valor.toFixed(2).replace('.',',') : '0,00',
+      status:   f.status || '',
+      nfe:      f.statusNFe === 'emitida' ? 'Emitida' : 'Pendente',
+    };
+  });
+  _exportarExcel(dados, [
+    {key:'fat',label:'FAT#'},{key:'pv',label:'PV#'},
+    {key:'cliente',label:'Cliente'},{key:'venc',label:'Vencimento'},
+    {key:'valor',label:'Valor (R$)'},{key:'status',label:'Status'},
+    {key:'nfe',label:'NF-e'},
+  ], 'Faturamentos_' + new Date().toISOString().substring(0,10));
+}
+
+// ── Exportar Entregas ─────────────────────────────────
+function entExportarExcel() {
+  var lista = getEntregas();
+  var dados = lista.map(function(e) {
+    return {
+      num:      e.num || '',
+      cliente:  e.cliente || e.tutor || '',
+      descricao:e.descricao || '',
+      data:     e.data || '',
+      status:   e.status || '',
+      valor:    e.valor ? parseFloat(e.valor).toFixed(2).replace('.',',') : '',
+      nf:       e.nf || '',
+      canhoto:  e.canhoto ? 'Sim — ' + (e.canhoto.assinante||'') : 'Não',
+    };
+  });
+  _exportarExcel(dados, [
+    {key:'num',label:'#'},{key:'cliente',label:'Cliente/Tutor'},
+    {key:'descricao',label:'Descrição'},{key:'data',label:'Data'},
+    {key:'status',label:'Status'},{key:'valor',label:'Valor (R$)'},
+    {key:'nf',label:'NF'},{key:'canhoto',label:'Canhoto'},
+  ], 'Entregas_' + new Date().toISOString().substring(0,10));
+}
+
+// ── Exportar Estoque ──────────────────────────────────
+function estExportarExcel() {
+  var lista;
+  try { lista = JSON.parse(localStorage.getItem('gl_produtos')||'[]'); } catch(e){ lista=[]; }
+  var dados = lista.map(function(p) {
+    return {
+      nome:     p.nome || '',
+      qtd:      p.quantidade || 0,
+      custo:    p.custo ? parseFloat(p.custo).toFixed(2).replace('.',',') : '',
+      minimo:   p.minimo || 0,
+      alerta:   (parseInt(p.quantidade)||0) < (parseInt(p.minimo)||0) ? 'Sim' : 'Não',
+    };
+  });
+  _exportarExcel(dados, [
+    {key:'nome',label:'Produto'},{key:'qtd',label:'Quantidade'},
+    {key:'custo',label:'Custo Unit. (R$)'},{key:'minimo',label:'Mín.'},
+    {key:'alerta',label:'Alerta'},
+  ], 'Estoque_' + new Date().toISOString().substring(0,10));
+}
 </script>anhotoVerFoto(entId) {
   var entregas = getEntregas();
   var e = entregas.find(function(x){ return x.id === entId; });
@@ -15529,6 +15823,42 @@ window.addEventListener('load',()=>{
       </div>
     </div>
 
+    <!-- Endereço de entrega -->
+    <details style="margin-bottom:14px;">
+      <summary style="cursor:pointer;font-size:11px;font-weight:700;color:var(--blue);
+        text-transform:uppercase;letter-spacing:.8px;padding:8px 0;list-style:none;
+        display:flex;align-items:center;gap:6px;">
+        <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 16 16"><path d="M8 1a5 5 0 010 10L8 15 8 11a5 5 0 010-10z"/><circle cx="8" cy="6" r="1.5" fill="currentColor"/></svg>
+        Endereço de entrega (opcional)
+      </summary>
+      <div style="padding-top:10px;display:grid;grid-template-columns:120px 1fr;gap:10px;margin-bottom:10px;">
+        <div>
+          <label class="mod-label" for="pvCEP">CEP</label>
+          <input type="text" id="pvCEP" class="inp" placeholder="00000-000" maxlength="9"
+            oninput="this.value=_maskCEP(this.value)"
+            onblur="if(this.value.replace(/\D/g,'').length===8)_cepPedido(this.value)">
+        </div>
+        <div>
+          <label class="mod-label" for="pvLogradouro">Logradouro</label>
+          <input type="text" id="pvLogradouro" class="inp" placeholder="Rua, Av..." maxlength="100">
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 80px;gap:10px;margin-bottom:10px;">
+        <div>
+          <label class="mod-label" for="pvBairro">Bairro</label>
+          <input type="text" id="pvBairro" class="inp" placeholder="Bairro" maxlength="60">
+        </div>
+        <div>
+          <label class="mod-label" for="pvCidade">Cidade</label>
+          <input type="text" id="pvCidade" class="inp" placeholder="Cidade" maxlength="60">
+        </div>
+        <div>
+          <label class="mod-label" for="pvUF">UF</label>
+          <input type="text" id="pvUF" class="inp" placeholder="SP" maxlength="2">
+        </div>
+      </div>
+    </details>
+
     <div class="field" style="margin-bottom:14px;">
       <label class="mod-label" for="pvObs">Observações</label>
       <textarea id="pvObs" class="inp" rows="2" placeholder="Instruções de entrega, observações..." style="resize:vertical;"></textarea>
@@ -15545,12 +15875,17 @@ window.addEventListener('load',()=>{
       <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--blue);">
         Meus Pedidos
       </div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+      <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
         <button class="mod-btn primary" onclick="pvRenderLista('todos')" style="font-size:10px;padding:4px 10px;">Todos</button>
         <button class="mod-btn" onclick="pvRenderLista('aberto')" style="font-size:10px;padding:4px 10px;">Em aberto</button>
         <button class="mod-btn" onclick="pvRenderLista('analise')" style="font-size:10px;padding:4px 10px;">Em análise</button>
         <button class="mod-btn" onclick="pvRenderLista('aprovado')" style="font-size:10px;padding:4px 10px;">Aprovado</button>
         <button class="mod-btn" onclick="pvRenderLista('faturado')" style="font-size:10px;padding:4px 10px;">Faturado</button>
+        <select id="pvFiltroVendedora" class="inp" onchange="pvRenderLista()"
+          style="font-size:11px;height:30px;padding:0 8px;min-width:110px;"
+          title="Filtrar por vendedora">
+          <option value="">Todas</option>
+        </select>
       </div>
     </div>
     <div style="overflow-x:auto;">
@@ -15679,6 +16014,11 @@ window.addEventListener('load',()=>{
       <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--blue);">
         Títulos Gerados
       </div>
+      <button class="mod-btn" onclick="fatExportarExcel()"
+        style="font-size:10px;padding:4px 10px;display:flex;align-items:center;gap:5px;">
+        <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 16 16"><path d="M8 1v10M4 7l4 4 4-4"/><rect x="1" y="12" width="14" height="3" rx="1"/></svg>
+        Excel
+      </button>
       <div style="display:flex;gap:6px;flex-wrap:wrap;">
         <button class="mod-btn primary" onclick="fatRenderLista('todos')" style="font-size:10px;padding:4px 10px;">Todos</button>
         <button class="mod-btn" onclick="fatRenderLista('aberto')" style="font-size:10px;padding:4px 10px;">Em aberto</button>
@@ -16444,6 +16784,7 @@ window.addEventListener('load',()=>{
   <div class="step-label" style="margin-top:8px;">
     <div class="step-num">ST</div>
     <div class="step-title">Controle de Estoque <span class="step-sub">— produtos, quantidades e histórico</span></div>
+    <button class="mod-btn" onclick="estExportarExcel()" style="font-size:10px;padding:4px 10px;display:flex;align-items:center;gap:5px;margin-left:auto;"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 16 16"><path d="M8 1v10M4 7l4 4 4-4"/><rect x="1" y="12" width="14" height="3" rx="1"/></svg> Excel</button>
   </div>
 
   
@@ -16596,6 +16937,7 @@ window.addEventListener('load',()=>{
   <div class="step-label" style="margin-top:8px;">
     <div class="step-num">EN</div>
     <div class="step-title">Controle de Entregas <span class="step-sub">— pedidos e status de entrega</span></div>
+    <button class="mod-btn" onclick="entExportarExcel()" style="font-size:10px;padding:4px 10px;display:flex;align-items:center;gap:5px;margin-left:auto;"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 16 16"><path d="M8 1v10M4 7l4 4 4-4"/><rect x="1" y="12" width="14" height="3" rx="1"/></svg> Excel</button>
   </div>
 
   <!-- ═══ MÉTRICAS POR PERÍODO ═══ -->
