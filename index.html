@@ -5851,12 +5851,22 @@ function getMetas() {
   try { return JSON.parse(localStorage.getItem('gl_metas') || 'null'); } catch(e) { return null; }
 }
 function abrirModalMetas() {
+  var modal = document.getElementById('modalMetas');
+  if (!modal) { _toast('Modal de metas não encontrado.', 'erro'); return; }
+  // Mostrar modal ANTES de setar valores — garante que inputs estão ativos no iOS
+  modal.style.display = 'flex';
   var m = getMetas() || {};
-  document.getElementById('metaFaturamento').value  = m.faturamento  || '';
-  document.getElementById('metaMargem').value       = m.margem       || '';
-  document.getElementById('metaFatAtual').value     = m.fat_atual    || '';
-  document.getElementById('metaMargemAtual').value  = m.margem_atual || '';
-  document.getElementById('modalMetas').style.display = 'flex';
+  setTimeout(function() {
+    var f1 = document.getElementById('metaFaturamento');
+    var f2 = document.getElementById('metaMargem');
+    var f3 = document.getElementById('metaFatAtual');
+    var f4 = document.getElementById('metaMargemAtual');
+    if (f1) f1.value = m.faturamento  || '';
+    if (f2) f2.value = m.margem       || '';
+    if (f3) f3.value = m.fat_atual    || '';
+    if (f4) f4.value = m.margem_atual || '';
+    if (f1) f1.focus();
+  }, 50);
 }
 function fecharModalMetas() { document.getElementById('modalMetas').style.display = 'none'; }
 function salvarMetas() {
